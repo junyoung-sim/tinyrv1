@@ -39,4 +39,16 @@ async def test_random(dut):
   clock = Clock(dut.clk, 10, units="ns")
   cocotb.start_soon(clock.start(start_high=False))
 
-  
+  q = x
+
+  for t in range(1000000):
+    rst = random.randint(0, 1)
+    en  = random.randint(0, 1)
+    d   = random.randint(0, pow(2,32)-1)
+
+    await check(dut, rst, en, d, q)
+
+    if rst:
+      q = 0
+    elif en:
+      q = d
