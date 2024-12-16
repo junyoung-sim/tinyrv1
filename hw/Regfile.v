@@ -12,7 +12,7 @@ module Regfile
   (* keep=1 *) input  logic [4:0]  raddr0,
   (* keep=1 *) output logic [31:0] rdata0,
   (* keep=1 *) input  logic [4:0]  raddr1,
-  (* keep=1 *) output logic [31:0] rdata1,
+  (* keep=1 *) output logic [31:0] rdata1
 );
 
   logic [31:0] R [32];
