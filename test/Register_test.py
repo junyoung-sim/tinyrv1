@@ -27,12 +27,12 @@ async def test_enable(dut):
   clock = Clock(dut.clk, 10, units="ns")
   cocotb.start_soon(clock.start(start_high=False))
 
-  await check(dut, 1, 0, 0x00000000, x          )
-  await check(dut, 0, 1, 0xabcdabcd, 0x00000000 )
-  await check(dut, 0, 1, 0xcafe2300, 0xabcdabcd )
-  await check(dut, 0, 1, 0xdeadbeef, 0xcafe2300 )
-  await check(dut, 0, 0, 0xffffffff, 0xdeadbeef )
-  await check(dut, 0, 0, 0xffffffff, 0xdeadbeef )
+  await check(dut, 1, 0, 0x00000000, x         )
+  await check(dut, 0, 1, 0xabcdabcd, 0x00000000)
+  await check(dut, 0, 1, 0xcafe2300, 0xabcdabcd)
+  await check(dut, 0, 1, 0xdeadbeef, 0xcafe2300)
+  await check(dut, 0, 0, 0xffffffff, 0xdeadbeef)
+  await check(dut, 0, 0, 0xffffffff, 0xdeadbeef)
 
 @cocotb.test()
 async def test_random(dut):

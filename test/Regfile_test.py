@@ -12,7 +12,7 @@ async def write(dut, wen, waddr, wdata):
 
   await RisingEdge(dut.clk)
 
-async def read(dut, raddr0, raddr1, rdata0, rdata1):
+async def read(dut, raddr0, rdata0, raddr1, rdata1):
   dut.raddr0.value = raddr0
   dut.raddr1.value = raddr1
 
@@ -27,4 +27,4 @@ async def test_read_init(dut):
   cocotb.start_soon(clock.start(start_high=False))
 
   for i in range(1, 32):
-    await read(dut, 0, i, 0, x)
+    await read(dut, 0, 0, i, x)
