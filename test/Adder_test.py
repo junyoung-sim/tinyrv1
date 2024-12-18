@@ -3,8 +3,6 @@ import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import *
 
-x = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-
 async def check(dut, in0, in1, sum):
   dut.in0.value = in0
   dut.in1.value = in1
