@@ -13,11 +13,17 @@ async def check(dut, sel, in0, in1, out):
 
 @cocotb.test()
 async def test_simple(dut):
+
+  # simple input selection
+
   await check(dut, 0, 0xbeefcafe, 0xfeedbeef, 0xbeefcafe)
   await check(dut, 1, 0xbeefcafe, 0xfeedbeef, 0xfeedbeef)
 
 @cocotb.test()
 async def test_random(dut):
+
+  # randomly select random inputs
+
   for t in range(1000000):
     sel = random.randint(0, 1)
     in0 = random.randint(0, pow(2,32)-1)

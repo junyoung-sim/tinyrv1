@@ -43,6 +43,8 @@ async def test_random(dut):
   clock = Clock(dut.clk, 10, units="ns")
   cocotb.start_soon(clock.start(start_high=False))
 
+  # randomly reset, enable, and write register
+
   q = x
 
   for t in range(1000000):
