@@ -8,7 +8,7 @@ module Mux2
   (* keep=1 *) input  logic             sel,
   (* keep=1 *) input  logic [nbits-1:0] in0,
   (* keep=1 *) input  logic [nbits-1:0] in1,
-  (* keep=1 *) output logic [nbits-1:0] out,
+  (* keep=1 *) output logic [nbits-1:0] out
 );
 
   always_comb begin
