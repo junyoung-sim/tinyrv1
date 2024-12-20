@@ -1,6 +1,6 @@
 module cocotb_iverilog_dump();
 initial begin
-    $dumpfile("sim_build/Mux4.fst");
-    $dumpvars(0, Mux4);
+    $dumpfile("sim_build/EqComp.fst");
+    $dumpvars(0, EqComp);
 end
 endmodule
