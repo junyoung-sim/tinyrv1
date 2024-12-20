@@ -26,7 +26,7 @@ async def check (
   dut.dmemreq_wdata.value = dmemreq_wdata
 
   await RisingEdge(dut.clk)
-  assert dut.imemresp_data.value == imemresp_data, "FAILED (imem)"
+  assert dut.imemresp_data.value  == imemresp_data,  "FAILED (imem)"
   assert dut.dmemresp_rdata.value == dmemresp_rdata, "FAILED (dmem)"
 
 @cocotb.test()
@@ -39,3 +39,30 @@ async def test_simple(dut):
   await check(dut, 0,  0, 0,   x,          0, 0, 0,   0,          x         )
   await check(dut, 0,  0, 0,   x,          1, 1, 0,   0xcafe2300, x         )
   await check(dut, 0,  1, 0,   0xcafe2300, 1, 0, 0,   0,          0xcafe2300)
+
+@cocotb.test()
+async def test_reset(dut):
+  clock = Clock(dut.clk, 10, units="ns")
+  cocotb.start_soon(clock.start(start_high=False))
+
+  #                    -------imem------- ---------------dmem---------------
+  #                rst v  addr data        v  t  addr wdata       rdata
+  await check(dut, 1,  0, 0,   x,          0, 0, 0,   0,          x         )
+  await check(dut, 0,  1, 0,   0,          1, 0, 0,   0,          0         )
+  await check(dut, 0,  1, 1,   0,          1, 0, 1,   0,          0         )
+  await check(dut, 0,  1, 2,   0,          1, 0, 2,   0,          0         )
+
+@cocotb.test()
+async def test_dmem(dut):
+  clock = Clock(dut.clk, 10, units="ns")
+  cocotb.start_soon(clock.start(start_high=False))
+
+@cocotb.test()
+async def test_dmem_imem(dut):
+  clock = Clock(dut.clk, 10, units="ns")
+  cocotb.start_soon(clock.start(start_high=False))
+
+@cocotb.test()
+async def test_random(dut):
+  clock = Clock(dut.clk, 10, units="ns")
+  cocotb.start_soon(clock.start(start_high=False))
