@@ -45,12 +45,12 @@ module ProcMem
 
   always_comb begin
     imemresp_data = 32'bx;
-    dmemresp_data = 32'bx;
+    dmemresp_rdata = 32'bx;
 
     if(imemreq_val)
-      imemresp_data = mem[imemreq_addr[$clog(memsize)+1:2]];
+      imemresp_data = mem[imemreq_addr[$clog2(memsize)+1:2]];
     if(dmemreq_val && (dmemreq_type == 0))
-      dmemresp_data = mem[dmemreq_addr[$clog(memsize)+1:2]];
+      dmemresp_rdata = mem[dmemreq_addr[$clog2(memsize)+1:2]];
   end
 
 endmodule
