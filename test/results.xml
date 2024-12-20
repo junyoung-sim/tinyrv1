@@ -1,6 +1,6 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1734722581" />
-    <testcase name="test_random" classname="EqComp_test" file="/home/junyoung-sim/ECE/tinyrv1/test/EqComp_test.py" lineno="21" time="67.90881896018982" sim_time_ns="10000000.001" ratio_time="147256.27914192263" />
+    <property name="random_seed" value="1734724564" />
+    <testcase name="test_random" classname="ALU_test" file="/home/junyoung-sim/ECE/tinyrv1/test/ALU_test.py" lineno="30" time="63.922998905181885" sim_time_ns="10000000.001" ratio_time="156438.21742207647" />
   </testsuite>
 </testsuites>
