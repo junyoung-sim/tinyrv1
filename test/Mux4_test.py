@@ -19,7 +19,7 @@ async def test_random(dut):
   # randomly select random inputs
 
   for t in range(1000000):
-    sel = random.randint(0, 1)
+    sel = random.randint(0, 3)
     in0 = random.randint(0, pow(2,32)-1)
     in1 = random.randint(0, pow(2,32)-1)
     in2 = random.randint(0, pow(2,32)-1)
@@ -34,4 +34,4 @@ async def test_random(dut):
     elif sel == 3:
       out = in3
 
-    await check(dut, sel, in0, in1, out)
+    await check(dut, sel, in0, in1, in2, in3, out)
