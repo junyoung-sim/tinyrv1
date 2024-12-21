@@ -53,16 +53,30 @@ async def test_reset(dut):
   await check(dut, 0,  1, 2,   0,          1, 0, 2,   0,          0         )
 
 @cocotb.test()
-async def test_dmem(dut):
-  clock = Clock(dut.clk, 10, units="ns")
-  cocotb.start_soon(clock.start(start_high=False))
-
-@cocotb.test()
 async def test_dmem_imem(dut):
   clock = Clock(dut.clk, 10, units="ns")
   cocotb.start_soon(clock.start(start_high=False))
+
+  #                    -------imem------- ---------------dmem---------------
+  #                rst v  addr data        v  t  addr wdata       rdata
+  await check(dut, 0,  0, 0,   x,          1, 1, 0,   0xcafe2300, x         )
+  await check(dut, 0,  0, 0,   x,          0, 1, 0,   0x00000000, x         )
+  await check(dut, 0,  0, 0,   x,          1, 1, 4,   0xacedbead, x         )
+  await check(dut, 0,  0, 0,   x,          0, 1, 4,   0x00000000, x         )
+  await check(dut, 0,  0, 0,   x,          1, 1, 8,   0xdeadface, x         )
+  await check(dut, 0,  0, 0,   x,          0, 1, 8,   0x00000000, x         )
+  await check(dut, 0,  0, 0,   x,          1, 1, 12,  0xfeedbeef, x         )
+  await check(dut, 0,  0, 0,   x,          0, 1, 12,  0x00000000, x         )
+  await check(dut, 0,  0, 0,   x,          1, 1, 16,  0xeeceecee, x         )
+  await check(dut, 0,  0, 0,   x,          0, 1, 16,  0x00000000, x         )
+  await check(dut, 0,  1, 0,   0xcafe2300, 1, 0, 0,   0,          0xcafe2300)
+  await check(dut, 0,  1, 4,   0xacedbead, 1, 0, 4,   0,          0xacedbead)
+  await check(dut, 0,  1, 8,   0xdeadface, 1, 0, 8,   0,          0xdeadface)
+  await check(dut, 0,  1, 12,  0xfeedbeef, 1, 0, 12,  0,          0xfeedbeef)
+  await check(dut, 0,  1, 16,  0xeeceecee, 1, 0, 16,  0,          0xeeceecee)
 
 @cocotb.test()
 async def test_random(dut):
   clock = Clock(dut.clk, 10, units="ns")
   cocotb.start_soon(clock.start(start_high=False))
+
