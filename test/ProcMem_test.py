@@ -34,6 +34,8 @@ async def test_simple(dut):
   clock = Clock(dut.clk, 10, units="ns")
   cocotb.start_soon(clock.start(start_high=False))
 
+  # test simple memory read/write
+
   #                    -------imem------- ---------------dmem---------------
   #                rst v  addr data        v  t  addr wdata       rdata
   await check(dut, 0,  0, 0,   x,          0, 0, 0,   0,          x         )
@@ -45,17 +47,22 @@ async def test_reset(dut):
   clock = Clock(dut.clk, 10, units="ns")
   cocotb.start_soon(clock.start(start_high=False))
 
+  # test memory reset behavior
+
   #                    -------imem------- ---------------dmem---------------
   #                rst v  addr data        v  t  addr wdata       rdata
   await check(dut, 1,  0, 0,   x,          0, 0, 0,   0,          x         )
   await check(dut, 0,  1, 0,   0,          1, 0, 0,   0,          0         )
-  await check(dut, 0,  1, 1,   0,          1, 0, 1,   0,          0         )
-  await check(dut, 0,  1, 2,   0,          1, 0, 2,   0,          0         )
+  await check(dut, 0,  1, 4,   0,          1, 0, 4,   0,          0         )
+  await check(dut, 0,  1, 8,   0,          1, 0, 8,   0,          0         )
 
 @cocotb.test()
 async def test_dmem_imem(dut):
   clock = Clock(dut.clk, 10, units="ns")
   cocotb.start_soon(clock.start(start_high=False))
+
+  # test memory write via dmem with varying val signal
+  # test memory read via both imem and dmem
 
   #                    -------imem------- ---------------dmem---------------
   #                rst v  addr data        v  t  addr wdata       rdata
@@ -80,3 +87,36 @@ async def test_random(dut):
   clock = Clock(dut.clk, 10, units="ns")
   cocotb.start_soon(clock.start(start_high=False))
 
+  # randomly read/write memory
+
+  memsize = pow(2,6)
+
+  M = []
+  for i in range(memsize):
+    M.append(random.randint(0, pow(2,32)-1))
+    await check(dut, 0, 0, 0, x, 1, 1, i << 2, M[i], x)
+  
+  for t in range(1000000):
+    rst    = 0
+    ival   = random.randint(0, 1)           # imemreq_val
+    iaddr  = random.randint(0, memsize-1)   # imemreq_addr
+    dval   = random.randint(0, 1)           # dmemreq_val
+    dtype  = random.randint(0, 1)           # dmemreq_type
+    daddr  = random.randint(0, memsize-1)   # dmemreq_addr
+    dwdata = random.randint(0, pow(2,32)-1) # dmemreq_wdata
+
+    irdata = x # imemresp_data
+    drdata = x # dmemresp_rdata
+
+    if ival:
+      irdata = M[iaddr]
+    if dval & (dtype == 0):
+      drdata = M[daddr]
+    
+    await check (
+      dut, rst, ival, iaddr << 2, irdata, 
+      dval, dtype, daddr << 2, dwdata, drdata
+    )
+
+    if dval & (dtype == 1):
+      M[daddr] = dwdata

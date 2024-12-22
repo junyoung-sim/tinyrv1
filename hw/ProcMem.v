@@ -33,6 +33,7 @@ module ProcMem
 
   always_ff @(posedge clk) begin
     if(rst) begin
+      // replace with default assembly program sequence
       for(int i = 0; i < memsize; i++)
         mem[i] <= 32'b0;
     end
