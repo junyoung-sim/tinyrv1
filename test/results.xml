@@ -1,6 +1,0 @@
-<testsuites name="results">
-  <testsuite name="all" package="all">
-    <property name="random_seed" value="1734829798" />
-    <testcase name="test_random" classname="ProcMem_test" file="/home/junyoung-sim/ECE/tinyrv1/test/ProcMem_test.py" lineno="85" time="142.00165176391602" sim_time_ns="10000635.001" ratio_time="70426.18784200127" />
-  </testsuite>
-</testsuites>
