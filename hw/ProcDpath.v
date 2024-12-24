@@ -1,6 +1,7 @@
 `ifndef PROCDPATH_V
 `define PROCDPATH_V
 
+`include "../hw/ALU.v"
 `include "../hw/Mux4.v"
 `include "../hw/Adder.v"
 `include "../hw/Regfile.v"
@@ -25,11 +26,14 @@ module ProcDpath
   (* keep=1 *) input  logic        c2d_op2_byp_sel_D,
   (* keep=1 *) input  logic        c2d_op1_sel_D,
   (* keep=1 *) input  logic        c2d_op2_sel_D,
+  (* keep=1 *) input  logic        c2d_alu_fn_X,
+  (* keep=1 *) input  logic        c2d_result_sel_X,
   (* keep=1 *) input  logic        c2d_imemreq_val,
 
   // Status Signals
 
-  (* keep=1 *) output logic [31:0] d2c_inst;
+  (* keep=1 *) output logic        d2c_eq,
+  (* keep=1 *) output logic [31:0] d2c_inst
 );
 
   //==========================================================
@@ -52,6 +56,14 @@ module ProcDpath
     .raddr1(rs2_addr),
     .rdata1(rs2),
   );
+
+  //==========================================================
+  // Bypass Paths
+  //==========================================================
+
+  logic [31:0] result_X;
+  logic [31:0] result_M;
+  logic [31:0] result_W;
 
   //==========================================================
   // Stage F
@@ -121,7 +133,7 @@ module ProcDpath
   Mux4#(32) op1_bypass_mux (
     .sel(c2d_op1_byp_sel_D),
     .in0(rs1),
-    .in1(32'b0),
+    .in1(result_X),
     .in2(32'b0),
     .in3(32'b0),
     .out(op1_bypass)
@@ -130,7 +142,7 @@ module ProcDpath
   Mux4#(32) op2_bypass_mux (
     .sel(c2d_op2_byp_sel_D),
     .in0(rs2),
-    .in1(32'b0),
+    .in1(result_X),
     .in2(32'b0),
     .in3(32'b0),
     .out(op2_bypass)
@@ -178,7 +190,27 @@ module ProcDpath
   // Stage X
   //==========================================================
 
+  // Arithmetic Logic Unit
 
+  logic [31:0] alu_out;
+
+  ALU alu (
+    .op(c2d_alu_fn_X),
+    .in0(op1),
+    .in1(op2),
+    .out(alu_out)
+  );
+
+  assign d2c_eq = alu_out[0];
+
+  // Result Selection
+
+  Mux2#(32) result_X_mux (
+    .sel(c2d_result_sel_X),
+    .in0(alu_out),
+    .in1(32'b0),
+    .out(result_X)
+  );
 
 endmodule
 
