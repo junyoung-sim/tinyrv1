@@ -61,9 +61,9 @@ module ProcDpath
   // Bypass Paths
   //==========================================================
 
-  logic [31:0] result_X;
-  logic [31:0] result_M;
-  logic [31:0] result_W;
+  logic [31:0] result_X_next;
+  logic [31:0] result_M_next;
+  logic [31:0] result_W_next;
 
   //==========================================================
   // Stage F
@@ -133,7 +133,7 @@ module ProcDpath
   Mux4#(32) op1_bypass_mux (
     .sel(c2d_op1_byp_sel_D),
     .in0(rs1),
-    .in1(result_X),
+    .in1(result_X_next),
     .in2(32'b0),
     .in3(32'b0),
     .out(op1_bypass)
@@ -142,7 +142,7 @@ module ProcDpath
   Mux4#(32) op2_bypass_mux (
     .sel(c2d_op2_byp_sel_D),
     .in0(rs2),
-    .in1(result_X),
+    .in1(result_X_next),
     .in2(32'b0),
     .in3(32'b0),
     .out(op2_bypass)
@@ -209,7 +209,17 @@ module ProcDpath
     .sel(c2d_result_sel_X),
     .in0(alu_out),
     .in1(32'b0),
-    .out(result_X)
+    .out(result_X_next)
+  );
+
+  logic [31:0] result_X;
+
+  Register#(32) result_XM (
+    .clk(clk),
+    .rst(rst),
+    .en(1'b1),
+    .d(result_X_next),
+    .q(result_X),
   );
 
 endmodule
