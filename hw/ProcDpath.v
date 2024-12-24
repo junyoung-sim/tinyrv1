@@ -29,6 +29,8 @@ module ProcDpath
   (* keep=1 *) input  logic        c2d_alu_fn_X,
   (* keep=1 *) input  logic        c2d_result_sel_X,
   (* keep=1 *) input  logic        c2d_wb_sel_M,
+  (* keep=1 *) input  logic        c2d_rf_wen_W,
+  (* keep=1 *) input  logic        c2d_rf_waddr_W,
   (* keep=1 *) input  logic        c2d_imemreq_val,
 
   // Status Signals
@@ -41,6 +43,10 @@ module ProcDpath
   // Register File
   //==========================================================
 
+  logic        rf_wen;
+  logic [4:0]  rf_waddr;
+  logic [31:0] rf_wdata;
+
   logic [4:0]  rs1_addr;
   logic [4:0]  rs2_addr;
 
@@ -49,9 +55,9 @@ module ProcDpath
 
   Regfile RF (
     .clk(clk),
-    .wen(),
-    .waddr(),
-    .wdata(),
+    .wen(rf_wen),
+    .waddr(rf_waddr),
+    .wdata(rf_wdata),
     .raddr0(rs1_addr),
     .rdata0(rs1),
     .raddr1(rs2_addr),
@@ -136,7 +142,7 @@ module ProcDpath
     .in0(rs1),
     .in1(result_X_next),
     .in2(result_M_next),
-    .in3(32'b0),
+    .in3(result_W_next),
     .out(op1_bypass)
   );
 
@@ -145,7 +151,7 @@ module ProcDpath
     .in0(rs2),
     .in1(result_X_next),
     .in2(result_M_next),
-    .in3(32'b0),
+    .in3(result_W_next),
     .out(op2_bypass)
   );
 
@@ -246,7 +252,15 @@ module ProcDpath
     .q(result_M),
   );
 
-  
+  //==========================================================
+  // Stage W
+  //==========================================================
+
+  assign result_W_next = result_M;
+
+  assign rf_wen   = c2d_rf_wen_W;
+  assign rf_waddr = c2d_rf_waddr_W;
+  assign rf_wdata = result_W_next;
 
 endmodule
 
