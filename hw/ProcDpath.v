@@ -28,6 +28,7 @@ module ProcDpath
   (* keep=1 *) input  logic        c2d_op2_sel_D,
   (* keep=1 *) input  logic        c2d_alu_fn_X,
   (* keep=1 *) input  logic        c2d_result_sel_X,
+  (* keep=1 *) input  logic        c2d_wb_sel_M,
   (* keep=1 *) input  logic        c2d_imemreq_val,
 
   // Status Signals
@@ -134,7 +135,7 @@ module ProcDpath
     .sel(c2d_op1_byp_sel_D),
     .in0(rs1),
     .in1(result_X_next),
-    .in2(32'b0),
+    .in2(result_M_next),
     .in3(32'b0),
     .out(op1_bypass)
   );
@@ -143,7 +144,7 @@ module ProcDpath
     .sel(c2d_op2_byp_sel_D),
     .in0(rs2),
     .in1(result_X_next),
-    .in2(32'b0),
+    .in2(result_M_next),
     .in3(32'b0),
     .out(op2_bypass)
   );
@@ -221,6 +222,31 @@ module ProcDpath
     .d(result_X_next),
     .q(result_X),
   );
+
+  //==========================================================
+  // Stage M
+  //==========================================================
+
+  // Write Selection
+
+  Mux2#(32) wb_mux (
+    .sel(c2d_wb_sel_M),
+    .in0(result_X),
+    .in1(32'b0),
+    .out(result_M_next),
+  );
+
+  logic [31:0] result_M;
+
+  Register#(32) result_MW (
+    .clk(clk),
+    .rst(rst),
+    .en(1'b1),
+    .d(result_M_next),
+    .q(result_M),
+  );
+
+  
 
 endmodule
 
