@@ -21,6 +21,7 @@ module ProcDpath
   // Control Signals
 
   (* keep=1 *) input  logic        c2d_reg_en_F,
+  (* keep=1 *) input  logic [1:0]  c2d_pc_sel_F,
   (* keep=1 *) input  logic        c2d_reg_en_D,
   (* keep=1 *) input  logic        c2d_op1_byp_sel_D,
   (* keep=1 *) input  logic        c2d_op2_byp_sel_D,
@@ -30,12 +31,12 @@ module ProcDpath
   (* keep=1 *) input  logic        c2d_result_sel_X,
   (* keep=1 *) input  logic        c2d_wb_sel_M,
   (* keep=1 *) input  logic        c2d_rf_wen_W,
-  (* keep=1 *) input  logic        c2d_rf_waddr_W,
+  (* keep=1 *) input  logic [4:0]  c2d_rf_waddr_W,
   (* keep=1 *) input  logic        c2d_imemreq_val,
 
   // Status Signals
 
-  (* keep=1 *) output logic        d2c_eq,
+  (* keep=1 *) output logic        d2c_eq_X,
   (* keep=1 *) output logic [31:0] d2c_inst
 );
 
@@ -98,6 +99,7 @@ module ProcDpath
   );
 
   Mux4#(32) pc_mux (
+    .sel(c2d_pc_sel_F),
     .in0(pc_plus_4),
     .in1(32'b0),
     .in2(32'b0),
@@ -208,7 +210,7 @@ module ProcDpath
     .out(alu_out)
   );
 
-  assign d2c_eq = alu_out[0];
+  assign d2c_eq_X = alu_out[0];
 
   // Result Selection
 
