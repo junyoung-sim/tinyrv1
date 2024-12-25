@@ -28,7 +28,6 @@ module ProcCtrl
   (* keep=1 *) output logic        c2d_reg_en_D,
   (* keep=1 *) output logic        c2d_op1_byp_sel_D,
   (* keep=1 *) output logic        c2d_op2_byp_sel_D,
-
   (* keep=1 *) output logic        c2d_op1_sel_D,
   (* keep=1 *) output logic        c2d_op2_sel_D,
   (* keep=1 *) output logic        c2d_alu_fn_X,
@@ -159,12 +158,15 @@ module ProcCtrl
   endtask
 
   always_comb begin
-    case(inst_D)
-      //         op1 op2
-      `ADD: cs_D( 0,  0 );
-
-      default: cs_D( 'x, 'x );
-    endcase
+    if(val_D) begin
+      case(inst_D)
+        //         op1 op2
+        `ADD: cs_D( 0,  0 );
+        default: cs_D( 'x, 'x );
+      endcase
+    end
+    else
+      cs_D( 'x, 'x );
   end
 
   //==========================================================
