@@ -1,8 +1,20 @@
 `ifndef PROCCTRL_V
 `define PROCCTRL_V
 
-`include "../hw/TinyRV1.v"
 `include "../hw/Register.v"
+
+//==========================================================
+// Instruction Opcodes
+//==========================================================
+
+`define ADD  32'b0000000_?????_?????_000_?????_0110011
+`define ADDI 32'b???????_?????_?????_000_?????_0010011
+`define MUL  32'b0000001_?????_?????_000_?????_0110011
+`define LW   32'b???????_?????_?????_010_?????_0000011
+`define SW   32'b???????_?????_?????_010_?????_0100011
+`define JAL  32'b???????_?????_?????_???_?????_1101111
+`define JR   32'b???????_?????_?????_000_?????_1100111
+`define BNE  32'b???????_?????_?????_001_?????_1100011
 
 module ProcCtrl
 (
@@ -33,7 +45,7 @@ module ProcCtrl
 );
 
   //==========================================================
-  // Squash Signals
+  // Hazard Signals
   //==========================================================
 
   logic squash_D;
@@ -116,13 +128,15 @@ module ProcCtrl
   );
 
   //==========================================================
-  // Squash
+  // Hazard Management
   //==========================================================
 
+  // Squash
+
   always_comb begin
-    squash_D = val_X & (inst_X == `TINYRV1_INST_BNE) & ~d2c_eq_X;
-    squash_F = squash_D | (val_D & ( (inst_D == `TINYRV1_INST_JAL) 
-                                   | (inst_D == `TINYRV1_INST_JR ) ));
+    squash_D = val_X & (inst_X == `BNE) & ~d2c_eq_X;
+    squash_F = squash_D | (val_D & ( (inst_D == `JAL)
+                                   | (inst_D == `JR ) ));
   end
 
   //==========================================================
@@ -146,8 +160,8 @@ module ProcCtrl
 
   always_comb begin
     case(inst_D)
-      //                      op1 op2
-      `TINYRV1_INST_ADD: cs_D( 0,  0 );
+      //         op1 op2
+      `ADD: cs_D( 0,  0 );
 
       default: cs_D( 'x, 'x );
     endcase
