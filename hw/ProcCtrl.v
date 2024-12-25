@@ -26,8 +26,8 @@ module ProcCtrl
   (* keep=1 *) output logic        c2d_reg_en_F,
   (* keep=1 *) output logic [1:0]  c2d_pc_sel_F,
   (* keep=1 *) output logic        c2d_reg_en_D,
-  (* keep=1 *) output logic        c2d_op1_byp_sel_D,
-  (* keep=1 *) output logic        c2d_op2_byp_sel_D,
+  (* keep=1 *) output logic [1:0]  c2d_op1_byp_sel_D,
+  (* keep=1 *) output logic [1:0]  c2d_op2_byp_sel_D,
   (* keep=1 *) output logic        c2d_op1_sel_D,
   (* keep=1 *) output logic        c2d_op2_sel_D,
   (* keep=1 *) output logic        c2d_alu_fn_X,
@@ -44,11 +44,33 @@ module ProcCtrl
 );
 
   //==========================================================
+  // Control Signals
+  //==========================================================
+
+  logic        reg_en_F;
+  logic [1:0]  pc_sel_F;
+  logic        reg_en_D;
+  logic [1:0]  op1_byp_sel_D;
+  logic [1:0]  op2_byp_sel_D;
+  logic        op1_sel_D;
+  logic        op2_sel_D;
+  logic        alu_fn_X;
+  logic        result_sel_X;
+  logic        wb_sel_M;
+  logic        rf_wen_W;
+  logic [4:0]  rf_waddr_W;
+  logic        imemreq_val;
+
+  //==========================================================
   // Hazard Signals
   //==========================================================
 
   logic squash_D;
   logic squash_F;
+
+  logic stall_lw_X_rs1_D;
+  logic stall_lw_X_rs2_D;
+  logic stall_D;
 
   //==========================================================
   // Instruction Registers
@@ -138,6 +160,20 @@ module ProcCtrl
                                    | (inst_D == `JR ) ));
   end
 
+  // Stall
+
+  always_comb begin
+    stall_lw_X_rs1_D = val_D & val_X
+                             & (inst_X == `LW)
+                             & (inst_D[19:15] == inst_X[11:7])
+                             & (inst_X[11:7] != 0);
+    stall_lw_X_rs2_D = val_D & val_X
+                             & (inst_X == `LW)
+                             & (inst_D[24:20] == inst_X[11:7])
+                             & (inst_X[11:7] != 0);
+    stall_D = val_D & (stall_lw_X_rs1_D | stall_lw_X_rs2_D);
+  end
+
   //==========================================================
   // Stage F
   //==========================================================
@@ -150,11 +186,11 @@ module ProcCtrl
 
   task automatic cs_D
   (
-    input logic op1_sel_D,
-    input logic op2_sel_D
+    input logic _op1_sel_D,
+    input logic _op2_sel_D
   );
-    c2d_op1_sel_D = op1_sel_D;
-    c2d_op2_sel_D = op2_sel_D;
+    op1_sel_D = _op1_sel_D;
+    op2_sel_D = _op2_sel_D;
   endtask
 
   always_comb begin
@@ -186,6 +222,24 @@ module ProcCtrl
   //==========================================================
 
 
+
+  //==========================================================
+  // Control Signal Assignment
+  //==========================================================
+
+  assign c2d_reg_en_F      = reg_en_F;
+  assign c2d_pc_sel_F      = pc_sel_F;
+  assign c2d_reg_en_D      = reg_en_D;
+  assign c2d_op1_byp_sel_D = op1_byp_sel_D;
+  assign c2d_op2_byp_sel_D = op2_byp_sel_D;
+  assign c2d_op1_sel_D     = op1_sel_D;
+  assign c2d_op2_sel_D     = op2_sel_D;
+  assign c2d_alu_fn_X      = alu_fn_X;
+  assign c2d_result_sel_X  = result_sel_X;
+  assign c2d_wb_sel_M      = wb_sel_M;
+  assign c2d_rf_wen_W      = rf_wen_W;
+  assign c2d_rf_waddr_W    = rf_waddr_W;
+  assign c2d_imemreq_val   = imemreq_val;
 
 endmodule
 
