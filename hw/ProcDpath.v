@@ -4,7 +4,6 @@
 `include "../hw/ALU.v"
 `include "../hw/Mux4.v"
 `include "../hw/Adder.v"
-`include "../hw/TinyRV1.v"
 `include "../hw/Regfile.v"
 `include "../hw/Register.v"
 
@@ -132,8 +131,8 @@ module ProcDpath
   // Stage D
   //==========================================================
 
-  assign rs1_addr = inst[`RS1];
-  assign rs2_addr = inst[`RS2];
+  assign rs1_addr = inst[19:15];
+  assign rs2_addr = inst[24:20];
 
   // Operand Bypass Selection
 
