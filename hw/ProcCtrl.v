@@ -155,41 +155,58 @@ module ProcCtrl
 
   // Bypass
 
+  logic rs1_en_D;
+  logic rs2_en_D;
+  
   logic rf_wen_X;
   logic rf_wen_M;
   logic rf_wen_W;
 
   always_comb begin
+    rs1_en_D = (inst_D == `ADD) | (inst_D == `ADDI) |
+               (inst_D == `MUL) | (inst_D == `LW  ) |
+               (inst_D == `SW ) | (inst_D == `JR  ) |
+               (inst_D == `BNE) ;
+    rs2_en_D = (inst_D == `ADD) | (inst_D == `MUL ) |
+               (inst_D == `SW ) | (inst_D == `BNE ) ;
     // X -> D
-    rf_wen_X = (inst_X == `ADD ) | (inst_X == `ADDI) | 
-               (inst_X == `MUL ) | (inst_X == `LW  ) | 
-               (inst_X == `JAL );
-    bypass_waddr_X_rs1_D = val_D & val_X & rf_wen_X
-                                 & (inst_D[`RS1] == inst_X[`RD])
-                                 & (inst_X[`RD] != 0);
-    bypass_waddr_X_rs2_D = val_D & val_X & rf_wen_X
-                                 & (inst_D[`RS2] == inst_X[`RD])
-                                 & (inst_X[`RD] != 0);
+    rf_wen_X = (inst_X == `ADD) | (inst_X == `ADDI) |
+               (inst_X == `MUL) | (inst_X == `LW  ) |
+               (inst_X == `JAL) ;
+    bypass_waddr_X_rs1_D =   val_D & rs1_en_D
+                           & val_X & rf_wen_X
+                           & (inst_D[`RS1] == inst_X[`RD])
+                           & (inst_X[`RD] != 0)
+                           & (inst_X != `LW);
+    bypass_waddr_X_rs2_D =   val_D & rs2_en_D
+                           & val_X & rf_wen_X
+                           & (inst_D[`RS2] == inst_X[`RD])
+                           & (inst_X[`RD] != 0)
+                           & (inst_X != `LW);
     // M -> D
-    rf_wen_M = (inst_M == `ADD ) | (inst_M == `ADDI) | 
-               (inst_M == `MUL ) | (inst_M == `LW  ) | 
-               (inst_M == `JAL );
-    bypass_waddr_M_rs1_D = val_D & val_M & rf_wen_M
-                                 & (inst_D[`RS1] == inst_M[`RD])
-                                 & (inst_M[`RD] != 0);
-    bypass_waddr_M_rs2_D = val_D & val_M & rf_wen_M
-                                 & (inst_D[`RS2] == inst_M[`RD])
-                                 & (inst_M[`RD] != 0);
+    rf_wen_M = (inst_M == `ADD) | (inst_M == `ADDI) |
+               (inst_M == `MUL) | (inst_M == `LW  ) |
+               (inst_M == `JAL) ;
+    bypass_waddr_M_rs1_D =   val_D & rs1_en_D
+                           & val_M & rf_wen_M
+                           & (inst_D[`RS1] == inst_M[`RD])
+                           & (inst_M[`RD] != 0);
+    bypass_waddr_M_rs2_D =   val_D & rs2_en_D
+                           & val_M & rf_wen_M
+                           & (inst_D[`RS2] == inst_M[`RD])
+                           & (inst_M[`RD] != 0);
     // W -> D
-    rf_wen_W = (inst_W == `ADD ) | (inst_W == `ADDI) | 
-               (inst_W == `MUL ) | (inst_W == `LW  ) | 
-               (inst_W == `JAL );
-    bypass_waddr_W_rs1_D = val_D & val_W & rf_wen_W
-                                 & (inst_D[`RS1] == inst_W[`RD])
-                                 & (inst_W[`RD] != 0);
-    bypass_waddr_W_rs2_D = val_D & val_W & rf_wen_W
-                                 & (inst_D[`RS2] == inst_W[`RD])
-                                 & (inst_W[`RD] != 0);
+    rf_wen_W = (inst_W == `ADD) | (inst_W == `ADDI) |
+               (inst_W == `MUL) | (inst_W == `LW  ) |
+               (inst_W == `JAL) ;
+    bypass_waddr_W_rs1_D =   val_D & rs1_en_D
+                           & val_W & rf_wen_W
+                           & (inst_D[`RS1] == inst_W[`RD])
+                           & (inst_W[`RD] != 0);
+    bypass_waddr_W_rs2_D =   val_D & rs2_en_D
+                           & val_W & rf_wen_W
+                           & (inst_D[`RS2] == inst_W[`RD])
+                           & (inst_W[`RD] != 0);
   end
 
   //==========================================================
