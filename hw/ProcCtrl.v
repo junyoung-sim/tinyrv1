@@ -169,17 +169,20 @@ module ProcCtrl
                (inst_D == `BNE) ;
     rs2_en_D = (inst_D == `ADD) | (inst_D == `MUL ) |
                (inst_D == `SW ) | (inst_D == `BNE ) ;
-    // X -> D (exclude LW)
+    // X -> D
     rf_wen_X = (inst_X == `ADD) | (inst_X == `ADDI) |
-               (inst_X == `MUL) | (inst_X == `JAL ) ;
+               (inst_X == `MUL) | (inst_X == `LW  ) |
+               (inst_X == `JAL) ;
     bypass_waddr_X_rs1_D =   val_D & rs1_en_D
                            & val_X & rf_wen_X
                            & (inst_D[`RS1] == inst_X[`RD])
-                           & (inst_X[`RD] != 0);
+                           & (inst_X[`RD] != 0)
+                           & (inst_X != `LW);
     bypass_waddr_X_rs2_D =   val_D & rs2_en_D
                            & val_X & rf_wen_X
                            & (inst_D[`RS2] == inst_X[`RD])
                            & (inst_X[`RD] != 0);
+                           & (inst_X != `LW);
     // M -> D
     rf_wen_M = (inst_M == `ADD) | (inst_M == `ADDI) |
                (inst_M == `MUL) | (inst_M == `LW  ) |
