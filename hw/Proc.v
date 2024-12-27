@@ -1,7 +1,6 @@
 `ifndef PROC_V
 `define PROC_V
 
-`include "../hw/ProcMem.v"
 `include "../hw/ProcCtrl.v"
 `include "../hw/ProcDpath.v"
 
@@ -10,8 +9,11 @@ module Proc
   (* keep=1 *) input  logic        clk,
   (* keep=1 *) input  logic        rst,
 
+  // Memory Interface
 
-
+  (* keep=1 *) output logic        imemreq_val,
+  (* keep=1 *) output logic [31:0] imemreq_addr,
+  (* keep=1 *) input  logic [31:0] imemresp_data
 );
 
   // Control Signals
@@ -35,7 +37,23 @@ module Proc
   logic        d2c_eq_X;
   logic [31:0] d2c_inst;
 
-  
+  //==========================================================
+  // Processor Controller
+  //==========================================================
+
+  ProcCtrl ctrl
+  (
+    .*
+  );
+
+  //==========================================================
+  // Processor Data Path
+  //==========================================================
+
+  ProcDpath dpath
+  (
+    .*
+  );
 
 endmodule
 
