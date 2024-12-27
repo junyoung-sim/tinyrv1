@@ -106,7 +106,7 @@ module ProcCtrl
     .clk(clk),
     .rst(rst),
     .en(1'b1),
-    .d(~squash_D),
+    .d(~squash_D & ~stall_D),
     .q(val_X)
   );
 
@@ -224,7 +224,8 @@ module ProcCtrl
   // Program Counter Selection
 
   always_comb begin
-    c2d_pc_sel_F = 0; // pc_plus4
+    c2d_pc_sel_F    = 0; // pc_plus4
+    c2d_imemreq_val = 1;
   end
 
   //==========================================================
@@ -261,16 +262,15 @@ module ProcCtrl
   endtask
 
   always_comb begin
+    cs_D( 'x, 'x );
     if(val_D) begin
       case(inst_D)
         //         op1 op2
-        `ADD: cs_D( 0,  0 );
+        `ADD: cs_D( 0,  0 ); // RF, RF
 
         default: cs_D( 'x, 'x );
       endcase
     end
-    else
-      cs_D( 'x, 'x );
   end
 
   //==========================================================
@@ -289,6 +289,7 @@ module ProcCtrl
   endtask
 
   always_comb begin
+    cs_X( 'x, 'x );
     if(val_X) begin
       case(inst_X)
         //         alu res
@@ -297,8 +298,6 @@ module ProcCtrl
         default: cs_X( 'x, 'x );
       endcase
     end
-    else
-      cs_X( 'x, 'x );
   end
 
   //==========================================================
@@ -315,6 +314,7 @@ module ProcCtrl
   endtask
 
   always_comb begin
+    cs_M( 'x );
     if(val_M) begin
       case(inst_M)
         //          wb
@@ -323,8 +323,6 @@ module ProcCtrl
         default: cs_M( 'x );
       endcase
     end
-    else
-      cs_M( 'x );
   end
 
   //==========================================================
@@ -343,6 +341,7 @@ module ProcCtrl
   endtask
 
   always_comb begin
+    cs_W( 0, 'x );
     if(val_W) begin
       case(inst_W)
         //         wen rf_waddr
@@ -351,8 +350,6 @@ module ProcCtrl
         default: cs_W( 0, 'x );
       endcase
     end
-    else
-      cs_W( 0, 'x );
   end
 
 endmodule
