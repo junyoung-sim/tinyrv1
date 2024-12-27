@@ -217,11 +217,39 @@ module ProcCtrl
   // Stage F
   //==========================================================
 
+  // Stall
 
+  assign c2d_reg_en_F = ~stall_F;
+
+  // Program Counter Selection
+
+  always_comb begin
+    c2d_pc_sel_F = 0; // pc_plus4
+  end
 
   //==========================================================
   // Stage D
   //==========================================================
+
+  // Stall
+
+  assign c2d_reg_en_D = ~stall_D;
+
+  // Bypass
+
+  always_comb begin
+    c2d_op1_byp_sel_D = 0; // rs1
+    if(bypass_waddr_W_rs1_D) c2d_op1_byp_sel_D = 3; // W -> D
+    if(bypass_waddr_M_rs1_D) c2d_op1_byp_sel_D = 2; // M -> D
+    if(bypass_waddr_X_rs1_D) c2d_op1_byp_sel_D = 1; // X -> D
+
+    c2d_op2_byp_sel_D = 0; // rs2
+    if(bypass_waddr_W_rs2_D) c2d_op2_byp_sel_D = 3; // W -> D
+    if(bypass_waddr_M_rs2_D) c2d_op2_byp_sel_D = 2; // M -> D
+    if(bypass_waddr_X_rs2_D) c2d_op2_byp_sel_D = 1; // X -> D
+  end
+
+  // Operand Selection
 
   task automatic cs_D
   (
@@ -237,6 +265,7 @@ module ProcCtrl
       case(inst_D)
         //         op1 op2
         `ADD: cs_D( 0,  0 );
+
         default: cs_D( 'x, 'x );
       endcase
     end
@@ -248,19 +277,83 @@ module ProcCtrl
   // Stage X
   //==========================================================
 
+  // ALU Function & Result Selection
 
+  task automatic cs_X
+  (
+    input logic alu_fn_X,
+    input logic result_sel_X
+  );
+    c2d_alu_fn_X     = alu_fn_X;
+    c2d_result_sel_X = result_sel_X;
+  endtask
+
+  always_comb begin
+    if(val_X) begin
+      case(inst_X)
+        //         alu res
+        `ADD: cs_X( 0,  0 ); // add, alu_out
+
+        default: cs_X( 'x, 'x );
+      endcase
+    end
+    else
+      cs_X( 'x, 'x );
+  end
 
   //==========================================================
   // Stage M
   //==========================================================
 
+  // Write Selection
 
+  task automatic cs_M
+  (
+    input logic wb_sel_M
+  );
+    c2d_wb_sel_M = wb_sel_M;
+  endtask
+
+  always_comb begin
+    if(val_M) begin
+      case(inst_M)
+        //          wb
+        `ADD: cs_M( 0 ); // result_X
+
+        default: cs_M( 'x );
+      endcase
+    end
+    else
+      cs_M( 'x );
+  end
 
   //==========================================================
   // Stage W
   //==========================================================
 
+  // RF Write
 
+  task auomatic cs_W
+  (
+    input logic       _rf_wen_W,
+    input logic [4:0] rf_waddr_W
+  );
+    c2d_rf_wen_W   = _rf_wen_W;
+    c2d_rf_waddr_W = rf_waddr_W;
+  endtask
+
+  always_comb begin
+    if(val_W) begin
+      case(inst_W)
+        //         wen rf_waddr
+        `ADD: cs_W( 1, inst_W[`RD] );
+
+        default: cs_W( 0, 'x );
+      endcase
+    end
+    else
+      cs_W( 0, 'x );
+  end
 
 endmodule
 
