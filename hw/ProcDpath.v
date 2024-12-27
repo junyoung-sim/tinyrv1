@@ -83,7 +83,7 @@ module ProcDpath
   logic [31:0] pc;
   logic [31:0] pc_next;
 
-  logic [31:0] pc_plus_4;
+  logic [31:0] pc_plus4;
 
   Register#(32) pc_F (
     .clk(clk),
@@ -93,15 +93,15 @@ module ProcDpath
     .q(pc)
   );
 
-  Adder#(32) pc_plus_4_adder (
+  Adder#(32) pc_plus4_adder (
     .in0(pc),
     .in1(32'h00000004);
-    .sum(pc_plus_4);
+    .sum(pc_plus4);
   );
 
   Mux4#(32) pc_mux (
     .sel(c2d_pc_sel_F),
-    .in0(pc_plus_4),
+    .in0(pc_plus4),
     .in1(32'b0),
     .in2(32'b0),
     .in3(32'b0),
