@@ -162,20 +162,20 @@ module ProcCtrl
   // Squash
 
   always_comb begin
-    squash_D = val_X & (inst_X == `BNE) & ~d2c_eq_X;
-    squash_F = squash_D | (val_D & ( (inst_D == `JAL)
-                                   | (inst_D == `JR ) ));
+    squash_D = val_X & (inst_X ==? `BNE) & ~d2c_eq_X;
+    squash_F = squash_D | (val_D & ( (inst_D ==? `JAL)
+                                   | (inst_D ==? `JR ) ));
   end
 
   // Stall
 
   always_comb begin
     stall_lw_X_rs1_D =   val_D & rs1_en_D
-                       & val_X & (inst_X == `LW)
+                       & val_X & (inst_X ==? `LW)
                        & (inst_D[`RS1] == inst_X[`RD])
                        & (inst_X[`RD] != 0);
     stall_lw_X_rs2_D =   val_D & rs2_en_D
-                       & val_X & (inst_X == `LW)
+                       & val_X & (inst_X ==? `LW)
                        & (inst_D[`RS2] == inst_X[`RD])
                        & (inst_X[`RD] != 0);
     stall_D = val_D & (stall_lw_X_rs1_D | stall_lw_X_rs2_D);
@@ -190,12 +190,12 @@ module ProcCtrl
                            & val_X & rf_wen_X
                            & (inst_D[`RS1] == inst_X[`RD])
                            & (inst_X[`RD] != 0)
-                           & (inst_X != `LW);
+                           & (inst_X !=? `LW);
     bypass_waddr_X_rs2_D =   val_D & rs2_en_D
                            & val_X & rf_wen_X
                            & (inst_D[`RS2] == inst_X[`RD])
                            & (inst_X[`RD] != 0)
-                           & (inst_X != `LW);
+                           & (inst_X !=? `LW);
     // M -> D
     bypass_waddr_M_rs1_D =   val_D & rs1_en_D
                            & val_M & rf_wen_M
