@@ -13,7 +13,11 @@ module Proc
 
   (* keep=1 *) output logic        imemreq_val,
   (* keep=1 *) output logic [31:0] imemreq_addr,
-  (* keep=1 *) input  logic [31:0] imemresp_data
+  (* keep=1 *) input  logic [31:0] imemresp_data,
+
+  // Trace Data
+
+  (* keep=1 *) output logic [31:0] trace_data
 );
 
   // Control Signals

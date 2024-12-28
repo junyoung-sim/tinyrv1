@@ -38,7 +38,11 @@ module ProcDpath
   // Status Signals
 
   (* keep=1 *) output logic        d2c_eq_X,
-  (* keep=1 *) output logic [31:0] d2c_inst
+  (* keep=1 *) output logic [31:0] d2c_inst,
+
+  // Trace Data
+
+  (* keep=1 *) output logic [31:0] trace_data
 );
 
   //==========================================================
