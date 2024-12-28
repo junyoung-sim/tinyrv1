@@ -140,23 +140,23 @@ module ProcCtrl
   logic rf_wen_W;
 
   always_comb begin
-    // RF Read Instructions
-    rs1_en_D = (inst_D == `ADD) | (inst_D == `ADDI) |
-               (inst_D == `MUL) | (inst_D == `LW  ) |
-               (inst_D == `SW ) | (inst_D == `JR  ) |
-               (inst_D == `BNE) ;
-    rs2_en_D = (inst_D == `ADD) | (inst_D == `MUL ) |
-               (inst_D == `SW ) | (inst_D == `BNE ) ;
+    // RF Read Instructions (RS1)
+    rs1_en_D = (inst_D ==? `ADD) | (inst_D ==? `ADDI) |
+               (inst_D ==? `MUL) | (inst_D ==? `LW  ) |
+               (inst_D ==? `SW ) | (inst_D ==? `JR  ) |
+               (inst_D ==? `BNE) ;
+    rs2_en_D = (inst_D ==? `ADD) | (inst_D ==? `MUL ) |
+               (inst_D ==? `SW ) | (inst_D ==? `BNE ) ;
     // RF Write Instructions
-    rf_wen_X = (inst_X == `ADD) | (inst_X == `ADDI) |
-               (inst_X == `MUL) | (inst_X == `LW  ) |
-               (inst_X == `JAL) ;
-    rf_wen_M = (inst_M == `ADD) | (inst_M == `ADDI) |
-               (inst_M == `MUL) | (inst_M == `LW  ) |
-               (inst_M == `JAL) ;
-    rf_wen_W = (inst_W == `ADD) | (inst_W == `ADDI) |
-               (inst_W == `MUL) | (inst_W == `LW  ) |
-               (inst_W == `JAL) ;
+    rf_wen_X = (inst_X ==? `ADD) | (inst_X ==? `ADDI) |
+               (inst_X ==? `MUL) | (inst_X ==? `LW  ) |
+               (inst_X ==? `JAL) ;
+    rf_wen_M = (inst_M ==? `ADD) | (inst_M ==? `ADDI) |
+               (inst_M ==? `MUL) | (inst_M ==? `LW  ) |
+               (inst_M ==? `JAL) ;
+    rf_wen_W = (inst_W ==? `ADD) | (inst_W ==? `ADDI) |
+               (inst_W ==? `MUL) | (inst_W ==? `LW  ) |
+               (inst_W ==? `JAL) ;
   end
 
   // Squash
