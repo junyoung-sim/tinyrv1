@@ -40,6 +40,7 @@ module Proc
   logic        c2d_reg_en_F;
   logic [1:0]  c2d_pc_sel_F;
   logic        c2d_reg_en_D;
+  logic [1:0]  c2d_imm_type;
   logic [1:0]  c2d_op1_byp_sel_D;
   logic [1:0]  c2d_op2_byp_sel_D;
   logic        c2d_op1_sel_D;
