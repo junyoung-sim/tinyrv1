@@ -4,6 +4,7 @@
 `include "../hw/ALU.v"
 `include "../hw/Mux4.v"
 `include "../hw/Adder.v"
+`include "../hw/ImmGen.v"
 `include "../hw/TinyRV1.v"
 `include "../hw/Regfile.v"
 `include "../hw/Register.v"
@@ -24,6 +25,7 @@ module ProcDpath
   (* keep=1 *) input  logic        c2d_reg_en_F,
   (* keep=1 *) input  logic [1:0]  c2d_pc_sel_F,
   (* keep=1 *) input  logic        c2d_reg_en_D,
+  (* keep=1 *) input  logic [1:0]  c2d_imm_type,
   (* keep=1 *) input  logic [1:0]  c2d_op1_byp_sel_D,
   (* keep=1 *) input  logic [1:0]  c2d_op2_byp_sel_D,
   (* keep=1 *) input  logic        c2d_op1_sel_D,
@@ -139,6 +141,16 @@ module ProcDpath
   assign rs1_addr = inst[`RS1];
   assign rs2_addr = inst[`RS2];
 
+  // Immediate Generation
+
+  logic [31:0] imm;
+
+  ImmGen immgen (
+    .inst(inst),
+    .imm_type(c2d_imm_type),
+    .imm(imm)
+  );
+
   // Operand Bypass Selection
 
   logic [31:0] op1_bypass;
@@ -180,7 +192,7 @@ module ProcDpath
   Mux2#(32) op2_mux (
     .sel(c2d_op2_sel_D),
     .in0(op2_bypass),
-    .in1(32'b0),
+    .in1(imm),
     .out(op2_next)
   );
 

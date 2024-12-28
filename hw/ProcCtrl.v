@@ -14,6 +14,7 @@ module ProcCtrl
   (* keep=1 *) output logic        c2d_reg_en_F,
   (* keep=1 *) output logic [1:0]  c2d_pc_sel_F,
   (* keep=1 *) output logic        c2d_reg_en_D,
+  (* keep=1 *) output logic [1:0]  c2d_imm_type,
   (* keep=1 *) output logic [1:0]  c2d_op1_byp_sel_D,
   (* keep=1 *) output logic [1:0]  c2d_op2_byp_sel_D,
   (* keep=1 *) output logic        c2d_op1_sel_D,
@@ -257,9 +258,11 @@ module ProcCtrl
 
   task automatic cs_D
   (
-    input logic op1_sel_D,
-    input logic op2_sel_D
+    input logic [1:0] imm_type,
+    input logic       op1_sel_D,
+    input logic       op2_sel_D
   );
+    c2d_imm_type  = imm_type;
     c2d_op1_sel_D = op1_sel_D;
     c2d_op2_sel_D = op2_sel_D;
   endtask
@@ -267,14 +270,15 @@ module ProcCtrl
   always_comb begin
     if(val_D) begin
       casez(inst_D)
-        //         op1 op2
-        `ADD: cs_D( 0,  0 ); // RF, RF
+        //             imm  op1 op2
+        `ADD:  cs_D(   'x,   0,  0 ); // X, RF, RF
+        `ADDI: cs_D( `IMM_I, 0,  1 ); // I, RF, Imm
 
-        default: cs_D( 'x, 'x );
+        default: cs_D( 'x, 'x, 'x );
       endcase
     end
     else
-      cs_D( 'x, 'x );
+      cs_D( 'x, 'x, 'x );
   end
 
   //==========================================================
@@ -295,8 +299,9 @@ module ProcCtrl
   always_comb begin
     if(val_X) begin
       casez(inst_X)
-        //         alu res
-        `ADD: cs_X( 0,  0 ); // add, alu_out
+        //          alu res
+        `ADD:  cs_X( 0,  0 ); // add, alu_out
+        `ADDI: cs_X( 0,  0 ); // add, alu_out
 
         default: cs_X( 'x, 'x );
       endcase
@@ -321,8 +326,9 @@ module ProcCtrl
   always_comb begin
     if(val_M) begin
       casez(inst_M)
-        //          wb
-        `ADD: cs_M( 0 ); // result_X
+        //           wb
+        `ADD:  cs_M( 0 ); // result_X
+        `ADDI: cs_M( 0 ); // result_X
 
         default: cs_M( 'x );
       endcase
@@ -349,8 +355,9 @@ module ProcCtrl
   always_comb begin
     if(val_W) begin
       casez(inst_W)
-        //         wen rf_waddr
-        `ADD: cs_W( 1, inst_W[`RD] );
+        //          wen rf_waddr
+        `ADD:  cs_W( 1, inst_W[`RD] );
+        `ADDI: cs_W( 1, inst_W[`RD] );
 
         default: cs_W( 0, 'x );
       endcase
