@@ -269,6 +269,12 @@ module ProcDpath
   assign rf_waddr = c2d_rf_waddr_W;
   assign rf_wdata = result_W_next;
 
+  //==========================================================
+  // Trace Data
+  //==========================================================
+
+  assign trace_data = rf_wdata;
+
 endmodule
 
 `endif
