@@ -6,6 +6,27 @@ from cocotb.triggers import *
 x = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 
 #===========================================================
+# Test Memory
+#===========================================================
+
+memsize = pow(2,6)
+
+mem = []
+for i in range(memsize):
+  mem.append(x)
+
+def data(addr, val):
+  mem[addr >> 2] = val
+
+def dump_mem():
+  for i in range(memsize):
+    addr = format(i << 2, "#005x")
+    try:
+      print("[{}] {}" .format(addr, format(mem[i], "#010x")))
+    except:
+      print("[{}] 0x????????" .format(addr))
+
+#===========================================================
 # Instruction Fields
 #===========================================================
 
@@ -37,27 +58,6 @@ def get_opcode(opcode):
   return opcode & OPCODE
 
 #===========================================================
-# Test Memory
-#===========================================================
-
-memsize = pow(2,6)
-
-mem = []
-for i in range(memsize):
-  mem.append(x)
-
-def data(addr, val):
-  mem[addr >> 2] = val
-
-def dump_mem():
-  for i in range(memsize):
-    addr = format(i << 2, "#005x")
-    try:
-      print("[{}] {}" .format(addr, format(mem[i], "#010x")))
-    except:
-      return
-
-#===========================================================
 # Instruction Assembly
 #===========================================================
 
@@ -79,8 +79,6 @@ def asm(addr, inst_s):
   data(addr, inst)
 
 if __name__ == "__main__":
-  asm( 0x000, "add x1 x2 x3"    )
-  asm( 0x004, "add x10 x20 x30" )
-  asm( 0x008, "add x15 x25 x35" )
+  asm( 0x000, "add x4 x4 x6" )
 
   dump_mem()
