@@ -89,6 +89,7 @@ module ProcCtrl
   // Validation Registers
   //==========================================================
 
+  logic val_D0;
   logic val_D;
   logic val_X;
   logic val_M;
@@ -99,14 +100,16 @@ module ProcCtrl
     .rst(rst),
     .en(1'b1),
     .d(~squash_F),
-    .q(val_D)
+    .q(val_D0)
   );
+
+  assign val_D = val_D0 & (inst_D != 32'b0);
 
   Register#(1) val_DX (
     .clk(clk),
     .rst(rst),
     .en(1'b1),
-    .d(~squash_D & ~stall_D),
+    .d(val_D & ~squash_D & ~stall_D),
     .q(val_X)
   );
 
@@ -191,7 +194,7 @@ module ProcCtrl
     bypass_waddr_X_rs2_D =   val_D & rs2_en_D
                            & val_X & rf_wen_X
                            & (inst_D[`RS2] == inst_X[`RD])
-                           & (inst_X[`RD] != 0);
+                           & (inst_X[`RD] != 0)
                            & (inst_X != `LW);
     // M -> D
     bypass_waddr_M_rs1_D =   val_D & rs1_en_D
@@ -262,15 +265,16 @@ module ProcCtrl
   endtask
 
   always_comb begin
-    cs_D( 'x, 'x );
     if(val_D) begin
-      case(inst_D)
+      casez(inst_D)
         //         op1 op2
         `ADD: cs_D( 0,  0 ); // RF, RF
 
         default: cs_D( 'x, 'x );
       endcase
     end
+    else
+      cs_D( 'x, 'x );
   end
 
   //==========================================================
@@ -289,15 +293,16 @@ module ProcCtrl
   endtask
 
   always_comb begin
-    cs_X( 'x, 'x );
     if(val_X) begin
-      case(inst_X)
+      casez(inst_X)
         //         alu res
         `ADD: cs_X( 0,  0 ); // add, alu_out
 
         default: cs_X( 'x, 'x );
       endcase
     end
+    else
+      cs_X( 'x, 'x );
   end
 
   //==========================================================
@@ -314,15 +319,16 @@ module ProcCtrl
   endtask
 
   always_comb begin
-    cs_M( 'x );
     if(val_M) begin
-      case(inst_M)
+      casez(inst_M)
         //          wb
         `ADD: cs_M( 0 ); // result_X
 
         default: cs_M( 'x );
       endcase
     end
+    else
+      cs_M( 'x );
   end
 
   //==========================================================
@@ -331,7 +337,7 @@ module ProcCtrl
 
   // RF Write
 
-  task auomatic cs_W
+  task automatic cs_W
   (
     input logic       _rf_wen_W,
     input logic [4:0] rf_waddr_W
@@ -341,15 +347,16 @@ module ProcCtrl
   endtask
 
   always_comb begin
-    cs_W( 0, 'x );
     if(val_W) begin
-      case(inst_W)
+      casez(inst_W)
         //         wen rf_waddr
         `ADD: cs_W( 1, inst_W[`RD] );
 
         default: cs_W( 0, 'x );
       endcase
     end
+    else
+      cs_W( 0, 'x );
   end
 
 endmodule

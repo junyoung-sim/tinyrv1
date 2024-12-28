@@ -6,27 +6,6 @@ from cocotb.triggers import *
 x = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 
 #===========================================================
-# Test Memory
-#===========================================================
-
-memsize = pow(2,6)
-
-mem = []
-for i in range(memsize):
-  mem.append(x)
-
-def data(addr, val):
-  mem[addr >> 2] = val
-
-def dump_mem():
-  for i in range(memsize):
-    addr = format(i << 2, "#005x")
-    try:
-      print("[{}] {}" .format(addr, format(mem[i], "#010x")))
-    except:
-      print("[{}] 0x????????" .format(addr))
-
-#===========================================================
 # Instruction Fields
 #===========================================================
 
@@ -70,14 +49,61 @@ def asm_add(inst_s):
   opcode = get_opcode(0b0110011)
   return funct7 | rs2 | rs1 | funct3 | rd | opcode
 
-def asm(addr, inst_s):
+def asm(inst_s):
   inst_s = inst_s.split()
 
   if inst_s[0] == "add":
     inst = asm_add(inst_s)
   
-  data(addr, inst)
+  return inst
+
+#===========================================================
+# DUT Access
+#===========================================================
+
+async def asm_write(dut, addr, inst_s):
+  dut.ext_dmemreq_val.value   = 1
+  dut.ext_dmemreq_type.value  = 1
+  dut.ext_dmemreq_addr.value  = addr
+  dut.ext_dmemreq_wdata.value = asm(inst_s)
+
+  await RisingEdge(dut.clk)
+  assert dut.ext_dmemreq_rdata.value == x
+
+async def reset(dut):
+  dut.rst.value = 1
+  dut.ext_dmemreq_val.value   = 0
+  dut.ext_dmemreq_type.value  = 0
+  dut.ext_dmemreq_addr.value  = 0
+  dut.ext_dmemreq_wdata.value = 0
+  await RisingEdge(dut.clk)
+  
+  dut.rst.value = 0
+  await RisingEdge(dut.clk)
+
+async def check_trace(dut, trace_data):
+  await RisingEdge(dut.clk)
+  assert dut.trace_data.value == trace_data
 
 #===========================================================
 # ADD
 #===========================================================
+
+@cocotb.test()
+async def test_add_simple(dut):
+  clock = Clock(dut.clk, 10, units="ns")
+  cocotb.start_soon(clock.start(start_high=False))
+
+  # Assembly Program
+
+  await asm_write( dut, 0x000, "add x1 x0 x0" )
+  await asm_write( dut, 0x004, "add x2 x1 x0" )
+  await reset(dut)
+
+  # Check Traces
+
+  await check_trace(dut, x)
+  await check_trace(dut, x)
+  await check_trace(dut, x)
+  await check_trace(dut, 0)
+  await check_trace(dut, 0)

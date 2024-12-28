@@ -67,7 +67,7 @@ module ProcDpath
     .raddr0(rs1_addr),
     .rdata0(rs1),
     .raddr1(rs2_addr),
-    .rdata1(rs2),
+    .rdata1(rs2)
   );
 
   //==========================================================
@@ -99,8 +99,8 @@ module ProcDpath
 
   Adder#(32) pc_plus4_adder (
     .in0(pc),
-    .in1(32'h00000004);
-    .sum(pc_plus4);
+    .in1(32'h00000004),
+    .sum(pc_plus4)
   );
 
   Mux4#(32) pc_mux (
@@ -233,7 +233,7 @@ module ProcDpath
     .rst(rst),
     .en(1'b1),
     .d(result_X_next),
-    .q(result_X),
+    .q(result_X)
   );
 
   //==========================================================
@@ -246,7 +246,7 @@ module ProcDpath
     .sel(c2d_wb_sel_M),
     .in0(result_X),
     .in1(32'b0),
-    .out(result_M_next),
+    .out(result_M_next)
   );
 
   logic [31:0] result_M;
@@ -256,7 +256,7 @@ module ProcDpath
     .rst(rst),
     .en(1'b1),
     .d(result_M_next),
-    .q(result_M),
+    .q(result_M)
   );
 
   //==========================================================
