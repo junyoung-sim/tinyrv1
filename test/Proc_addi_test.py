@@ -131,7 +131,6 @@ async def test_raw_bypass(dut):
   await asm_write(dut, 0x018, "add x7 x1 x6") #             F D X M W   (X-D)
   await asm_write(dut, 0x01c, "add x8 x3 x5") #               F D X M W (W-D)
 
-
   await reset(dut)
 
   # Check Traces
