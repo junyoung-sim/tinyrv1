@@ -1,39 +1,4 @@
-import random
-import cocotb
-from cocotb.clock import Clock
-from cocotb.triggers import *
-
 from TinyRV1 import *
-
-x = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-
-#===========================================================
-# Processor Interface
-#===========================================================
-
-async def asm_write(dut, addr, inst_s):
-  dut.ext_dmemreq_val.value   = 1
-  dut.ext_dmemreq_type.value  = 1
-  dut.ext_dmemreq_addr.value  = addr
-  dut.ext_dmemreq_wdata.value = asm(inst_s)
-
-  await RisingEdge(dut.clk)
-  assert dut.ext_dmemreq_rdata.value == x
-
-async def reset(dut):
-  dut.rst.value = 1
-  dut.ext_dmemreq_val.value   = 0
-  dut.ext_dmemreq_type.value  = 0
-  dut.ext_dmemreq_addr.value  = 0
-  dut.ext_dmemreq_wdata.value = 0
-  await RisingEdge(dut.clk)
-  
-  dut.rst.value = 0
-  await RisingEdge(dut.clk)
-
-async def check_trace(dut, trace_data):
-  await RisingEdge(dut.clk)
-  assert dut.trace_data.value == trace_data
 
 #===========================================================
 # ADDI
@@ -46,8 +11,10 @@ async def test_simple(dut):
 
   # Assembly Program
 
-  await asm_write(dut, 0x000, "addi x1 x0 1") # F D X M W
-  await asm_write(dut, 0x004, "addi x2 x0 2") #   F D X M W
+  await asm_write(dut, 0x000, "addi x1 x0 1" ) # F D X M W
+  await asm_write(dut, 0x004, "addi x2 x0 2" ) #   F D X M W
+  await asm_write(dut, 0x008, "addi x3 x0 -1") #     F D X M W
+  await asm_write(dut, 0x00c, "addi x4 x0 -2") #       F D X M W
 
   await reset(dut)
 
@@ -56,8 +23,10 @@ async def test_simple(dut):
   await check_trace(dut, x)
   await check_trace(dut, x)
   await check_trace(dut, x)
-  await check_trace(dut, 1)
-  await check_trace(dut, 2)
+  await check_trace(dut, 0x00000001) #  1
+  await check_trace(dut, 0x00000002) #  2
+  await check_trace(dut, 0xffffffff) # -1
+  await check_trace(dut, 0xfffffffe) # -2
 
 @cocotb.test()
 async def test_imm_bound_valid(dut):
@@ -76,8 +45,8 @@ async def test_imm_bound_valid(dut):
   await check_trace(dut, x)
   await check_trace(dut, x)
   await check_trace(dut, x)
-  await check_trace(dut,  2047 & 0xffffffff)
-  await check_trace(dut, -2048 & 0xffffffff)
+  await check_trace(dut, 0x000007ff) #  2047
+  await check_trace(dut, 0xfffff800) # -2048
 
 @cocotb.test()
 async def test_imm_bound_invalid_1(dut):
@@ -95,7 +64,7 @@ async def test_imm_bound_invalid_1(dut):
   await check_trace(dut, x)
   await check_trace(dut, x)
   await check_trace(dut, x)
-  await check_trace(dut, 2048) # FAIL
+  await check_trace(dut, 0x00000800) # 2048 (FAIL)
 
 @cocotb.test()
 async def test_imm_bound_invalid_2(dut):
@@ -113,7 +82,7 @@ async def test_imm_bound_invalid_2(dut):
   await check_trace(dut, x)
   await check_trace(dut, x)
   await check_trace(dut, x)
-  await check_trace(dut, -2049) # FAIL
+  await check_trace(dut, 0xfffff7ff) # -2049 (FAIL)
 
 @cocotb.test()
 async def test_raw_bypass(dut):
@@ -137,11 +106,11 @@ async def test_raw_bypass(dut):
   await check_trace(dut, x)
   await check_trace(dut, x)
   await check_trace(dut, x)
-  await check_trace(dut, 1)
-  await check_trace(dut, 2)
-  await check_trace(dut, 3)
-  await check_trace(dut, 4)
-  await check_trace(dut, 5)
-  await check_trace(dut, 6)
-  await check_trace(dut, 7)
-  await check_trace(dut, 8)
+  await check_trace(dut, 0x00000001)
+  await check_trace(dut, 0x00000002)
+  await check_trace(dut, 0x00000003)
+  await check_trace(dut, 0x00000004)
+  await check_trace(dut, 0x00000005)
+  await check_trace(dut, 0x00000006)
+  await check_trace(dut, 0x00000007)
+  await check_trace(dut, 0x00000008)

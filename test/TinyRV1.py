@@ -1,3 +1,9 @@
+import cocotb
+from cocotb.clock import Clock
+from cocotb.triggers import *
+
+x = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+
 #===========================================================
 # Instruction Fields
 #===========================================================
@@ -64,3 +70,31 @@ def asm(inst_s):
     inst = asm_addi(inst_s)
   
   return inst
+
+#===========================================================
+# Processor Interface
+#===========================================================
+
+async def asm_write(dut, addr, inst_s):
+  dut.ext_dmemreq_val.value   = 1
+  dut.ext_dmemreq_type.value  = 1
+  dut.ext_dmemreq_addr.value  = addr
+  dut.ext_dmemreq_wdata.value = asm(inst_s)
+
+  await RisingEdge(dut.clk)
+  assert dut.ext_dmemreq_rdata.value == x
+
+async def reset(dut):
+  dut.rst.value = 1
+  dut.ext_dmemreq_val.value   = 0
+  dut.ext_dmemreq_type.value  = 0
+  dut.ext_dmemreq_addr.value  = 0
+  dut.ext_dmemreq_wdata.value = 0
+  await RisingEdge(dut.clk)
+  
+  dut.rst.value = 0
+  await RisingEdge(dut.clk)
+
+async def check_trace(dut, trace_data):
+  await RisingEdge(dut.clk)
+  assert dut.trace_data.value == trace_data

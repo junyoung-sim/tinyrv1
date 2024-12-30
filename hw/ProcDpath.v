@@ -8,6 +8,7 @@
 `include "../hw/TinyRV1.v"
 `include "../hw/Regfile.v"
 `include "../hw/Register.v"
+`include "../hw/Multiplier.v"
 
 module ProcDpath
 (
@@ -229,12 +230,22 @@ module ProcDpath
 
   assign d2c_eq_X = alu_out[0];
 
+  // Multiplier
+
+  logic [31:0] mul_out;
+
+  Multiplier#(32) mul (
+    .in0(op1),
+    .in1(op2),
+    .prod(mul_out)
+  );
+
   // Result Selection
 
   Mux2#(32) result_X_mux (
     .sel(c2d_result_sel_X),
     .in0(alu_out),
-    .in1(32'b0),
+    .in1(mul_out),
     .out(result_X_next)
   );
 

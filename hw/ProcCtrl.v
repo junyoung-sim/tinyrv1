@@ -271,8 +271,9 @@ module ProcCtrl
     if(val_D) begin
       casez(inst_D)
         //             imm  op1 op2
-        `ADD:  cs_D(   'x,   0,  0 ); // X, RF, RF
-        `ADDI: cs_D( `IMM_I, 0,  1 ); // I, RF, Imm
+        `ADD  : cs_D(   'x,   0,  0 ); // X, RF, RF
+        `ADDI : cs_D( `IMM_I, 0,  1 ); // I, RF, Imm
+        `MUL  : cs_D(   'x,   0,  0 ); // X, RF, RF
 
         default: cs_D( 'x, 'x, 'x );
       endcase
@@ -299,9 +300,10 @@ module ProcCtrl
   always_comb begin
     if(val_X) begin
       casez(inst_X)
-        //          alu res
-        `ADD:  cs_X( 0,  0 ); // add, alu_out
-        `ADDI: cs_X( 0,  0 ); // add, alu_out
+        //            alu res
+        `ADD  : cs_X(  0,  0 ); // add, alu_out
+        `ADDI : cs_X(  0,  0 ); // add, alu_out
+        `MUL  : cs_X( 'x,  1 ); // mul, mul_out
 
         default: cs_X( 'x, 'x );
       endcase
@@ -327,8 +329,9 @@ module ProcCtrl
     if(val_M) begin
       casez(inst_M)
         //           wb
-        `ADD:  cs_M( 0 ); // result_X
-        `ADDI: cs_M( 0 ); // result_X
+        `ADD  : cs_M( 0 ); // result_X
+        `ADDI : cs_M( 0 ); // result_X
+        `MUL  : cs_M( 0 ); // result_X
 
         default: cs_M( 'x );
       endcase
@@ -356,8 +359,9 @@ module ProcCtrl
     if(val_W) begin
       casez(inst_W)
         //          wen rf_waddr
-        `ADD:  cs_W( 1, inst_W[`RD] );
-        `ADDI: cs_W( 1, inst_W[`RD] );
+        `ADD  : cs_W( 1, inst_W[`RD] );
+        `ADDI : cs_W( 1, inst_W[`RD] );
+        `MUL  : cs_W( 1, inst_W[`RD] );
 
         default: cs_W( 0, 'x );
       endcase
