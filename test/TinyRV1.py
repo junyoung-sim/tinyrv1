@@ -61,6 +61,16 @@ def asm_addi(inst_s):
   opcode = get_opcode(0b0010011)
   return imm_i | rs1 | funct3 | rd | opcode
 
+# mul rd rs1 rs2
+def asm_mul(inst_s):
+  funct7 = get_funct7(0b00000001)
+  rs2    = get_RS2(int(inst_s[3][1:]))
+  rs1    = get_RS1(int(inst_s[2][1:]))
+  funct3 = get_funct3(0b000)
+  rd     = get_RD(int(inst_s[1][1:]))
+  opcode = get_opcode(0b0110011)
+  return funct7 | rs2 | rs1 | funct3 | rd | opcode
+
 def asm(inst_s):
   inst_s = inst_s.split()
 
@@ -68,6 +78,8 @@ def asm(inst_s):
     inst = asm_add(inst_s)
   elif inst_s[0] == "addi":
     inst = asm_addi(inst_s)
+  elif inst_s[0] == "mul":
+    inst = asm_mul(inst_s)
   
   return inst
 

@@ -270,7 +270,7 @@ module ProcCtrl
   always_comb begin
     if(val_D) begin
       casez(inst_D)
-        //             imm  op1 op2
+        //              imm  op1 op2
         `ADD  : cs_D(   'x,   0,  0 ); // X, RF, RF
         `ADDI : cs_D( `IMM_I, 0,  1 ); // I, RF, Imm
         `MUL  : cs_D(   'x,   0,  0 ); // X, RF, RF
