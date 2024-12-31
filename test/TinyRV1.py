@@ -94,7 +94,7 @@ async def asm_write(dut, addr, inst_s):
   dut.ext_dmemreq_wdata.value = asm(inst_s)
 
   await RisingEdge(dut.clk)
-  assert dut.ext_dmemreq_rdata.value == x
+  assert dut.ext_dmemresp_rdata.value == x
 
 async def reset(dut):
   dut.rst.value = 1

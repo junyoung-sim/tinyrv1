@@ -11,6 +11,9 @@ module ProcCtrl
 
   // Control Signals
 
+  (* keep=1 *) output logic        c2d_imemreq_val,
+  (* keep=1 *) output logic        c2d_dmemreq_val,
+  (* keep=1 *) output logic        c2d_dmemreq_type,
   (* keep=1 *) output logic        c2d_reg_en_F,
   (* keep=1 *) output logic [1:0]  c2d_pc_sel_F,
   (* keep=1 *) output logic        c2d_reg_en_D,
@@ -24,7 +27,6 @@ module ProcCtrl
   (* keep=1 *) output logic        c2d_wb_sel_M,
   (* keep=1 *) output logic        c2d_rf_wen_W,
   (* keep=1 *) output logic [4:0]  c2d_rf_waddr_W,
-  (* keep=1 *) output logic        c2d_imemreq_val,
 
   // Status Signals
 

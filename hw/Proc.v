@@ -5,18 +5,26 @@
 `include "../hw/ProcCtrl.v"
 `include "../hw/ProcDpath.v"
 
+/*
+  FOR SYNTHESIS:
+    (1) REMOVE EXTERNAL MEMORY INTERFACE (COCOTB)
+    (2) REMOVE PROCMEM FROM PROC
+    (3) MAKE INTERNAL MEMORY INTERFACE PROC OUTPUTS
+    (4) CONNECT PROC TO AN EXTERNAL PROCMEM
+*/
+
 module Proc
 (
   (* keep=1 *) input  logic        clk,
   (* keep=1 *) input  logic        rst,
 
-  // External Memory Interface
+  // External Memory Interface (Cocotb)
 
   (* keep=1 *) input  logic        ext_dmemreq_val,
   (* keep=1 *) input  logic        ext_dmemreq_type,
   (* keep=1 *) input  logic [31:0] ext_dmemreq_addr,
   (* keep=1 *) input  logic [31:0] ext_dmemreq_wdata,
-  (* keep=1 *) output logic [31:0] ext_dmemreq_rdata,
+  (* keep=1 *) output logic [31:0] ext_dmemresp_rdata,
 
   // Trace Data
 
@@ -29,14 +37,17 @@ module Proc
   logic [31:0] imemreq_addr;
   logic [31:0] imemresp_data;
 
-  //logic        dmemreq_val;
-  //logic        dmemreq_type;
-  //logic [31:0] dmemreq_addr;
-  //logic [31:0] dmemreq_wdata;
-  //logic [31:0] dmemresp_rdata;
+  logic        dmemreq_val;
+  logic        dmemreq_type;
+  logic [31:0] dmemreq_addr;
+  logic [31:0] dmemreq_wdata;
+  logic [31:0] dmemresp_rdata;
 
   // Control Signals
 
+  logic        c2d_imemreq_val;
+  logic        c2d_dmemreq_val;
+  logic        c2d_dmemreq_type;
   logic        c2d_reg_en_F;
   logic [1:0]  c2d_pc_sel_F;
   logic        c2d_reg_en_D;
@@ -50,7 +61,6 @@ module Proc
   logic        c2d_wb_sel_M;
   logic        c2d_rf_wen_W;
   logic [4:0]  c2d_rf_waddr_W;
-  logic        c2d_imemreq_val;
 
   // Status Signals
 
@@ -61,6 +71,34 @@ module Proc
   // Processor Memory
   //==========================================================
 
+  logic        dval;
+  logic        dtype;
+  logic [31:0] daddr;
+  logic [31:0] wdata;
+
+  always_comb begin
+
+    dval  = dmemreq_val | ext_dmemreq_val;
+    dtype = 'x;
+    daddr = 'x;
+    wdata = 'x;
+    
+    if(dmemreq_val) begin
+      dtype = dmemreq_type;
+      daddr = dmemreq_addr;
+      wdata = dmemreq_wdata;
+    end
+    
+    if(ext_dmemreq_val) begin
+      dtype = ext_dmemreq_type;
+      daddr = ext_dmemreq_addr;
+      wdata = ext_dmemreq_wdata;
+    end
+
+    ext_dmemresp_rdata = dmemresp_rdata;
+  
+  end
+
   ProcMem mem
   (
     .clk(clk),
@@ -68,11 +106,11 @@ module Proc
     .imemreq_val(imemreq_val),
     .imemreq_addr(imemreq_addr),
     .imemresp_data(imemresp_data),
-    .dmemreq_val(ext_dmemreq_val),
-    .dmemreq_type(ext_dmemreq_type),
-    .dmemreq_addr(ext_dmemreq_addr),
-    .dmemreq_wdata(ext_dmemreq_wdata),
-    .dmemresp_rdata(ext_dmemreq_rdata)
+    .dmemreq_val(dval),
+    .dmemreq_type(dtype),
+    .dmemreq_addr(daddr),
+    .dmemreq_wdata(wdata),
+    .dmemresp_rdata(dmemresp_rdata)
   );
 
   //==========================================================

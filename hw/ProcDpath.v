@@ -21,8 +21,17 @@ module ProcDpath
   (* keep=1 *) output logic [31:0] imemreq_addr,
   (* keep=1 *) input  logic [31:0] imemresp_data,
 
+  (* keep=1 *) output logic        dmemreq_val,
+  (* keep=1 *) output logic        dmemreq_type,
+  (* keep=1 *) output logic [31:0] dmemreq_addr,
+  (* keep=1 *) output logic [31:0] dmemreq_wdata,
+  (* keep=1 *) input  logic [31:0] dmemresp_rdata,
+
   // Control Signals
 
+  (* keep=1 *) input  logic        c2d_imemreq_val,
+  (* keep=1 *) input  logic        c2d_dmemreq_val,
+  (* keep=1 *) input  logic        c2d_dmemreq_type,
   (* keep=1 *) input  logic        c2d_reg_en_F,
   (* keep=1 *) input  logic [1:0]  c2d_pc_sel_F,
   (* keep=1 *) input  logic        c2d_reg_en_D,
@@ -36,8 +45,7 @@ module ProcDpath
   (* keep=1 *) input  logic        c2d_wb_sel_M,
   (* keep=1 *) input  logic        c2d_rf_wen_W,
   (* keep=1 *) input  logic [4:0]  c2d_rf_waddr_W,
-  (* keep=1 *) input  logic        c2d_imemreq_val,
-
+  
   // Status Signals
 
   (* keep=1 *) output logic        d2c_eq_X,
@@ -263,12 +271,19 @@ module ProcDpath
   // Stage M
   //==========================================================
 
+  // Data Memory Requests
+
+  assign dmemreq_val   = c2d_dmemreq_val;
+  assign dmemreq_type  = c2d_dmemreq_type;
+  assign dmemreq_addr  = result_X;
+  assign dmemreq_wdata = 32'b0;
+
   // Write Selection
 
   Mux2#(32) wb_mux (
     .sel(c2d_wb_sel_M),
     .in0(result_X),
-    .in1(32'b0),
+    .in1(dmemresp_rdata),
     .out(result_M_next)
   );
 
