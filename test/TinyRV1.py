@@ -18,6 +18,10 @@ RD     = 0b00000000000000000000111110000000 # 11:7
 OPCODE = 0b00000000000000000000000001111111 #  6:0
 
 def get_imm_i(imm):
+  if imm.find("0x") != -1:
+    imm = int(imm[2:], 16)
+  else:
+    imm = int(imm, 10)
   return ((imm & 0b111111111111) << 20) & IMM_I
 
 def get_funct7(funct7):
@@ -54,7 +58,7 @@ def asm_add(inst_s):
 
 # addi rd rs1 imm
 def asm_addi(inst_s):
-  imm_i  = get_imm_i(int(inst_s[3]))
+  imm_i  = get_imm_i(inst_s[3])
   rs1    = get_RS1(int(inst_s[2][1:]))
   funct3 = get_funct3(0b000)
   rd     = get_RD(int(inst_s[1][1:]))
@@ -75,7 +79,7 @@ def asm_mul(inst_s):
 def asm_lw(inst_s):
   rd_o   = inst_s[2].find("(")
   rd_c   = inst_s[2].find(")")
-  imm_i  = get_imm_i(int(inst_s[2][:rd_o]))
+  imm_i  = get_imm_i(inst_s[2][:rd_o])
   rs1    = get_RS1(int(inst_s[2][rd_o+1:rd_c][1:]))
   funct3 = get_funct3(0b010)
   rd     = get_RD(int(inst_s[1][1:]))
@@ -99,6 +103,13 @@ def asm(inst_s):
 #===========================================================
 # Processor Interface
 #===========================================================
+
+async def data(dut, addr, wdata):
+  dut.ext_dmemreq_val.value   = 1
+  dut.ext_dmemreq_type.value  = 1
+  dut.ext_dmemreq_addr.value  = addr
+  dut.ext_dmemreq_wdata.value = wdata
+  await RisingEdge(dut.clk)
 
 async def asm_write(dut, addr, inst_s):
   dut.ext_dmemreq_val.value   = 1

@@ -5,15 +5,6 @@
 `include "../hw/ProcCtrl.v"
 `include "../hw/ProcDpath.v"
 
-/*
-  FOR SYNTHESIS:
-    (1) REMOVE EXTERNAL MEMORY INTERFACE (COCOTB)
-    (2) REMOVE PROCMEM FROM PROC
-    (3) MAKE INTERNAL MEMORY INTERFACE PROC OUTPUTS
-    (4) CONNECT PROC TO AN EXTERNAL PROCMEM
-    (5) MODIFY PROCMEM RESET WITH IMEM AND DMEM
-*/
-
 module Proc
 (
   (* keep=1 *) input  logic        clk,
@@ -80,20 +71,17 @@ module Proc
   always_comb begin
 
     dval  = dmemreq_val | ext_dmemreq_val;
-    dtype = 'x;
-    daddr = 'x;
-    wdata = 'x;
-    
-    if(dmemreq_val) begin
-      dtype = dmemreq_type;
-      daddr = dmemreq_addr;
-      wdata = dmemreq_wdata;
-    end
     
     if(ext_dmemreq_val) begin
       dtype = ext_dmemreq_type;
       daddr = ext_dmemreq_addr;
       wdata = ext_dmemreq_wdata;
+    end
+
+    if(dmemreq_val) begin
+      dtype = dmemreq_type;
+      daddr = dmemreq_addr;
+      wdata = dmemreq_wdata;
     end
 
     ext_dmemresp_rdata = dmemresp_rdata;
