@@ -14,7 +14,7 @@ module ProcCtrl
   (* keep=1 *) output logic        c2d_reg_en_F,
   (* keep=1 *) output logic [1:0]  c2d_pc_sel_F,
   (* keep=1 *) output logic        c2d_reg_en_D,
-  (* keep=1 *) output logic [1:0]  c2d_imm_type,
+  (* keep=1 *) output logic [1:0]  c2d_imm_type_D,
   (* keep=1 *) output logic [1:0]  c2d_op1_byp_sel_D,
   (* keep=1 *) output logic [1:0]  c2d_op2_byp_sel_D,
   (* keep=1 *) output logic        c2d_op1_sel_D,
@@ -262,7 +262,7 @@ module ProcCtrl
     input logic       op1_sel_D,
     input logic       op2_sel_D
   );
-    c2d_imm_type  = imm_type;
+    c2d_imm_type_D  = imm_type;
     c2d_op1_sel_D = op1_sel_D;
     c2d_op2_sel_D = op2_sel_D;
   endtask
