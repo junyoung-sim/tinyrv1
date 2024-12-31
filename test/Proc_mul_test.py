@@ -57,3 +57,51 @@ async def test_verify_mul_add(dut):
   await check_trace(dut, 0xffffffff) # -1
   await check_trace(dut, 0xffffffec) # -1 x 20 = -20
   await check_trace(dut, 0x00000000) # -20 + 20 = 0
+
+@cocotb.test()
+async def test_overflow_pos(dut):
+  clock = Clock(dut.clk, 10, units="ns")
+  cocotb.start_soon(clock.start(start_high=False))
+
+  # Assembly Program
+
+  await asm_write(dut, 0x000, "addi x1 x0 2047") # F D X M W
+  await asm_write(dut, 0x004, "addi x2 x0 2047") #   F D X M W
+  await asm_write(dut, 0x008, "mul x1 x1 x2"   ) #     F D X M W   (M-D, X-D)
+  await asm_write(dut, 0x00c, "mul x1 x1 x2"   ) #       F D X M W (X-D, M-D)
+
+  await reset(dut)
+
+  # Check Traces
+
+  await check_trace(dut, x)
+  await check_trace(dut, x)
+  await check_trace(dut, x)
+  await check_trace(dut, 0x000007ff)
+  await check_trace(dut, 0x000007ff)
+  await check_trace(dut, 0x003ff001)
+  await check_trace(dut, 0xff4017ff) # truncated
+
+@cocotb.test()
+async def test_overflow_neg(dut):
+  clock = Clock(dut.clk, 10, units="ns")
+  cocotb.start_soon(clock.start(start_high=False))
+
+  # Assembly Program
+
+  await asm_write(dut, 0x000, "addi x1 x0 -2048") # F D X M W
+  await asm_write(dut, 0x004, "addi x2 x0 2047" ) #   F D X M W
+  await asm_write(dut, 0x008, "mul x1 x1 x2"    ) #     F D X M W   (M-D, X-D)
+  await asm_write(dut, 0x00c, "mul x1 x1 x2"    ) #       F D X M W (X-D, M-D)
+
+  await reset(dut)
+
+  # Check Traces
+
+  await check_trace(dut, x)
+  await check_trace(dut, x)
+  await check_trace(dut, x)
+  await check_trace(dut, 0xfffff800)
+  await check_trace(dut, 0x000007ff)
+  await check_trace(dut, 0xffc00800)
+  await check_trace(dut, 0x007ff800) # truncated
