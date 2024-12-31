@@ -276,7 +276,7 @@ module ProcCtrl
         `ADD  : cs_D(   'x,   0,  0 ); // X, RF, RF
         `ADDI : cs_D( `IMM_I, 0,  1 ); // I, RF, Imm
         `MUL  : cs_D(   'x,   0,  0 ); // X, RF, RF
-        `LW   : cs_D(   'x,   0,  0 ); // X, RF, RF
+        `LW   : cs_D( `IMM_I, 0,  0 ); // I, RF, RF
 
         default: cs_D( 'x, 'x, 'x );
       endcase
@@ -330,13 +330,13 @@ module ProcCtrl
   );
     c2d_dmemreq_val_M  = dmemreq_val;
     c2d_dmemreq_type_M = dmemreq_type;
-    c2d_wb_sel_M     = wb_sel_M;
+    c2d_wb_sel_M       = wb_sel_M;
   endtask
 
   always_comb begin
     if(val_M) begin
       casez(inst_M)
-        //           dval dtype  wb
+        //            dval dtype wb
         `ADD  : cs_M( 0,   'x,   0 ); // result_X
         `ADDI : cs_M( 0,   'x,   0 ); // result_X
         `MUL  : cs_M( 0,   'x,   0 ); // result_X

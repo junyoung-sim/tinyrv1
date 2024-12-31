@@ -71,6 +71,17 @@ def asm_mul(inst_s):
   opcode = get_opcode(0b0110011)
   return funct7 | rs2 | rs1 | funct3 | rd | opcode
 
+# lw rd imm(rs1)
+def asm_lw(inst_s):
+  rd_o   = inst_s[2].find("(")
+  rd_c   = inst_s[2].find(")")
+  imm_i  = get_imm_i(int(inst_s[2][:rd_o]))
+  rs1    = get_RS1(int(inst_s[2][rd_o+1:rd_c][1:]))
+  funct3 = get_funct3(0b010)
+  rd     = get_RD(int(inst_s[1][1:]))
+  opcode = get_opcode(0b0000011)
+  return imm_i | rs1 | funct3 | rd | opcode
+
 def asm(inst_s):
   inst_s = inst_s.split()
 
@@ -80,6 +91,8 @@ def asm(inst_s):
     inst = asm_addi(inst_s)
   elif inst_s[0] == "mul":
     inst = asm_mul(inst_s)
+  elif inst_s[0] == "lw":
+    inst = asm_lw(inst_s)
   
   return inst
 
@@ -92,9 +105,7 @@ async def asm_write(dut, addr, inst_s):
   dut.ext_dmemreq_type.value  = 1
   dut.ext_dmemreq_addr.value  = addr
   dut.ext_dmemreq_wdata.value = asm(inst_s)
-
   await RisingEdge(dut.clk)
-  assert dut.ext_dmemresp_rdata.value == x
 
 async def reset(dut):
   dut.rst.value = 1
