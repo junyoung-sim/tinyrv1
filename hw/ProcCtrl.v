@@ -11,9 +11,7 @@ module ProcCtrl
 
   // Control Signals
 
-  (* keep=1 *) output logic        c2d_imemreq_val,
-  (* keep=1 *) output logic        c2d_dmemreq_val,
-  (* keep=1 *) output logic        c2d_dmemreq_type,
+  (* keep=1 *) output logic        c2d_imemreq_val_F,
   (* keep=1 *) output logic        c2d_reg_en_F,
   (* keep=1 *) output logic [1:0]  c2d_pc_sel_F,
   (* keep=1 *) output logic        c2d_reg_en_D,
@@ -24,6 +22,8 @@ module ProcCtrl
   (* keep=1 *) output logic        c2d_op2_sel_D,
   (* keep=1 *) output logic        c2d_alu_fn_X,
   (* keep=1 *) output logic        c2d_result_sel_X,
+  (* keep=1 *) output logic        c2d_dmemreq_val_M,
+  (* keep=1 *) output logic        c2d_dmemreq_type_M,
   (* keep=1 *) output logic        c2d_wb_sel_M,
   (* keep=1 *) output logic        c2d_rf_wen_W,
   (* keep=1 *) output logic [4:0]  c2d_rf_waddr_W,
@@ -230,8 +230,8 @@ module ProcCtrl
   // Program Counter Selection
 
   always_comb begin
-    c2d_pc_sel_F    = 0; // pc_plus4
-    c2d_imemreq_val = 1;
+    c2d_pc_sel_F      = 0; // pc_plus4
+    c2d_imemreq_val_F = 1;
   end
 
   //==========================================================
@@ -276,6 +276,7 @@ module ProcCtrl
         `ADD  : cs_D(   'x,   0,  0 ); // X, RF, RF
         `ADDI : cs_D( `IMM_I, 0,  1 ); // I, RF, Imm
         `MUL  : cs_D(   'x,   0,  0 ); // X, RF, RF
+        `LW   : cs_D(   'x,   0,  0 ); // X, RF, RF
 
         default: cs_D( 'x, 'x, 'x );
       endcase
@@ -306,6 +307,7 @@ module ProcCtrl
         `ADD  : cs_X(  0,  0 ); // add, alu_out
         `ADDI : cs_X(  0,  0 ); // add, alu_out
         `MUL  : cs_X( 'x,  1 ); // mul, mul_out
+        `LW   : cs_X(  0,  0 ); // add, alu_out
 
         default: cs_X( 'x, 'x );
       endcase
@@ -322,24 +324,29 @@ module ProcCtrl
 
   task automatic cs_M
   (
+    input logic dmemreq_val,
+    input logic dmemreq_type,
     input logic wb_sel_M
   );
-    c2d_wb_sel_M = wb_sel_M;
+    c2d_dmemreq_val_M  = dmemreq_val;
+    c2d_dmemreq_type_M = dmemreq_type;
+    c2d_wb_sel_M     = wb_sel_M;
   endtask
 
   always_comb begin
     if(val_M) begin
       casez(inst_M)
-        //           wb
-        `ADD  : cs_M( 0 ); // result_X
-        `ADDI : cs_M( 0 ); // result_X
-        `MUL  : cs_M( 0 ); // result_X
+        //           dval dtype  wb
+        `ADD  : cs_M( 0,   'x,   0 ); // result_X
+        `ADDI : cs_M( 0,   'x,   0 ); // result_X
+        `MUL  : cs_M( 0,   'x,   0 ); // result_X
+        `LW   : cs_M( 1,    0,   1 ); // dmemresp_rdata
 
-        default: cs_M( 'x );
+        default: cs_M( 'x, 'x, 'x );
       endcase
     end
     else
-      cs_M( 'x );
+      cs_M( 'x, 'x, 'x );
   end
 
   //==========================================================
@@ -364,6 +371,7 @@ module ProcCtrl
         `ADD  : cs_W( 1, inst_W[`RD] );
         `ADDI : cs_W( 1, inst_W[`RD] );
         `MUL  : cs_W( 1, inst_W[`RD] );
+        `LW   : cs_W( 1, inst_W[`RD] );
 
         default: cs_W( 0, 'x );
       endcase

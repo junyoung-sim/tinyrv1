@@ -29,9 +29,7 @@ module ProcDpath
 
   // Control Signals
 
-  (* keep=1 *) input  logic        c2d_imemreq_val,
-  (* keep=1 *) input  logic        c2d_dmemreq_val,
-  (* keep=1 *) input  logic        c2d_dmemreq_type,
+  (* keep=1 *) input  logic        c2d_imemreq_val_F,
   (* keep=1 *) input  logic        c2d_reg_en_F,
   (* keep=1 *) input  logic [1:0]  c2d_pc_sel_F,
   (* keep=1 *) input  logic        c2d_reg_en_D,
@@ -42,6 +40,8 @@ module ProcDpath
   (* keep=1 *) input  logic        c2d_op2_sel_D,
   (* keep=1 *) input  logic        c2d_alu_fn_X,
   (* keep=1 *) input  logic        c2d_result_sel_X,
+  (* keep=1 *) input  logic        c2d_dmemreq_val_M,
+  (* keep=1 *) input  logic        c2d_dmemreq_type_M,
   (* keep=1 *) input  logic        c2d_wb_sel_M,
   (* keep=1 *) input  logic        c2d_rf_wen_W,
   (* keep=1 *) input  logic [4:0]  c2d_rf_waddr_W,
@@ -125,7 +125,7 @@ module ProcDpath
 
   // Fetch
 
-  assign imemreq_val  = c2d_imemreq_val;
+  assign imemreq_val  = c2d_imemreq_val_F;
   assign imemreq_addr = pc;
 
   logic [31:0] inst;
@@ -273,8 +273,8 @@ module ProcDpath
 
   // Data Memory Requests
 
-  assign dmemreq_val   = c2d_dmemreq_val;
-  assign dmemreq_type  = c2d_dmemreq_type;
+  assign dmemreq_val   = c2d_dmemreq_val_M;
+  assign dmemreq_type  = c2d_dmemreq_type_M;
   assign dmemreq_addr  = result_X;
   assign dmemreq_wdata = 32'b0;
 
