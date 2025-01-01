@@ -49,9 +49,6 @@ module ProcMem
   // Read
 
   always_comb begin
-    imemresp_data = 32'bx;
-    dmemresp_rdata = 32'bx;
-
     if(imemreq_val)
       imemresp_data = mem[imemreq_addr[$clog2(memsize)+1:2]];
     if(dmemreq_val && (dmemreq_type == 0))
