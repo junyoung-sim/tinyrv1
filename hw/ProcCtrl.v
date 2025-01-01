@@ -43,6 +43,7 @@ module ProcCtrl
   logic [31:0] inst_M;
   logic [31:0] inst_W;
 
+  logic val_D0;
   logic val_D;
   logic val_M;
   logic val_W;
@@ -102,7 +103,15 @@ module ProcCtrl
   // Validation Registers
   //==========================================================
 
-  assign val_D = (inst_D != 0);
+  Register#(1) val_FD (
+    .clk(clk),
+    .rst(rst),
+    .en(1'b1),
+    .d(1'b1),
+    .q(val_D0)
+  );
+
+  assign val_D = val_D0 & (inst_D != 0);
 
   Register#(1) val_DX (
     .clk(clk),
@@ -363,11 +372,11 @@ module ProcCtrl
         `MUL  : cs_W( 1, inst_W[`RD] );
         `LW   : cs_W( 1, inst_W[`RD] );
 
-        default: cs_W( 0, 'x );
+        default: cs_W( 'x, 'x );
       endcase
     end
     else
-      cs_W( 0, 'x );
+      cs_W( 'x, 'x );
   end
 
 endmodule
