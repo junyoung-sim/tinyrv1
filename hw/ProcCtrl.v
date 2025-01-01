@@ -103,10 +103,10 @@ module ProcCtrl
     .rst(rst),
     .en(1'b1),
     .d(~squash_F),
-    .q(val_D0)
+    .q(val_D)
   );
 
-  assign val_D = val_D0 & (inst_D != 32'b0);
+  //assign val_D = val_D0 & (inst_D != 32'b0);
 
   Register#(1) val_DX (
     .clk(clk),
@@ -264,9 +264,9 @@ module ProcCtrl
     input logic       op1_sel_D,
     input logic       op2_sel_D
   );
-    c2d_imm_type_D  = imm_type;
-    c2d_op1_sel_D = op1_sel_D;
-    c2d_op2_sel_D = op2_sel_D;
+    c2d_imm_type_D = imm_type;
+    c2d_op1_sel_D  = op1_sel_D;
+    c2d_op2_sel_D  = op2_sel_D;
   endtask
 
   always_comb begin
