@@ -35,16 +35,24 @@ module ProcCtrl
 );
 
   //==========================================================
-  // Hazard Signals
+  // Internal Signals
   //==========================================================
 
-  logic squash_D;
-  logic squash_F;
+  logic [31:0] inst_D;
+  logic [31:0] inst_X;
+  logic [31:0] inst_M;
+  logic [31:0] inst_W;
 
-  logic stall_lw_X_rs1_D;
-  logic stall_lw_X_rs2_D;
-  logic stall_D;
-  logic stall_F;
+  logic val_D0;
+  logic val_D;
+  logic val_M;
+  logic val_W;
+
+  logic rs1_en_D;
+  logic rs2_en_D;
+  logic rf_wen_X;
+  logic rf_wen_M;
+  logic rf_wen_W;
 
   logic bypass_waddr_X_rs1_D;
   logic bypass_waddr_X_rs2_D;
@@ -53,14 +61,17 @@ module ProcCtrl
   logic bypass_waddr_W_rs1_D;
   logic bypass_waddr_W_rs2_D;
 
+  logic stall_lw_X_rs1_D;
+  logic stall_lw_X_rs2_D;
+  logic stall_D;
+  logic stall_F;
+
+  //logic squash_D;
+  //logic squash_F;
+
   //==========================================================
   // Instruction Registers
   //==========================================================
-
-  logic [31:0] inst_D;
-  logic [31:0] inst_X;
-  logic [31:0] inst_M;
-  logic [31:0] inst_W;
 
   assign inst_D = d2c_inst;
 
@@ -92,27 +103,13 @@ module ProcCtrl
   // Validation Registers
   //==========================================================
 
-  logic val_D0;
-  logic val_D;
-  logic val_X;
-  logic val_M;
-  logic val_W;
-
-  Register#(1) val_FD (
-    .clk(clk),
-    .rst(rst),
-    .en(1'b1),
-    .d(~squash_F),
-    .q(val_D)
-  );
-
-  //assign val_D = val_D0 & (inst_D != 32'b0);
+  assign val_D = (inst_D != 0);
 
   Register#(1) val_DX (
     .clk(clk),
     .rst(rst),
     .en(1'b1),
-    .d(val_D & ~squash_D & ~stall_D),
+    .d(val_D),
     .q(val_X)
   );
 
@@ -136,12 +133,6 @@ module ProcCtrl
   // Hazard Management
   //==========================================================
 
-  logic rs1_en_D;
-  logic rs2_en_D;
-  logic rf_wen_X;
-  logic rf_wen_M;
-  logic rf_wen_W;
-
   always_comb begin
     // RF Read Instructions (RS1)
     rs1_en_D = (inst_D ==? `ADD) | (inst_D ==? `ADDI) |
@@ -160,29 +151,6 @@ module ProcCtrl
     rf_wen_W = (inst_W ==? `ADD) | (inst_W ==? `ADDI) |
                (inst_W ==? `MUL) | (inst_W ==? `LW  ) |
                (inst_W ==? `JAL) ;
-  end
-
-  // Squash
-
-  always_comb begin
-    squash_D = val_X & (inst_X ==? `BNE) & ~d2c_eq_X;
-    squash_F = squash_D | (val_D & ( (inst_D ==? `JAL)
-                                   | (inst_D ==? `JR ) ));
-  end
-
-  // Stall
-
-  always_comb begin
-    stall_lw_X_rs1_D =   val_D & rs1_en_D
-                       & val_X & (inst_X ==? `LW)
-                       & (inst_D[`RS1] == inst_X[`RD])
-                       & (inst_X[`RD] != 0);
-    stall_lw_X_rs2_D =   val_D & rs2_en_D
-                       & val_X & (inst_X ==? `LW)
-                       & (inst_D[`RS2] == inst_X[`RD])
-                       & (inst_X[`RD] != 0);
-    stall_D = val_D & (stall_lw_X_rs1_D | stall_lw_X_rs2_D);
-    stall_F = stall_D;
   end
 
   // Bypass
@@ -219,6 +187,29 @@ module ProcCtrl
                            & (inst_W[`RD] != 0);
   end
 
+  // Stall
+
+  always_comb begin
+    stall_lw_X_rs1_D =   val_D & rs1_en_D
+                       & val_X & (inst_X ==? `LW)
+                       & (inst_D[`RS1] == inst_X[`RD])
+                       & (inst_X[`RD] != 0);
+    stall_lw_X_rs2_D =   val_D & rs2_en_D
+                       & val_X & (inst_X ==? `LW)
+                       & (inst_D[`RS2] == inst_X[`RD])
+                       & (inst_X[`RD] != 0);
+    stall_D = val_D & (stall_lw_X_rs1_D | stall_lw_X_rs2_D);
+    stall_F = stall_D;
+  end
+
+  // Squash
+/*
+  always_comb begin
+    squash_D = val_X & (inst_X ==? `BNE) & ~d2c_eq_X;
+    squash_F = squash_D | (val_D & ( (inst_D ==? `JAL)
+                                   | (inst_D ==? `JR ) ));
+  end
+*/
   //==========================================================
   // Stage F
   //==========================================================
