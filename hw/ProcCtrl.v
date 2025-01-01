@@ -60,10 +60,10 @@ module ProcCtrl
   logic bypass_waddr_W_rs1_D;
   logic bypass_waddr_W_rs2_D;
 
-  //logic stall_lw_X_rs1_D;
-  //logic stall_lw_X_rs2_D;
-  //logic stall_D;
-  //logic stall_F;
+  logic stall_lw_X_rs1_D;
+  logic stall_lw_X_rs2_D;
+  logic stall_D;
+  logic stall_F;
 
   //logic squash_D;
   //logic squash_F;
@@ -108,7 +108,7 @@ module ProcCtrl
     .clk(clk),
     .rst(rst),
     .en(1'b1),
-    .d(val_D),
+    .d(val_D & ~stall_D),
     .q(val_X)
   );
 
@@ -187,7 +187,7 @@ module ProcCtrl
   end
 
   // Stall
-/*
+
   always_comb begin
     stall_lw_X_rs1_D =   val_D & rs1_en_D
                        & val_X & (inst_X ==? `LW)
@@ -200,7 +200,7 @@ module ProcCtrl
     stall_D = val_D & (stall_lw_X_rs1_D | stall_lw_X_rs2_D);
     stall_F = stall_D;
   end
-*/
+
   // Squash
 /*
   always_comb begin
@@ -215,7 +215,7 @@ module ProcCtrl
 
   // Stall
 
-  assign c2d_reg_en_F = 1;//~stall_F;
+  assign c2d_reg_en_F = ~stall_F;
 
   // Program Counter Selection
 
@@ -230,7 +230,7 @@ module ProcCtrl
 
   // Stall
 
-  assign c2d_reg_en_D = 1;//~stall_D;
+  assign c2d_reg_en_D = ~stall_D;
 
   // Bypass
 
