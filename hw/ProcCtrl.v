@@ -276,7 +276,7 @@ module ProcCtrl
         `ADD  : cs_D(   'x,   0,  0 ); // X, RF, RF
         `ADDI : cs_D( `IMM_I, 0,  1 ); // I, RF, Imm
         `MUL  : cs_D(   'x,   0,  0 ); // X, RF, RF
-        `LW   : cs_D( `IMM_I, 0,  0 ); // I, RF, RF
+        `LW   : cs_D( `IMM_I, 0,  1 ); // I, RF, Imm
 
         default: cs_D( 'x, 'x, 'x );
       endcase
