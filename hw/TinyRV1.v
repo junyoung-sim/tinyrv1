@@ -1,3 +1,17 @@
+//========================================================================
+// TinyRV1 Instruction Set Specification
+//========================================================================
+//
+// ECE 2300 TinyRV1 ISA
+// https://cornell-ece2300.github.io/ece2300-docs/ece2300-tinyrv1-isa/
+//
+//  31          25 24   20 19   15 14    12 11          7 6      0
+// | funct7       | rs2   | rs1   | funct3 | rd          | opcode |  R-type
+// | imm[11:0]            | rs1   | funct3 | rd          | opcode |  I-type,I-imm
+// | imm[11:5]    | rs2   | rs1   | funct3 | imm[4:0]    | opcode |  S-type,S-imm
+// | imm[12|10:5] | rs2   | rs1   | funct3 | imm[4:1|11] | opcode |  S-type,B-imm
+// | imm[20|10:1|11|19:12]                 | rd          | opcode |  U-type,J-imm
+
 `ifndef TINYRV1_V
 `define TINYRV1_V
 
