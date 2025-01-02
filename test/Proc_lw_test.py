@@ -48,8 +48,10 @@ async def test_stall(dut):
   # Assembly Program
 
   await asm_write(dut, 0x000, "addi x1 x0 0x080") # F D X M W
-  await asm_write(dut, 0x004, "lw x2 0(x1)"     ) #   F D X M W     (X-D)
-  await asm_write(dut, 0x008, "addi x2 x2 1"    ) #     F D D X M W (M-D)
+  await asm_write(dut, 0x004, "lw x2 0(x1)"     ) #   F D X M W         (X-D)
+  await asm_write(dut, 0x008, "addi x2 x2 1"    ) #     F D D X M W     (M-D)
+  await asm_write(dut, 0x00c, "addi x3 x2 1"    ) #       F F D X M W   (X-D)
+  await asm_write(dut, 0x010, "addi x4 x3 1"    ) #           F D X M W (X-D)
 
   await reset(dut)
 
@@ -60,5 +62,7 @@ async def test_stall(dut):
   await check_trace(dut, x)
   await check_trace(dut, 0x00000080)
   await check_trace(dut, 0x0000000a)
-  await check_trace(dut, 0x0000000a)
+  await check_trace(dut, 0x0000000a) # stalled trace
   await check_trace(dut, 0x0000000b)
+  await check_trace(dut, 0x0000000c)
+  await check_trace(dut, 0x0000000d)
