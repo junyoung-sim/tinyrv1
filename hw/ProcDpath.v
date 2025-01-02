@@ -221,6 +221,18 @@ module ProcDpath
     .q(op2)
   );
 
+  // Store Data
+
+  logic [31:0] sd_X
+
+  Register#(32) sd_DX (
+    .clk(clk),
+    .rst(rst),
+    .en(1'b1),
+    .d(op2_bypass),
+    .q(sd_X)
+  );
+
   //==========================================================
   // Stage X
   //==========================================================
@@ -267,6 +279,18 @@ module ProcDpath
     .q(result_X)
   );
 
+  // Store Data
+
+  logic [31:0] sd_M;
+
+  Register#(32) sd_XM (
+    .clk(clk),
+    .rst(rst),
+    .en(1'b1),
+    .d(sd_X),
+    .q(sd_M)
+  );
+
   //==========================================================
   // Stage M
   //==========================================================
@@ -276,7 +300,7 @@ module ProcDpath
   assign dmemreq_val   = c2d_dmemreq_val_M;
   assign dmemreq_type  = c2d_dmemreq_type_M;
   assign dmemreq_addr  = result_X;
-  assign dmemreq_wdata = 32'b0;
+  assign dmemreq_wdata = sd_M;
 
   // Write Selection
 

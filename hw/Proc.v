@@ -70,7 +70,7 @@ module Proc
 
   always_comb begin
 
-    dval  = dmemreq_val | ext_dmemreq_val;
+    dval = (dmemreq_val | ext_dmemreq_val);
     
     if(ext_dmemreq_val) begin
       dtype = ext_dmemreq_type;

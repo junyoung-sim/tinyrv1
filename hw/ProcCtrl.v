@@ -276,6 +276,7 @@ module ProcCtrl
         `ADDI : cs_D( `IMM_I, 0,  1 ); // I, RF, Imm
         `MUL  : cs_D(   'x,   0,  0 ); // X, RF, RF
         `LW   : cs_D( `IMM_I, 0,  1 ); // I, RF, Imm
+        `SW   : cs_D( `IMM_S, 0,  1 ); // S, RF, Imm
 
         default: cs_D( 'x, 'x, 'x );
       endcase
@@ -307,6 +308,7 @@ module ProcCtrl
         `ADDI : cs_X(  0,  0 ); // add, alu_out
         `MUL  : cs_X( 'x,  1 ); // mul, mul_out
         `LW   : cs_X(  0,  0 ); // add, alu_out
+        `SW   : cs_X(  0,  0 ); // add, alu_out
 
         default: cs_X( 'x, 'x );
       endcase
@@ -335,11 +337,12 @@ module ProcCtrl
   always_comb begin
     if(val_M) begin
       casez(inst_M)
-        //            dval dtype wb
+        //           dval  dtype wb
         `ADD  : cs_M( 0,   'x,   0 ); // result_X
         `ADDI : cs_M( 0,   'x,   0 ); // result_X
         `MUL  : cs_M( 0,   'x,   0 ); // result_X
         `LW   : cs_M( 1,    0,   1 ); // dmemresp_rdata
+        `SW   : cs_M( 1,    1,  'x ); // dmemreq_wdata
 
         default: cs_M( 'x, 'x, 'x );
       endcase
@@ -366,11 +369,12 @@ module ProcCtrl
   always_comb begin
     if(val_W) begin
       casez(inst_W)
-        //          wen rf_waddr
+        //           wen rf_waddr
         `ADD  : cs_W( 1, inst_W[`RD] );
         `ADDI : cs_W( 1, inst_W[`RD] );
         `MUL  : cs_W( 1, inst_W[`RD] );
         `LW   : cs_W( 1, inst_W[`RD] );
+        `SW   : cs_W( 0, 'x          );
 
         default: cs_W( 'x, 'x );
       endcase
