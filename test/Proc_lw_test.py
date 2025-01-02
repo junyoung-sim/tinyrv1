@@ -7,16 +7,20 @@ async def test_simple(dut):
 
   # Data Memory
 
+  await data(dut, 0x078, 0xdeadbeef)
   await data(dut, 0x07c, 0xcafe2300)
   await data(dut, 0x080, 0xacedbeef)
   await data(dut, 0x084, 0xdeafface)
+  await data(dut, 0x088, 0xabacadab)
 
   # Assembly Program
 
   await asm_write(dut, 0x000, "addi x1 x0 0x080") # F D X M W
-  await asm_write(dut, 0x004, "lw x2 -4(x1)"    ) #   F D X M W     (X-D)
-  await asm_write(dut, 0x008, "lw x2 0(x1)"     ) #     F D X M W   (M-D)
-  await asm_write(dut, 0x00c, "lw x2 4(x1)"     ) #       F D X M W (W-D)
+  await asm_write(dut, 0x004, "lw x2 -8(x1)"    ) #   F D X M W       (X-D)
+  await asm_write(dut, 0x008, "lw x2 -4(x1)"    ) #     F D X M W     (M-D)
+  await asm_write(dut, 0x00c, "lw x2 0(x1)"     ) #       F D X M W   (W-D)
+  await asm_write(dut, 0x010, "lw x2 4(x1)"     ) #         F D X M W
+  await asm_write(dut, 0x014, "lw x2 8(x1)"     ) #           F D X M W
 
   await reset(dut)
 
@@ -26,9 +30,11 @@ async def test_simple(dut):
   await check_trace(dut, x)
   await check_trace(dut, x)
   await check_trace(dut, 0x00000080)
+  await check_trace(dut, 0xdeadbeef)
   await check_trace(dut, 0xcafe2300)
   await check_trace(dut, 0xacedbeef)
   await check_trace(dut, 0xdeafface)
+  await check_trace(dut, 0xabacadab)
 
 @cocotb.test()
 async def test_stall(dut):
