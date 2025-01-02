@@ -223,7 +223,7 @@ module ProcDpath
 
   // Store Data
 
-  logic [31:0] sd_X
+  logic [31:0] sd_X;
 
   Register#(32) sd_DX (
     .clk(clk),
