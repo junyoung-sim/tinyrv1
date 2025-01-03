@@ -338,11 +338,11 @@ module ProcCtrl
     if(val_M) begin
       casez(inst_M)
         //           dval  dtype wb
-        `ADD  : cs_M( 0,   'x,   0 ); // result_X
-        `ADDI : cs_M( 0,   'x,   0 ); // result_X
-        `MUL  : cs_M( 0,   'x,   0 ); // result_X
-        `LW   : cs_M( 1,    0,   1 ); // dmemresp_rdata
-        `SW   : cs_M( 1,    1,  'x ); // dmemreq_wdata
+        `ADD  : cs_M( 0,   'x,   0 ); // result_X       (RF)
+        `ADDI : cs_M( 0,   'x,   0 ); // result_X       (RF)
+        `MUL  : cs_M( 0,   'x,   0 ); // result_X       (RF)
+        `LW   : cs_M( 1,    0,   1 ); // dmemresp_rdata (RF)
+        `SW   : cs_M( 1,    1,  'x ); // dmemreq_wdata  (M)
 
         default: cs_M( 'x, 'x, 'x );
       endcase
