@@ -66,8 +66,8 @@ module ProcCtrl
   logic stall_D;
   logic stall_F;
 
-  //logic squash_D;
-  //logic squash_F;
+  logic squash_D;
+  logic squash_F;
 
   //==========================================================
   // Instruction Registers
@@ -107,7 +107,7 @@ module ProcCtrl
     .clk(clk),
     .rst(rst),
     .en(1'b1),
-    .d(1'b1),
+    .d(~squash_F),
     .q(val_D0)
   );
 
@@ -211,13 +211,13 @@ module ProcCtrl
   end
 
   // Squash
-/*
+
   always_comb begin
     squash_D = val_X & (inst_X ==? `BNE) & ~d2c_eq_X;
     squash_F = squash_D | (val_D & ( (inst_D ==? `JAL)
                                    | (inst_D ==? `JR ) ));
   end
-*/
+
   //==========================================================
   // Stage F
   //==========================================================
@@ -229,9 +229,16 @@ module ProcCtrl
   // Program Counter Selection
 
   always_comb begin
-    c2d_pc_sel_F      = 0; // pc_plus4
-    c2d_imemreq_val_F = 1;
+    casez(inst_D)
+      `JR  : c2d_pc_sel_F = inst_D[`RS1];
+      //`JAL : c2d_pc_sel_F = 
+      //`BNE : c2d_pc_sel_F = 
+
+      default: c2d_pc_sel_F = `PLUS4;
+    endcase
   end
+
+  assign c2d_imemreq_val_F = 1;
 
   //==========================================================
   // Stage D
@@ -272,11 +279,12 @@ module ProcCtrl
     if(val_D) begin
       casez(inst_D)
         //              imm  op1 op2
-        `ADD  : cs_D(   'x,   0,  0 ); // X, RF, RF
+        `ADD  : cs_D(   'x,   0,  0 ); // -, RF, RF
         `ADDI : cs_D( `IMM_I, 0,  1 ); // I, RF, Imm
-        `MUL  : cs_D(   'x,   0,  0 ); // X, RF, RF
+        `MUL  : cs_D(   'x,   0,  0 ); // -, RF, RF
         `LW   : cs_D( `IMM_I, 0,  1 ); // I, RF, Imm
         `SW   : cs_D( `IMM_S, 0,  1 ); // S, RF, Imm
+        `JR   : cs_D( `IMM_I, 0, 'x ); // I, RF, ---
 
         default: cs_D( 'x, 'x, 'x );
       endcase
@@ -309,6 +317,7 @@ module ProcCtrl
         `MUL  : cs_X( 'x,  1 ); // mul, mul_out
         `LW   : cs_X(  0,  0 ); // add, alu_out
         `SW   : cs_X(  0,  0 ); // add, alu_out
+        `JR   : cs_X( 'x, 'x ); // ---, -------
 
         default: cs_X( 'x, 'x );
       endcase
@@ -341,8 +350,9 @@ module ProcCtrl
         `ADD  : cs_M( 0,   'x,   0 ); // result_X
         `ADDI : cs_M( 0,   'x,   0 ); // result_X
         `MUL  : cs_M( 0,   'x,   0 ); // result_X
-        `LW   : cs_M( 1,    0,   1 ); // dmemresp_rdata (M)
-        `SW   : cs_M( 1,    1,  'x ); // dmemreq_wdata  (M)
+        `LW   : cs_M( 1,    0,   1 ); // mem (r)
+        `SW   : cs_M( 1,    1,  'x ); // mem (w)
+        `JR   : cs_M( 0,   'x,  'x ); // --------
 
         default: cs_M( 'x, 'x, 'x );
       endcase
@@ -375,6 +385,7 @@ module ProcCtrl
         `MUL  : cs_W( 1, inst_W[`RD] );
         `LW   : cs_W( 1, inst_W[`RD] );
         `SW   : cs_W( 0, 'x          );
+        `JR   : cs_W( 0, 'x          );
 
         default: cs_W( 'x, 'x );
       endcase
