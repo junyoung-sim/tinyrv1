@@ -350,8 +350,8 @@ module ProcCtrl
         `ADD  : cs_M( 0,   'x,   0 ); // result_X
         `ADDI : cs_M( 0,   'x,   0 ); // result_X
         `MUL  : cs_M( 0,   'x,   0 ); // result_X
-        `LW   : cs_M( 1,    0,   1 ); // mem (r)
-        `SW   : cs_M( 1,    1,  'x ); // mem (w)
+        `LW   : cs_M( 1,    0,   1 ); // mem  (r)
+        `SW   : cs_M( 1,    1,  'x ); // mem  (w)
         `JR   : cs_M( 0,   'x,  'x ); // --------
 
         default: cs_M( 'x, 'x, 'x );
