@@ -28,10 +28,10 @@
 // Control Flow Types
 //==========================================================
 
-`define PLUS4 2'b00
-`define JR    2'b01
-`define JTARG 2'b10
-`define BTARG 2'b11
+`define PC_PLUS4 2'b00
+`define PC_JR    2'b01
+`define PC_JTARG 2'b10
+`define PC_BTARG 2'b11
 
 //==========================================================
 // Instruction Fields

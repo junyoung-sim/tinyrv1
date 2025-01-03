@@ -104,6 +104,12 @@ def asm_sw(inst_s):
   opcode = get_opcode(0b0100011)
   return imm_s | rs2 | rs1 | funct3 | opcode
 
+# jr rs1
+def asm_jr(inst_s):
+  rs1    = get_RS1(int(inst_s[1][1:]))
+  opcode = get_opcode(0b1100111)
+  return rs1 | opcode
+
 def asm(inst_s):
   inst_s = inst_s.split()
 
@@ -117,6 +123,8 @@ def asm(inst_s):
     inst = asm_lw(inst_s)
   elif inst_s[0] == "sw":
     inst = asm_sw(inst_s)
+  elif inst_s[0] == "jr":
+    inst = asm_jr(inst_s)
   
   return inst
 

@@ -230,11 +230,11 @@ module ProcCtrl
 
   always_comb begin
     casez(inst_D)
-      `JR  : c2d_pc_sel_F = inst_D[`RS1];
+      `JR  : c2d_pc_sel_F = `PC_JR;
       //`JAL : c2d_pc_sel_F = 
       //`BNE : c2d_pc_sel_F = 
 
-      default: c2d_pc_sel_F = `PLUS4;
+      default: c2d_pc_sel_F = `PC_PLUS4;
     endcase
   end
 

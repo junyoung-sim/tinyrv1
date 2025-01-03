@@ -89,6 +89,9 @@ module ProcDpath
   logic [31:0] result_M_next;
   logic [31:0] result_W_next;
 
+  logic [31:0] op1_bypass;
+  logic [31:0] op2_bypass;
+
   //==========================================================
   // Stage F
   //==========================================================
@@ -99,6 +102,9 @@ module ProcDpath
   logic [31:0] pc_next;
 
   logic [31:0] pc_plus4;
+  logic [31:0] pc_jr;
+
+  assign pc_jr = op1_bypass;
 
   Register#(32) pc_F (
     .clk(clk),
@@ -117,7 +123,7 @@ module ProcDpath
   Mux4#(32) pc_mux (
     .sel(c2d_pc_sel_F),
     .in0(pc_plus4),
-    .in1(32'b0),
+    .in1(pc_jr),
     .in2(32'b0),
     .in3(32'b0),
     .out(pc_next)
@@ -161,9 +167,6 @@ module ProcDpath
   );
 
   // Operand Bypass Selection
-
-  logic [31:0] op1_bypass;
-  logic [31:0] op2_bypass;
 
   Mux4#(32) op1_bypass_mux (
     .sel(c2d_op1_byp_sel_D),
