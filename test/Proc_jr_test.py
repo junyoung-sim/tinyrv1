@@ -17,7 +17,7 @@ async def test_count(dut):
   #                            add x0 x0 x0       #               F - - - -
   #                            addi x2 x2 0x001   #                 F D X M W   (W-D)
   #                            jr x1              #                   F D X M W
-  #                                 ...           #                      ...
+  #                                   ...         #                      ...
 
   await reset(dut)
 
