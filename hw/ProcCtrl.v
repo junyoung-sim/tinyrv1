@@ -19,7 +19,7 @@ module ProcCtrl
   (* keep=1 *) output logic [1:0]  c2d_op1_byp_sel_D,
   (* keep=1 *) output logic [1:0]  c2d_op2_byp_sel_D,
   (* keep=1 *) output logic        c2d_op1_sel_D,
-  (* keep=1 *) output logic        c2d_op2_sel_D,
+  (* keep=1 *) output logic [1:0]  c2d_op2_sel_D,
   (* keep=1 *) output logic        c2d_alu_fn_X,
   (* keep=1 *) output logic        c2d_result_sel_X,
   (* keep=1 *) output logic        c2d_dmemreq_val_M,
@@ -231,7 +231,7 @@ module ProcCtrl
   always_comb begin
     casez(inst_D)
       `JR  : c2d_pc_sel_F = `PC_JR;
-      //`JAL : c2d_pc_sel_F = 
+      `JAL : c2d_pc_sel_F = `PC_JTARG;
       //`BNE : c2d_pc_sel_F = 
 
       default: c2d_pc_sel_F = `PC_PLUS4;
@@ -268,7 +268,7 @@ module ProcCtrl
   (
     input logic [1:0] imm_type,
     input logic       op1_sel_D,
-    input logic       op2_sel_D
+    input logic [1:0] op2_sel_D
   );
     c2d_imm_type_D = imm_type;
     c2d_op1_sel_D  = op1_sel_D;
@@ -284,7 +284,8 @@ module ProcCtrl
         `MUL  : cs_D(   'x,   0,  0 ); // -, RF, RF
         `LW   : cs_D( `IMM_I, 0,  1 ); // I, RF, Imm
         `SW   : cs_D( `IMM_S, 0,  1 ); // S, RF, Imm
-        `JR   : cs_D( `IMM_I, 0, 'x ); // I, RF, ---
+        `JR   : cs_D(   'x,   0, 'x ); // -, RF, ---
+        `JAL  : cs_D( `IMM_J, 1,  2 ); // J, PC, +4
 
         default: cs_D( 'x, 'x, 'x );
       endcase
@@ -318,6 +319,7 @@ module ProcCtrl
         `LW   : cs_X(  0,  0 ); // add, alu_out
         `SW   : cs_X(  0,  0 ); // add, alu_out
         `JR   : cs_X( 'x, 'x ); // ---, -------
+        `JAL  : cs_X(  0,  0 ); // add, alu_out
 
         default: cs_X( 'x, 'x );
       endcase
@@ -353,6 +355,7 @@ module ProcCtrl
         `LW   : cs_M( 1,    0,   1 ); // mem  (r)
         `SW   : cs_M( 1,    1,  'x ); // mem  (w)
         `JR   : cs_M( 0,   'x,  'x ); // --------
+        `JAL  : cs_M( 0,   'x,   0 ); // result_X
 
         default: cs_M( 'x, 'x, 'x );
       endcase
@@ -386,6 +389,7 @@ module ProcCtrl
         `LW   : cs_W( 1, inst_W[`RD] );
         `SW   : cs_W( 0, 'x          );
         `JR   : cs_W( 0, 'x          );
+        `JAL  : cs_W( 1, inst_W[`RD] );
 
         default: cs_W( 'x, 'x );
       endcase

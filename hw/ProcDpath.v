@@ -37,7 +37,7 @@ module ProcDpath
   (* keep=1 *) input  logic [1:0]  c2d_op1_byp_sel_D,
   (* keep=1 *) input  logic [1:0]  c2d_op2_byp_sel_D,
   (* keep=1 *) input  logic        c2d_op1_sel_D,
-  (* keep=1 *) input  logic        c2d_op2_sel_D,
+  (* keep=1 *) input  logic [1:0]  c2d_op2_sel_D,
   (* keep=1 *) input  logic        c2d_alu_fn_X,
   (* keep=1 *) input  logic        c2d_result_sel_X,
   (* keep=1 *) input  logic        c2d_dmemreq_val_M,
@@ -101,11 +101,6 @@ module ProcDpath
   logic [31:0] pc;
   logic [31:0] pc_next;
 
-  logic [31:0] pc_plus4;
-  logic [31:0] pc_jr;
-
-  assign pc_jr = op1_bypass;
-
   Register#(32) pc_F (
     .clk(clk),
     .rst(rst),
@@ -114,17 +109,27 @@ module ProcDpath
     .q(pc)
   );
 
+  logic [31:0] pc_plus4;
+
   Adder#(32) pc_plus4_adder (
     .in0(pc),
     .in1(32'h00000004),
     .sum(pc_plus4)
   );
 
+  logic [31:0] pc_jr;
+  logic [31:0] pc_targ;
+  logic [31:0] pc_jtarg;
+  //logic [31:0] pc_btarg;
+
+  assign pc_jr    = op1_bypass;
+  assign pc_jtarg = pc_targ;
+
   Mux4#(32) pc_mux (
     .sel(c2d_pc_sel_F),
     .in0(pc_plus4),
     .in1(pc_jr),
-    .in2(32'b0),
+    .in2(pc_jtarg),
     .in3(32'b0),
     .out(pc_next)
   );
@@ -149,6 +154,18 @@ module ProcDpath
 
   assign d2c_inst = inst;
 
+  // Program Counter (FD)
+
+  logic [31:0] inst_pc;
+
+  Register#(32) pc_FD (
+    .clk(clk),
+    .rst(rst),
+    .en(c2d_reg_en_D),
+    .d(pc),
+    .q(inst_pc)
+  );
+
   //==========================================================
   // Stage D
   //==========================================================
@@ -164,6 +181,14 @@ module ProcDpath
     .inst(inst),
     .imm_type(c2d_imm_type_D),
     .imm(imm)
+  );
+
+  // Jump & Branch Calculation
+
+  Adder#(32) pc_targ_adder (
+    .in0(inst_pc),
+    .in1(imm),
+    .sum(pc_targ)
   );
 
   // Operand Bypass Selection
@@ -197,14 +222,16 @@ module ProcDpath
   Mux2#(32) op1_mux (
     .sel(c2d_op1_sel_D),
     .in0(op1_bypass),
-    .in1(32'b0),
+    .in1(inst_pc),
     .out(op1_next)
   );
 
-  Mux2#(32) op2_mux (
+  Mux4#(32) op2_mux (
     .sel(c2d_op2_sel_D),
     .in0(op2_bypass),
     .in1(imm),
+    .in2(32'h00000004),
+    .in3(32'h00000000),
     .out(op2_next)
   );
 
