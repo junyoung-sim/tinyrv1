@@ -230,11 +230,11 @@ module ProcCtrl
 
   always_comb begin
     casez(inst_D)
-      `JR  : c2d_pc_sel_F = `PC_JR;
-      `JAL : c2d_pc_sel_F = `PC_JTARG;
+      `JR  : c2d_pc_sel_F = 1;
+      `JAL : c2d_pc_sel_F = 2;
       //`BNE : c2d_pc_sel_F = 
 
-      default: c2d_pc_sel_F = `PC_PLUS4;
+      default: c2d_pc_sel_F = 0;
     endcase
   end
 
@@ -278,14 +278,14 @@ module ProcCtrl
   always_comb begin
     if(val_D) begin
       casez(inst_D)
-        //              imm  op1 op2
-        `ADD  : cs_D(   'x,   0,  0 ); // -, RF, RF
-        `ADDI : cs_D( `IMM_I, 0,  1 ); // I, RF, Imm
-        `MUL  : cs_D(   'x,   0,  0 ); // -, RF, RF
-        `LW   : cs_D( `IMM_I, 0,  1 ); // I, RF, Imm
-        `SW   : cs_D( `IMM_S, 0,  1 ); // S, RF, Imm
-        `JR   : cs_D(   'x,   0, 'x ); // -, RF, ---
-        `JAL  : cs_D( `IMM_J, 1,  2 ); // J, PC, +4
+        //            imm op1 op2
+        `ADD  : cs_D( 'x, 0,  0 ); // -, RF, RF
+        `ADDI : cs_D(  0, 0,  1 ); // I, RF, Imm
+        `MUL  : cs_D( 'x, 0,  0 ); // -, RF, RF
+        `LW   : cs_D(  0, 0,  1 ); // I, RF, Imm
+        `SW   : cs_D(  1, 0,  1 ); // S, RF, Imm
+        `JR   : cs_D( 'x, 0, 'x ); // -, RF, ---
+        `JAL  : cs_D(  2, 1,  2 ); // J, PC, +4
 
         default: cs_D( 'x, 'x, 'x );
       endcase
