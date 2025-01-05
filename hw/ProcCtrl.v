@@ -117,7 +117,7 @@ module ProcCtrl
     .clk(clk),
     .rst(rst),
     .en(1'b1),
-    .d(val_D & ~stall_D),
+    .d(val_D & ~stall_D & ~squash_D),
     .q(val_X)
   );
 
@@ -232,7 +232,7 @@ module ProcCtrl
     casez(inst_D)
       `JR  : c2d_pc_sel_F = 1;
       `JAL : c2d_pc_sel_F = 2;
-      //`BNE : c2d_pc_sel_F = 
+      `BNE : c2d_pc_sel_F = (d2c_eq_X ? 0 : 3);
 
       default: c2d_pc_sel_F = 0;
     endcase
@@ -286,6 +286,7 @@ module ProcCtrl
         `SW   : cs_D(  1, 0,  1 ); // S, RF, Imm
         `JR   : cs_D( 'x, 0, 'x ); // -, RF, ---
         `JAL  : cs_D(  2, 1,  2 ); // J, PC, +4
+        `BNE  : cs_D(  3, 0,  0 ); // B, RF, RF
 
         default: cs_D( 'x, 'x, 'x );
       endcase
@@ -320,6 +321,7 @@ module ProcCtrl
         `SW   : cs_X(  0,  0 ); // add, alu_out
         `JR   : cs_X( 'x, 'x ); // ---, -------
         `JAL  : cs_X(  0,  0 ); // add, alu_out
+        `BNE  : cs_X(  1, 'x ); // cmp, -------
 
         default: cs_X( 'x, 'x );
       endcase
@@ -356,6 +358,7 @@ module ProcCtrl
         `SW   : cs_M( 1,    1,  'x ); // mem  (w)
         `JR   : cs_M( 0,   'x,  'x ); // --------
         `JAL  : cs_M( 0,   'x,   0 ); // result_X
+        `BNE  : cs_M( 0,   'x,  'x ); // --------
 
         default: cs_M( 'x, 'x, 'x );
       endcase
@@ -390,6 +393,7 @@ module ProcCtrl
         `SW   : cs_W( 0, 'x          );
         `JR   : cs_W( 0, 'x          );
         `JAL  : cs_W( 1, inst_W[`RD] );
+        `BNE  : cs_W( 0, 'x          );
 
         default: cs_W( 'x, 'x );
       endcase

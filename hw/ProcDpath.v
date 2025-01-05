@@ -120,7 +120,7 @@ module ProcDpath
   logic [31:0] pc_jr;
   logic [31:0] pc_targ;
   logic [31:0] pc_jtarg;
-  //logic [31:0] pc_btarg;
+  logic [31:0] pc_btarg;
 
   assign pc_jr    = op1_bypass;
   assign pc_jtarg = pc_targ;
@@ -130,7 +130,7 @@ module ProcDpath
     .in0(pc_plus4),
     .in1(pc_jr),
     .in2(pc_jtarg),
-    .in3(32'b0),
+    .in3(pc_btarg),
     .out(pc_next)
   );
 
@@ -189,6 +189,14 @@ module ProcDpath
     .in0(inst_pc),
     .in1(imm),
     .sum(pc_targ)
+  );
+
+  Register#(32) btarg_DX (
+    .clk(clk),
+    .rst(rst),
+    .en(1'b1),
+    .d(pc_targ),
+    .q(pc_btarg)
   );
 
   // Operand Bypass Selection
