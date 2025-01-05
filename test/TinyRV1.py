@@ -49,6 +49,21 @@ def get_imm_s(imm):
     imm = int(imm, 10)
   return get_funct7(imm >> 5) | get_RD(imm & 0b11111)
 
+def get_imm_j(addr, targ):
+  if targ.find("0x") != -1:
+    targ = int(targ[2:], 16)
+  else:
+    targ = int(targ, 10)
+  
+  imm = (targ - addr) & 0b111111111111111111111
+
+  i1 = (imm & 0b100000000000000000000) >> 1
+  i2 = (imm & 0b000000000011111111110) << 8
+  i3 = (imm & 0b000000000100000000000) >> 3
+  i4 = (imm & 0b011111111000000000000) >> 12
+
+  return ((i1 | i2 | i3 | i4) << 12) & IMM_J
+
 #===========================================================
 # Instruction Assembly
 #===========================================================
@@ -110,7 +125,15 @@ def asm_jr(inst_s):
   opcode = get_opcode(0b1100111)
   return rs1 | opcode
 
-def asm(inst_s):
+# jal rd targ
+def asm_jal(addr, inst_s):
+  targ   = inst_s[2]
+  imm_j  = get_imm_j(addr, targ)
+  rd     = get_RD(int(inst_s[1][1:]))
+  opcode = get_opcode(0b1101111)
+  return imm_j | rd | opcode
+
+def asm(addr, inst_s):
   inst_s = inst_s.split()
 
   if inst_s[0] == "add":
@@ -125,6 +148,8 @@ def asm(inst_s):
     inst = asm_sw(inst_s)
   elif inst_s[0] == "jr":
     inst = asm_jr(inst_s)
+  elif inst_s[0] == "jal":
+    inst = asm_jal(addr, inst_s)
   
   return inst
 
@@ -143,7 +168,7 @@ async def asm_write(dut, addr, inst_s):
   dut.ext_dmemreq_val.value   = 1
   dut.ext_dmemreq_type.value  = 1
   dut.ext_dmemreq_addr.value  = addr
-  dut.ext_dmemreq_wdata.value = asm(inst_s)
+  dut.ext_dmemreq_wdata.value = asm(addr, inst_s)
   await RisingEdge(dut.clk)
 
 async def reset(dut):
