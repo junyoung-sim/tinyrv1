@@ -21,7 +21,7 @@
 
 `define IMM_I 2'b00
 `define IMM_S 2'b01
-`define IMM_J 2'b01
+`define IMM_J 2'b10
 `define IMM_B 2'b11
 
 //==========================================================
