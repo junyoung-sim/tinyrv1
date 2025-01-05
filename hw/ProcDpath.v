@@ -183,7 +183,7 @@ module ProcDpath
     .imm(imm)
   );
 
-  // Jump & Branch Calculation
+  // Jump & Branch Target
 
   Adder#(32) pc_targ_adder (
     .in0(inst_pc),
@@ -332,7 +332,7 @@ module ProcDpath
   assign dmemreq_addr  = result_X;
   assign dmemreq_wdata = sd_M;
 
-  // Write Selection
+  // Writeback Selection
 
   Mux2#(32) wb_mux (
     .sel(c2d_wb_sel_M),
