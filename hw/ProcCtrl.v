@@ -226,19 +226,22 @@ module ProcCtrl
 
   assign c2d_reg_en_F = ~stall_F;
 
-  // Program Counter Selection
-
-  always_comb begin
-    casez(inst_D)
-      `JR  : c2d_pc_sel_F = 1;
-      `JAL : c2d_pc_sel_F = 2;
-      `BNE : c2d_pc_sel_F = (d2c_eq_X ? 0 : 3);
-
-      default: c2d_pc_sel_F = 0;
-    endcase
-  end
+  // Fetch Logic
 
   assign c2d_imemreq_val_F = 1;
+
+  always_comb begin
+    if(squash_D) c2d_pc_sel_F = 3;
+    else if(val_D) begin
+      casez(inst_D)
+        `JR  :   c2d_pc_sel_F = 1;
+        `JAL :   c2d_pc_sel_F = 2;
+        default: c2d_pc_sel_F = 0;
+      endcase
+    end
+    else
+      c2d_pc_sel_F = 0;
+  end
 
   //==========================================================
   // Stage D
@@ -278,16 +281,15 @@ module ProcCtrl
   always_comb begin
     if(val_D) begin
       casez(inst_D)
-        //            imm op1 op2
-        `ADD  : cs_D( 'x, 0,  0 ); // -, RF, RF
-        `ADDI : cs_D(  0, 0,  1 ); // I, RF, Imm
-        `MUL  : cs_D( 'x, 0,  0 ); // -, RF, RF
-        `LW   : cs_D(  0, 0,  1 ); // I, RF, Imm
-        `SW   : cs_D(  1, 0,  1 ); // S, RF, Imm
-        `JR   : cs_D( 'x, 0, 'x ); // -, RF, ---
-        `JAL  : cs_D(  2, 1,  2 ); // J, PC, +4
-        `BNE  : cs_D(  3, 0,  0 ); // B, RF, RF
-
+        //             imm op1 op2
+        `ADD  :  cs_D( 'x,  0,  0 ); // -, RF, RF
+        `ADDI :  cs_D(  0,  0,  1 ); // I, RF, Imm
+        `MUL  :  cs_D( 'x,  0,  0 ); // -, RF, RF
+        `LW   :  cs_D(  0,  0,  1 ); // I, RF, Imm
+        `SW   :  cs_D(  1,  0,  1 ); // S, RF, Imm
+        `JR   :  cs_D( 'x,  0, 'x ); // -, RF, ---
+        `JAL  :  cs_D(  2,  1,  2 ); // J, PC, +4
+        `BNE  :  cs_D(  3,  0,  0 ); // B, RF, RF
         default: cs_D( 'x, 'x, 'x );
       endcase
     end
@@ -314,15 +316,14 @@ module ProcCtrl
     if(val_X) begin
       casez(inst_X)
         //            alu res
-        `ADD  : cs_X(  0,  0 ); // add, alu_out
-        `ADDI : cs_X(  0,  0 ); // add, alu_out
-        `MUL  : cs_X( 'x,  1 ); // mul, mul_out
-        `LW   : cs_X(  0,  0 ); // add, alu_out
-        `SW   : cs_X(  0,  0 ); // add, alu_out
-        `JR   : cs_X( 'x, 'x ); // ---, -------
-        `JAL  : cs_X(  0,  0 ); // add, alu_out
-        `BNE  : cs_X(  1, 'x ); // cmp, -------
-
+        `ADD  :  cs_X(  0,  0 ); // add, alu_out
+        `ADDI :  cs_X(  0,  0 ); // add, alu_out
+        `MUL  :  cs_X( 'x,  1 ); // mul, mul_out
+        `LW   :  cs_X(  0,  0 ); // add, alu_out
+        `SW   :  cs_X(  0,  0 ); // add, alu_out
+        `JR   :  cs_X( 'x, 'x ); // ---, -------
+        `JAL  :  cs_X(  0,  0 ); // add, alu_out
+        `BNE  :  cs_X(  1, 'x ); // cmp, -------
         default: cs_X( 'x, 'x );
       endcase
     end
@@ -350,17 +351,16 @@ module ProcCtrl
   always_comb begin
     if(val_M) begin
       casez(inst_M)
-        //           dval  dtype wb
-        `ADD  : cs_M( 0,   'x,   0 ); // result_X
-        `ADDI : cs_M( 0,   'x,   0 ); // result_X
-        `MUL  : cs_M( 0,   'x,   0 ); // result_X
-        `LW   : cs_M( 1,    0,   1 ); // mem  (r)
-        `SW   : cs_M( 1,    1,  'x ); // mem  (w)
-        `JR   : cs_M( 0,   'x,  'x ); // --------
-        `JAL  : cs_M( 0,   'x,   0 ); // result_X
-        `BNE  : cs_M( 0,   'x,  'x ); // --------
-
-        default: cs_M( 'x, 'x, 'x );
+        //             dval dtype wb
+        `ADD  :  cs_M(  0,  'x,   0 ); // result_X
+        `ADDI :  cs_M(  0,  'x,   0 ); // result_X
+        `MUL  :  cs_M(  0,  'x,   0 ); // result_X
+        `LW   :  cs_M(  1,   0,   1 ); // mem  (r)
+        `SW   :  cs_M(  1,   1,  'x ); // mem  (w)
+        `JR   :  cs_M(  0,  'x,  'x ); // --------
+        `JAL  :  cs_M(  0,  'x,   0 ); // result_X
+        `BNE  :  cs_M(  0,  'x,  'x ); // --------
+        default: cs_M( 'x,  'x,  'x );
       endcase
     end
     else
@@ -385,17 +385,16 @@ module ProcCtrl
   always_comb begin
     if(val_W) begin
       casez(inst_W)
-        //           wen rf_waddr
-        `ADD  : cs_W( 1, inst_W[`RD] );
-        `ADDI : cs_W( 1, inst_W[`RD] );
-        `MUL  : cs_W( 1, inst_W[`RD] );
-        `LW   : cs_W( 1, inst_W[`RD] );
-        `SW   : cs_W( 0, 'x          );
-        `JR   : cs_W( 0, 'x          );
-        `JAL  : cs_W( 1, inst_W[`RD] );
-        `BNE  : cs_W( 0, 'x          );
-
-        default: cs_W( 'x, 'x );
+        //             wen rf_waddr
+        `ADD  :  cs_W(  1, inst_W[`RD] );
+        `ADDI :  cs_W(  1, inst_W[`RD] );
+        `MUL  :  cs_W(  1, inst_W[`RD] );
+        `LW   :  cs_W(  1, inst_W[`RD] );
+        `SW   :  cs_W(  0, 'x          );
+        `JR   :  cs_W(  0, 'x          );
+        `JAL  :  cs_W(  1, inst_W[`RD] );
+        `BNE  :  cs_W(  0, 'x          );
+        default: cs_W( 'x, 'x          );
       endcase
     end
     else
