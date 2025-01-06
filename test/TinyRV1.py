@@ -40,13 +40,19 @@ def get_imm_i(imm):
     imm = int(imm[2:], 16)
   else:
     imm = int(imm, 10)
-  return ((imm & 0b111111111111) << 20) & IMM_I
+
+  imm = (imm & 0b111111111111)
+
+  return (imm << 20) & IMM_I
 
 def get_imm_s(imm):
   if imm.find("0x") != -1:
     imm = int(imm[2:], 16)
   else:
     imm = int(imm, 10)
+
+  imm = (imm & 0b111111111111)
+
   return get_funct7(imm >> 5) | get_RD(imm & 0b11111)
 
 def get_imm_j(addr, targ):
@@ -63,6 +69,21 @@ def get_imm_j(addr, targ):
   i4 = (imm & 0b011111111000000000000) >> 12
 
   return ((i1 | i2 | i3 | i4) << 12) & IMM_J
+
+def get_imm_b(addr, targ):
+  if targ.find("0x") != -1:
+    targ = int(targ[2:], 16)
+  else:
+    targ = int(targ, 10)
+  
+  imm = (targ - addr) & 0b1111111111111
+
+  i1 = (imm & 0b1000000000000) >> 6
+  i2 = (imm & 0b0011111100000) >> 5
+  i3 = (imm & 0b0000000011110)
+  i4 = (imm & 0b0100000000000) >> 11
+
+  return get_funct7(i1 | i2) | get_RD(i3 | i4)
 
 #===========================================================
 # Instruction Assembly
@@ -133,6 +154,16 @@ def asm_jal(addr, inst_s):
   opcode = get_opcode(0b1101111)
   return imm_j | rd | opcode
 
+# bne rs1 rs2 targ
+def asm_bne(addr, inst_s):
+  targ = inst_s[3]
+  imm_b  = get_imm_b(addr, targ)
+  rs1    = get_RS1(int(inst_s[1][1:]))
+  rs2    = get_RS2(int(inst_s[2][1:]))
+  funct3 = get_funct3(0b001)
+  opcode = get_opcode(0b1100011)
+  return imm_b | rs1 | rs2 | funct3 | opcode
+
 def asm(addr, inst_s):
   inst_s = inst_s.split()
 
@@ -150,6 +181,8 @@ def asm(addr, inst_s):
     inst = asm_jr(inst_s)
   elif inst_s[0] == "jal":
     inst = asm_jal(addr, inst_s)
+  elif inst_s[0] == "bne":
+    inst = asm_bne(addr, inst_s)
   
   return inst
 
