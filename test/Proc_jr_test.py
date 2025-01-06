@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from TinyRV1 import *
 
 @cocotb.test()
@@ -76,3 +78,6 @@ async def test_backward_jump(dut):
   await check_trace(dut, 0x002)
   await check_trace(dut, 0x003)
   
+if __name__ == "__main__":
+  run("Proc_jr_test", "test_forward_jump")
+  run("Proc_jr_test", "test_backward_jump")

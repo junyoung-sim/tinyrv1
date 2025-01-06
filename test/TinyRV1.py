@@ -1,6 +1,7 @@
 import cocotb
-from cocotb.clock import Clock
+import subprocess
 from cocotb.triggers import *
+from cocotb.clock import Clock
 
 x = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 
@@ -218,3 +219,15 @@ async def reset(dut):
 async def check_trace(dut, trace_data):
   await RisingEdge(dut.clk)
   assert dut.trace_data.value == trace_data
+
+#===========================================================
+# Test Call
+#===========================================================
+
+def run(module, testcase):
+  subprocess.run([
+    "make",
+    "TOPLEVEL=Proc",
+    "MODULE=" + module,
+    "TESTCASE=" + testcase
+  ])

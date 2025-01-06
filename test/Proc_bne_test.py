@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from TinyRV1 import *
 
 @cocotb.test()
@@ -147,3 +149,9 @@ async def test_backward_taken(dut):
   await check_trace(dut, 0x003)
   await check_trace(dut, 0x003)
   await check_trace(dut, 0x003)
+
+if __name__ == "__main__":
+  run("Proc_bne_test", "test_forward_not_taken")
+  run("Proc_bne_test", "test_forward_taken")
+  run("Proc_bne_test", "test_backward_not_taken")
+  run("Proc_bne_test", "test_backward_taken")

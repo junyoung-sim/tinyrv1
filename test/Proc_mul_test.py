@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from TinyRV1 import *
 
 #===========================================================
@@ -105,3 +107,9 @@ async def test_overflow_neg(dut):
   await check_trace(dut, 0x000007ff)
   await check_trace(dut, 0xffc00800)
   await check_trace(dut, 0x007ff800) # truncated
+
+if __name__ == "__main__":
+  run("Proc_mul_test", "test_simple")
+  run("Proc_mul_test", "test_verify_mul_add")
+  run("Proc_mul_test", "test_overflow_pos")
+  run("Proc_mul_test", "test_overflow_neg")

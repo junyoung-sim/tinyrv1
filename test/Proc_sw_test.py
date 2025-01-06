@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from TinyRV1 import *
 
 @cocotb.test()
@@ -67,3 +69,7 @@ async def test_imm(dut):
   await check_trace(dut, 0x00000064) #
   await check_trace(dut, 0x00000064) #
   await check_trace(dut, 0x00000064) #
+
+if __name__ == "__main__":
+  run("Proc_sw_test", "test_simple")
+  run("Proc_sw_test", "test_imm")

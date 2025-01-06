@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from TinyRV1 import *
 
 @cocotb.test()
@@ -104,3 +106,8 @@ async def test_backward_jal(dut):
   await check_trace(dut, 0x018)
   await check_trace(dut, 0x018)
   await check_trace(dut, 0x001)
+
+if __name__ == "__main__":
+  run("Proc_jal_test", "test_simple")
+  run("Proc_jal_test", "test_forward_jal")
+  run("Proc_jal_test", "test_backward_jal")

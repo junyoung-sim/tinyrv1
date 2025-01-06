@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from TinyRV1 import *
 
 #===========================================================
@@ -49,3 +51,7 @@ async def test_raw_bypass(dut):
   await check_trace(dut, 0)
   await check_trace(dut, 0)
   await check_trace(dut, 0)
+
+if __name__ == "__main__":
+  run("Proc_add_test", "test_simple")
+  run("Proc_add_test", "test_raw_bypass")

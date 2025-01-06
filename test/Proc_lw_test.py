@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from TinyRV1 import *
 
 @cocotb.test()
@@ -66,3 +68,7 @@ async def test_stall(dut):
   await check_trace(dut, 0x0000000b)
   await check_trace(dut, 0x0000000c)
   await check_trace(dut, 0x0000000d)
+
+if __name__ == "__main__":
+  run("Proc_lw_test", "test_simple")
+  run("Proc_lw_test", "test_stall")
