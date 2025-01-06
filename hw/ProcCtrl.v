@@ -315,7 +315,7 @@ module ProcCtrl
   always_comb begin
     if(val_X) begin
       casez(inst_X)
-        //            alu res
+        //             alu res
         `ADD  :  cs_X(  0,  0 ); // add, alu_out
         `ADDI :  cs_X(  0,  0 ); // add, alu_out
         `MUL  :  cs_X( 'x,  1 ); // mul, mul_out
