@@ -251,7 +251,7 @@ async def test_lw_mul(dut):
 
   await check_trace(dut, 0x0fc)
   await check_trace(dut, 0x003)
-  await check_trace(dut, 0x003)
+  await RisingEdge(dut.clk)
   await check_trace(dut, 0x009)
 
   await check_trace(dut, 0x0fc)

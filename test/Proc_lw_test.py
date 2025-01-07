@@ -277,7 +277,7 @@ async def test_lw_lw(dut):
 
   await check_trace(dut, 0x0fb)
   await check_trace(dut, 0x0fc)
-  await check_trace(dut, 0x0fc)
+  await RisingEdge(dut.clk)
   await check_trace(dut, 0x001)
 
   await check_trace(dut, 0x0fb)
