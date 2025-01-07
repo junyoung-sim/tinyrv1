@@ -272,7 +272,6 @@ async def test_lw_mul(dut):
   await check_trace(dut, 0x000)
   await check_trace(dut, 0x009)
 
-
 if __name__ == "__main__":
   test_case = int(sys.argv[1])
   if (test_case < 0) | (test_case == 0):
