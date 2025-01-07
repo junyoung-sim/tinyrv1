@@ -240,10 +240,6 @@ async def test_lw_add(dut):
   await check_trace(dut, 0x000)
   await check_trace(dut, 0x002)
 
-@cocotb.test()
-async def test_sw_add(dut):
-  pass
-
 if __name__ == "__main__":
   test_case = int(sys.argv[1])
   if (test_case < 0) | (test_case == 0):
@@ -254,5 +250,3 @@ if __name__ == "__main__":
     run("Proc_add_test", "test_mul_add")
   if (test_case < 0) | (test_case == 3):
     run("Proc_add_test", "test_lw_add")
-  if (test_case < 0) | (test_case == 4):
-    run("Proc_add_test", "test_sw_add")
