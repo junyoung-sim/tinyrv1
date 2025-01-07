@@ -192,9 +192,9 @@ async def test_lw_add(dut):
   await asm_write(dut, 0x008, "add x1 x1 x1"    ) #     F D D X M W    (M-D)
 
   await asm_write(dut, 0x00c, "addi x1 x0 0x0fc") # F F D X M W
-  await asm_write(dut, 0x010, "lw x1 0(x1)"     ) #     F D X M W        (X-D)
+  await asm_write(dut, 0x010, "lw x1 0(x1)"     ) #     F D X M W      (X-D)
   await asm_write(dut, 0x014, "add x0 x0 x0"    ) #       F D X M W
-  await asm_write(dut, 0x018, "add x1 x1 x1"    ) #         F D X M W    (M-D)
+  await asm_write(dut, 0x018, "add x1 x1 x1"    ) #         F D X M W  (M-D)
 
   await asm_write(dut, 0x01c, "addi x1 x0 0x0fc") # F D X M W
   await asm_write(dut, 0x020, "lw x1 0(x1)"     ) #   F D X M W        (X-D)
