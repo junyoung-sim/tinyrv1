@@ -8,7 +8,7 @@ from TinyRV1 import *
 #===========================================================
 
 @cocotb.test()
-async def test_verify_mul_add(dut):
+async def test_simple(dut):
   clock = Clock(dut.clk, 10, units="ns")
   cocotb.start_soon(clock.start(start_high=False))
 
@@ -275,7 +275,7 @@ async def test_lw_mul(dut):
 if __name__ == "__main__":
   test_case = int(sys.argv[1])
   if (test_case < 0) | (test_case == 0):
-    run("Proc_mul_test", "test_verify_mul_add")
+    run("Proc_mul_test", "test_simple")
   if (test_case < 0) | (test_case == 1):
     run("Proc_mul_test", "test_addi_mul")
   if (test_case < 0) | (test_case == 2):
