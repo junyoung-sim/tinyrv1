@@ -322,7 +322,7 @@ async def test_sw_lw(dut):
   await check_trace(dut, 0x0fc)
   await check_trace(dut, 0x001)
   await check_trace(dut, 0x000)
-  await check_trace(dut, 0x000)
+  await RisingEdge(dut.clk)
   await check_trace(dut, 0x001)
 
 if __name__ == "__main__":
