@@ -307,7 +307,7 @@ async def test_lw_jr(dut):
   await asm_write(dut, 0x000, "addi x1 x0 0x0f0") # F D X M W
   await asm_write(dut, 0x004, "lw x2 0(x1)"     ) #   F D X M W         (X-D)
   await asm_write(dut, 0x008, "jr x2"           ) #     F D D X M W     (M-D)
-  #                    0x00c   addi x1 x0 0x0f4   #       F F - - - -
+  #                    0x00c   addi x1 x0 0x0fc   #       F F - - - -
 
   await asm_write(dut, 0x030, "addi x1 x0 0x0f4") # F D X M W
   await asm_write(dut, 0x034, "lw x2 0(x1)"     ) #   F D X M W         (X-D)
@@ -322,13 +322,13 @@ async def test_lw_jr(dut):
   await asm_write(dut, 0x024, "add x0 x0 x0"    ) #     F D X M W
   await asm_write(dut, 0x028, "add x0 x0 x0"    ) #       F D X M W
   await asm_write(dut, 0x02c, "jr x2"           ) #         F D X M W   (W-D)
-  #                    0x030  addi x1 x0 0x0f8    #           F - - - -
+  #                    0x030  addi x1 x0 0x0f4    #           F - - - -
 
   await asm_write(dut, 0x00c, "addi x1 x0 0x0fc") # F D X M W
   await asm_write(dut, 0x010, "lw x2 0(x1)"     ) #   F D X M W         (X-D)
   await asm_write(dut, 0x014, "add x0 x0 x0"    ) #     F D X M W
   await asm_write(dut, 0x018, "jr x2"           ) #       F D X M W     (M-D)
-  #                    0x01c  addi x1 x0 0x0fc    #         F - - - -
+  #                    0x01c  addi x1 x0 0x0f8    #         F - - - -
   #                    0x000  addi x1 x0 0x0f0    #           F D X M W
   #                                  ...          #              ...
 
