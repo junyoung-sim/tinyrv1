@@ -142,7 +142,7 @@ module ProcCtrl
   //==========================================================
 
   always_comb begin
-    // RF Read Instructions (RS1)
+    // RF Read Instructions
     rs1_en_D = (inst_D ==? `ADD) | (inst_D ==? `ADDI) |
                (inst_D ==? `MUL) | (inst_D ==? `LW  ) |
                (inst_D ==? `SW ) | (inst_D ==? `JR  ) |
