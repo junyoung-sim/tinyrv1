@@ -107,7 +107,7 @@ module ProcCtrl
     .clk(clk),
     .rst(rst),
     .en(1'b1),
-    .d(~squash_F),
+    .d(~squash_F + stall_D),
     .q(val_D0)
   );
 
