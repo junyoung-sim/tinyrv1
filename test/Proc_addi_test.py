@@ -277,6 +277,67 @@ async def test_lw_addi(dut):
   await check_trace(dut, 0x000)
   await check_trace(dut, 0x002)
 
+#===========================================================
+# ADDI: test_jal_addi
+#===========================================================
+
+@cocotb.test()
+async def test_jal_addi(dut):
+  clock = Clock(dut.clk, 10, units="ns")
+  cocotb.start_soon(clock.start(start_high=False))
+
+  # Assembly Program
+
+  await asm_write(dut, 0x000, "jal x1 0x004") # F D X M W
+  await asm_write(dut, 0x004, "addi x2 x1 4") #   F F D X M W     (M-D)
+
+  await asm_write(dut, 0x008, "jal x1 0x014") # F D X M W
+  await asm_write(dut, 0x00c, "add x0 x0 x0") #   F - - - -
+  await asm_write(dut, 0x010, "add x0 x0 x0") #
+  await asm_write(dut, 0x014, "addi x2 x1 4") #     F D X M W     (M-D)
+
+  await asm_write(dut, 0x018, "jal x1 0x024") # F D X M W
+  await asm_write(dut, 0x01c, "add x0 x0 x0") #   F - - - -
+  await asm_write(dut, 0x020, "add x0 x0 x0") #
+  await asm_write(dut, 0x024, "add x0 x0 x0") #     F D X M W
+  await asm_write(dut, 0x028, "addi x2 x1 4") #       F D X M W   (W-D)
+
+  await asm_write(dut, 0x02c, "jal x1 0x038") # F D X M W
+  await asm_write(dut, 0x030, "add x0 x0 x0") #   F - - - -
+  await asm_write(dut, 0x034, "add x0 x0 x0") #
+  await asm_write(dut, 0x038, "add x0 x0 x0") #     F D X M W
+  await asm_write(dut, 0x03c, "add x0 x0 x0") #       F D X M W
+  await asm_write(dut, 0x040, "addi x2 x1 4") #         F D X M W
+
+  await reset(dut)
+
+  # Check Traces
+
+  await check_trace(dut, x)
+  await check_trace(dut, x)
+  await check_trace(dut, x)
+
+  await check_trace(dut, 0x004)
+  await RisingEdge(dut.clk)
+  await check_trace(dut, 0x008)
+
+  await check_trace(dut, 0x00c)
+  await RisingEdge(dut.clk)
+  await check_trace(dut, 0x010)
+
+  await check_trace(dut, 0x01c)
+  await RisingEdge(dut.clk)
+  await check_trace(dut, 0x000)
+  await check_trace(dut, 0x020)
+
+  await check_trace(dut, 0x030)
+  await RisingEdge(dut.clk)
+  await check_trace(dut, 0x000)
+  await check_trace(dut, 0x000)
+  await check_trace(dut, 0x034)
+
+#===========================================================
+
 if __name__ == "__main__":
   test_case = int(sys.argv[1])
   if (test_case < 0) | (test_case == 0):
@@ -289,3 +350,5 @@ if __name__ == "__main__":
     run("Proc_addi_test", "test_mul_addi")
   if (test_case < 0) | (test_case == 4):
     run("Proc_addi_test", "test_lw_addi")
+  if (test_case < 0) | (test_case == 5):
+    run("Proc_addi_test", "test_jal_addi")
