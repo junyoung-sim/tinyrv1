@@ -297,40 +297,46 @@ async def test_lw_jr(dut):
 
   # Data Memory
 
-  await data(dut, 0x0f0, 0x030)
-  await data(dut, 0x0f4, 0x01c)
-  await data(dut, 0x0f8, 0x00c)
+  await data(dut, 0x0f0, 0x020)
+  await data(dut, 0x0f4, 0x00c)
+  await data(dut, 0x0f8, 0x030)
   await data(dut, 0x0fc, 0x000)
   
-  # Assembly Program (Dynamic Order)
+  # Assembly Program
 
   await asm_write(dut, 0x000, "addi x1 x0 0x0f0") # F D X M W
-  await asm_write(dut, 0x004, "lw x2 0(x1)"     ) #   F D X M W         (X-D)
-  await asm_write(dut, 0x008, "jr x2"           ) #     F D D X M W     (M-D)
-  #                    0x00c   addi x1 x0 0x0fc   #       F F - - - -
+  await asm_write(dut, 0x004, "lw x2 0(x1)"     ) #   F D X M W          (X-D)
+  await asm_write(dut, 0x008, "jr x2"           ) #     F D D X M W      (M-D)
+  #                    0x00c   addi x1 x0 0x0f8   #       F F - - - -
+  #                    0x020   addi x1 x0 0x0f4   #           F D X M W
+  #                                  ...          #              ...
 
-  await asm_write(dut, 0x030, "addi x1 x0 0x0f4") # F D X M W
-  await asm_write(dut, 0x034, "lw x2 0(x1)"     ) #   F D X M W         (X-D)
+  await asm_write(dut, 0x00c, "addi x1 x0 0x0f8") # F D X M W
+  await asm_write(dut, 0x010, "lw x2 0(x1)"     ) #   F D X M W          (X-D)
+  await asm_write(dut, 0x014, "add x0 x0 x0"    ) #     F D X M W
+  await asm_write(dut, 0x018, "add x0 x0 x0"    ) #       F D X M W
+  await asm_write(dut, 0x01c, "jr x2"           ) #         F D X M W    (W-D)
+  #                    0x020   addi x1 x0 0x0f4   #           F - - - -
+  #                    0x030   addi x1 x0 0x0fc   #             F D X M W
+  #                                  ...          #                ...
+
+  await asm_write(dut, 0x020, "addi x1 x0 0x0f4") # F D X M W
+  await asm_write(dut, 0x024, "lw x2 0(x1)"     ) #   F D X M W          (X-D)
+  await asm_write(dut, 0x028, "add x0 x0 x0"    ) #     F D X M W
+  await asm_write(dut, 0x02c, "jr x2"           ) #       F D X M W      (M-D)
+  #                    0x030   addi x1 x0 0x0fc   #         F - - - -
+  #                    0x00c   addi x1 x0 0x0f8   #           F D X M W
+  #                                  ...          #              ...
+
+  await asm_write(dut, 0x030, "addi x1 x0 0x0fc") # F D X M W
+  await asm_write(dut, 0x034, "lw x2 0(x1)"     ) #   F D X M W          (X-D)
   await asm_write(dut, 0x038, "add x0 x0 x0"    ) #     F D X M W
   await asm_write(dut, 0x03c, "add x0 x0 x0"    ) #       F D X M W
   await asm_write(dut, 0x040, "add x0 x0 x0"    ) #         F D X M W
   await asm_write(dut, 0x044, "jr x2"           ) #           F D X M W
   await asm_write(dut, 0x048, "add x0 x0 x0"    ) #             F - - - -
-
-  await asm_write(dut, 0x01c, "addi x1 x0 0x0f8") # F D X M W
-  await asm_write(dut, 0x020, "lw x2 0(x1)"     ) #   F D X M W         (X-D)
-  await asm_write(dut, 0x024, "add x0 x0 x0"    ) #     F D X M W
-  await asm_write(dut, 0x028, "add x0 x0 x0"    ) #       F D X M W
-  await asm_write(dut, 0x02c, "jr x2"           ) #         F D X M W   (W-D)
-  #                    0x030  addi x1 x0 0x0f4    #           F - - - -
-
-  await asm_write(dut, 0x00c, "addi x1 x0 0x0fc") # F D X M W
-  await asm_write(dut, 0x010, "lw x2 0(x1)"     ) #   F D X M W         (X-D)
-  await asm_write(dut, 0x014, "add x0 x0 x0"    ) #     F D X M W
-  await asm_write(dut, 0x018, "jr x2"           ) #       F D X M W     (M-D)
-  #                    0x01c  addi x1 x0 0x0f8    #         F - - - -
-  #                    0x000  addi x1 x0 0x0f0    #           F D X M W
-  #                                  ...          #              ...
+  #                    0x000   addi x1 x0 0x0f0   #               F D X M W
+  #                                  ...          #                  ...
 
   await reset(dut)
 
@@ -342,27 +348,27 @@ async def test_lw_jr(dut):
 
   for i in range(3):
     await check_trace(dut, 0x0f0)
-    await check_trace(dut, 0x030)
+    await check_trace(dut, 0x020)
     await RisingEdge(dut.clk)
     await RisingEdge(dut.clk)
     await RisingEdge(dut.clk)
 
     await check_trace(dut, 0x0f4)
-    await check_trace(dut, 0x01c)
-    await check_trace(dut, 0x000)
-    await check_trace(dut, 0x000)
+    await check_trace(dut, 0x00c)
     await check_trace(dut, 0x000)
     await RisingEdge(dut.clk)
     await RisingEdge(dut.clk)
 
     await check_trace(dut, 0x0f8)
-    await check_trace(dut, 0x00c)
+    await check_trace(dut, 0x030)
     await check_trace(dut, 0x000)
     await check_trace(dut, 0x000)
     await RisingEdge(dut.clk)
     await RisingEdge(dut.clk)
 
     await check_trace(dut, 0x0fc)
+    await check_trace(dut, 0x000)
+    await check_trace(dut, 0x000)
     await check_trace(dut, 0x000)
     await check_trace(dut, 0x000)
     await RisingEdge(dut.clk)
