@@ -4,7 +4,7 @@ import sys
 from TinyRV1 import *
 
 #===========================================================
-# ADD
+# ADD: test_addi_add
 #===========================================================
 
 @cocotb.test()
@@ -57,6 +57,10 @@ async def test_addi_add(dut):
   await check_trace(dut, 0)
   await check_trace(dut, 0)
   await check_trace(dut, 2)
+
+#===========================================================
+# ADD: test_add_add
+#===========================================================
 
 @cocotb.test()
 async def test_add_add(dut):
@@ -117,6 +121,10 @@ async def test_add_add(dut):
   await check_trace(dut, 0)
   await check_trace(dut, 4)
 
+#===========================================================
+# ADD: test_mul_add
+#===========================================================
+
 @cocotb.test()
 async def test_mul_add(dut):
   clock = Clock(dut.clk, 10, units="ns")
@@ -175,6 +183,10 @@ async def test_mul_add(dut):
   await check_trace(dut, 0x000)
   await check_trace(dut, 0x000)
   await check_trace(dut, 0x012)
+
+#===========================================================
+# ADD: test_lw_add
+#===========================================================
 
 @cocotb.test()
 async def test_lw_add(dut):

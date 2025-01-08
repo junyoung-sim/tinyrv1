@@ -4,7 +4,7 @@ import sys
 from TinyRV1 import *
 
 #===========================================================
-# MUL
+# MUL: test_simple
 #===========================================================
 
 @cocotb.test()
@@ -38,6 +38,10 @@ async def test_simple(dut):
   await check_trace(dut, 0xffffffff) # -1
   await check_trace(dut, 0xffffffec) # -1 x 20 = -20
   await check_trace(dut, 0x00000000) # -20 + 20 = 0
+
+#===========================================================
+# MUL: test_addi_mul
+#===========================================================
 
 @cocotb.test()
 async def test_addi_mul(dut):
@@ -89,6 +93,10 @@ async def test_addi_mul(dut):
   await check_trace(dut, 0)
   await check_trace(dut, 0)
   await check_trace(dut, 9)
+
+#===========================================================
+# MUL: test_add_mul
+#===========================================================
 
 @cocotb.test()
 async def test_add_mul(dut):
@@ -149,6 +157,10 @@ async def test_add_mul(dut):
   await check_trace(dut, 0x000)
   await check_trace(dut, 0x010)
 
+#===========================================================
+# MUL: test_mul_mul
+#===========================================================
+
 @cocotb.test()
 async def test_mul_mul(dut):
   clock = Clock(dut.clk, 10, units="ns")
@@ -207,6 +219,10 @@ async def test_mul_mul(dut):
   await check_trace(dut, 0x000)
   await check_trace(dut, 0x000)
   await check_trace(dut, 0x010)
+
+#===========================================================
+# MUL: test_lw_mul
+#===========================================================
 
 @cocotb.test()
 async def test_lw_mul(dut):

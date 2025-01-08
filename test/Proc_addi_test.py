@@ -4,7 +4,7 @@ import sys
 from TinyRV1 import *
 
 #===========================================================
-# ADDI
+# ADDI: test_immediate
 #===========================================================
 
 @cocotb.test()
@@ -27,6 +27,10 @@ async def test_immediate(dut):
 
   await check_trace(dut, 0x000007ff)
   await check_trace(dut, 0xfffff800)
+
+#===========================================================
+# ADDI: test_addi_addi
+#===========================================================
 
 @cocotb.test()
 async def test_addi_addi(dut):
@@ -78,6 +82,10 @@ async def test_addi_addi(dut):
   await check_trace(dut, 0)
   await check_trace(dut, 0)
   await check_trace(dut, 2)
+
+#===========================================================
+# ADDI: test_add_addi
+#===========================================================
 
 @cocotb.test()
 async def test_add_addi(dut):
@@ -138,6 +146,10 @@ async def test_add_addi(dut):
   await check_trace(dut, 0)
   await check_trace(dut, 3)
 
+#===========================================================
+# ADDI: test_mul_addi
+#===========================================================
+
 @cocotb.test()
 async def test_mul_addi(dut):
   clock = Clock(dut.clk, 10, units="ns")
@@ -196,6 +208,10 @@ async def test_mul_addi(dut):
   await check_trace(dut, 0x000)
   await check_trace(dut, 0x000)
   await check_trace(dut, 0x012)
+
+#===========================================================
+# ADDI: test_lw_addi
+#===========================================================
 
 @cocotb.test()
 async def test_lw_addi(dut):
