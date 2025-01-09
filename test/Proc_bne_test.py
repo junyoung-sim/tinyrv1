@@ -93,18 +93,19 @@ async def test_squash_jump(dut):
 
   # Assembly Program
 
-  await asm_write(dut, 0x000, "addi x1 x0 1"   ) # F D X M W
-  await asm_write(dut, 0x004, "bne x0 x1 0x018") #   F D X M W            (X-D)
-  await asm_write(dut, 0x008, "jal x0 0x008"   ) #     F D - - -
-  await asm_write(dut, 0x00c, "add x0 x0 x0"   ) #       F - - - -
-  await asm_write(dut, 0x010, "add x0 x0 x0"   ) #
-  await asm_write(dut, 0x014, "add x0 x0 x0"   ) #
-  await asm_write(dut, 0x018, "addi x1 x0 1"   ) #         F D X M W
-  await asm_write(dut, 0x01c, "bne x0 x1 0x000") #           F D X M W    (X-D)
-  await asm_write(dut, 0x020, "jal x0 0x020"   ) #             F D - - -
-  await asm_write(dut, 0x024, "add x0 x0 x0"   ) #               F - - - -
-  #                    0x000   addi x1 x0 1      #                 F D X M W
-  #                                 ...          #                    ...
+  await asm_write(dut, 0x000, "addi x1 x0 1"    ) # F D X M W
+  await asm_write(dut, 0x004, "bne x0 x1 0x018" ) #   F D X M W                (X-D)
+  await asm_write(dut, 0x008, "jal x0 0x008"    ) #     F D - - -
+  await asm_write(dut, 0x00c, "add x0 x0 x0"    ) #       F - - - -
+  await asm_write(dut, 0x010, "add x0 x0 x0"    ) #
+  await asm_write(dut, 0x014, "add x0 x0 x0"    ) #
+  await asm_write(dut, 0x018, "addi x1 x0 1"    ) #         F D X M W
+  await asm_write(dut, 0x01c, "addi x2 x0 0x024") #           F D X M W
+  await asm_write(dut, 0x020, "bne x0 x1 0x000" ) #             F D X M W      (X-D)
+  await asm_write(dut, 0x024, "jr x2"           ) #               F D - - -
+  await asm_write(dut, 0x028, "add x0 x0 x0"    ) #                 F - - - -
+  #                    0x000   addi x1 x0 1       #                   F D X M W
+  #                                 ...           #                      ...
 
   await reset(dut)
 
@@ -120,6 +121,7 @@ async def test_squash_jump(dut):
     await RisingEdge(dut.clk)
     await RisingEdge(dut.clk)
     await check_trace(dut, 0x001)
+    await check_trace(dut, 0x024)
     await RisingEdge(dut.clk)
     await RisingEdge(dut.clk)
     await RisingEdge(dut.clk)
