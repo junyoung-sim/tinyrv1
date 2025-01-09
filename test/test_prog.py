@@ -45,7 +45,7 @@ async def dot_product(dut):
   #                    0x030   sw x4 0(x2)        #         F D - - -
   #                    0x034   lw x4 0(x2)        #           F - - - -
 
-  await asm_write(dut, 0x030, "sw x4 0(x2)"     ) # F D X M W
+  await asm_write(dut, 0x030, "sw x4 0(x2)"     ) # F D X M W          (W-D)
   await asm_write(dut, 0x034, "lw x4 0(x2)"     ) #   F D X M W
   await asm_write(dut, 0x038, "jal x0 0x038"    ) #     F D X M W
   await asm_write(dut, 0x03c, "add x0 x0 x0"    ) #       F - - - -
