@@ -4,6 +4,72 @@ import sys
 from TinyRV1 import *
 
 #===========================================================
+# Iterator
+#===========================================================
+
+@cocotb.test()
+async def iterator(dut):
+  clock = Clock(dut.clk, 10, units="ns")
+  cocotb.start_soon(clock.start(start_high=False))
+
+  # Data Memory
+
+  await data(dut, 0x0a0, 0) # A
+  await data(dut, 0x0a4, 0) #
+  await data(dut, 0x0a8, 0) #
+  await data(dut, 0x0ac, 0) #
+
+  # Assembly Program
+
+  await asm_write(dut, 0x000, "addi x1 x0 0x0a0")
+  await asm_write(dut, 0x004, "addi x2 x0 0x000")
+  await asm_write(dut, 0x008, "addi x3 x0 0x004")
+  await asm_write(dut, 0x00c, "bne x2 x3 0x014" )
+  await asm_write(dut, 0x010, "jr x4"           )
+  await asm_write(dut, 0x014, "sw x2 0(x1)"     )
+  await asm_write(dut, 0x018, "addi x1 x1 4"    )
+  await asm_write(dut, 0x01c, "addi x2 x2 1"    )
+  await asm_write(dut, 0x020, "jal x4 0x00c"    )
+  await asm_write(dut, 0x024, "jal x0 0x024"    )
+
+  await reset(dut)
+
+  # Check Traces
+
+  n = 0
+  addr_A = 0x0a0
+
+  await check_trace(dut, x)
+  await check_trace(dut, x)
+  await check_trace(dut, x)
+
+  await check_trace(dut, 0x0a0)
+  await check_trace(dut, 0x000)
+  await check_trace(dut, 0x004)
+
+  while (n != 4):
+    await RisingEdge(dut.clk)
+    await RisingEdge(dut.clk)
+    await RisingEdge(dut.clk)
+    await RisingEdge(dut.clk)
+
+    n += 1
+    addr_A += 0x004
+
+    await check_trace(dut, addr_A)
+    await check_trace(dut, n)
+    await check_trace(dut, 0x024)
+    await RisingEdge(dut.clk)
+  
+  await RisingEdge(dut.clk)
+  await RisingEdge(dut.clk)
+  await RisingEdge(dut.clk)
+
+  for i in range(3):
+    await check_trace(dut, 0x028)
+    await RisingEdge(dut.clk)
+
+#===========================================================
 # Dot Product
 #===========================================================
 
@@ -28,27 +94,21 @@ async def dot_product(dut):
 
   # Assembly Program
 
-  await asm_write(dut, 0x000, "addi x1 x0 0x0a0") # F D X M W
-  await asm_write(dut, 0x004, "addi x2 x0 0x0b0") #   F D X M W
-  await asm_write(dut, 0x008, "addi x3 x0 0x004") #     F D X M W
-  await asm_write(dut, 0x00c, "addi x4 x0 0"    ) #       F D X M W
-
-  await asm_write(dut, 0x010, "lw x5 0(x1)"     ) # F D X M W
-  await asm_write(dut, 0x014, "lw x6 0(x2)"     ) #   F D X M W
-  await asm_write(dut, 0x018, "mul x5 x5 x6"    ) #     F D D X M W    (W-D, M-D)
-  await asm_write(dut, 0x01c, "add x4 x4 x5"    ) #       F F D X M W  (X-D)
-
-  await asm_write(dut, 0x020, "addi x1 x1 4"    ) # F D X M W
-  await asm_write(dut, 0x024, "addi x2 x2 4"    ) #   F D X M W
-  await asm_write(dut, 0x028, "addi x3 x3 -1"   ) #     F D X M W
-  await asm_write(dut, 0x02c, "bne x0 x3 0x010" ) #       F D X M W    (X-D)
-  #                    0x030   sw x4 0(x2)        #         F D - - -
-  #                    0x034   lw x4 0(x2)        #           F - - - -
-
-  await asm_write(dut, 0x030, "sw x4 0(x2)"     ) # F D X M W          (W-D)
-  await asm_write(dut, 0x034, "lw x4 0(x2)"     ) #   F D X M W
-  await asm_write(dut, 0x038, "jal x0 0x038"    ) #     F D X M W
-  await asm_write(dut, 0x03c, "add x0 x0 x0"    ) #       F - - - -
+  await asm_write(dut, 0x000, "addi x1 x0 0x0a0")
+  await asm_write(dut, 0x004, "addi x2 x0 0x0b0")
+  await asm_write(dut, 0x008, "addi x3 x0 0x004")
+  await asm_write(dut, 0x00c, "addi x4 x0 0"    )
+  await asm_write(dut, 0x010, "lw x5 0(x1)"     )
+  await asm_write(dut, 0x014, "lw x6 0(x2)"     )
+  await asm_write(dut, 0x018, "mul x5 x5 x6"    )
+  await asm_write(dut, 0x01c, "add x4 x4 x5"    )
+  await asm_write(dut, 0x020, "addi x1 x1 4"    )
+  await asm_write(dut, 0x024, "addi x2 x2 4"    )
+  await asm_write(dut, 0x028, "addi x3 x3 -1"   )
+  await asm_write(dut, 0x02c, "bne x0 x3 0x010" )
+  await asm_write(dut, 0x030, "sw x4 0(x2)"     )
+  await asm_write(dut, 0x034, "lw x4 0(x2)"     )
+  await asm_write(dut, 0x038, "jal x0 0x038"    )
 
   await reset(dut)
 
@@ -101,4 +161,6 @@ async def dot_product(dut):
 if __name__ == "__main__":
   test_case = int(sys.argv[1])
   if (test_case < 0) | (test_case == 0):
+    run("test_prog", "iterator")
+  if (test_case < 0) | (test_case == 1):
     run("test_prog", "dot_product")
