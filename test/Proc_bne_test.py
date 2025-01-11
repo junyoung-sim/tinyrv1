@@ -371,6 +371,59 @@ async def test_mul_bne(dut):
     await RisingEdge(dut.clk)
 
 #===========================================================
+# BNE: test_lw_bne
+#===========================================================
+
+@cocotb.test()
+async def test_lw_bne(dut):
+  clock = Clock(dut.clk, 10, units="ns")
+  cocotb.start_soon(clock.start(start_high=False))
+
+  # Data Memory
+
+  await data(dut, 0x0a0, 0)
+  await data(dut, 0x0b0, 1)
+
+  # Assembly Program
+
+  await asm_write(dut, 0x000, "addi x1 x0 0x0a0") # F D X M W
+  await asm_write(dut, 0x004, "lw x2 0(x1)"     ) #   F D X M W
+  await asm_write(dut, 0x008, "lw x3 0(x1)"     ) #     F D X M W
+  await asm_write(dut, 0x00c, "bne x2 x3 0x000" ) #       F D D X M W        (W-D, M-D)
+
+  await asm_write(dut, 0x010, "addi x1 x0 0x0a0") # F F D X M W
+  await asm_write(dut, 0x014, "addi x2 x0 0x0b0") #     F D X M W
+  await asm_write(dut, 0x018, "lw x4 0(x2)"     ) #       F D X M W
+  await asm_write(dut, 0x01c, "lw x3 0(x1)"     ) #         F D X M W
+  await asm_write(dut, 0x020, "bne x3 x4 0x000" ) #           F D D X M W    (M-D, W-D)
+  await asm_write(dut, 0x024, "add x0 x0 x0"    ) #             F F D - - -
+  await asm_write(dut, 0x028, "add x0 x0 x0"    ) #                 F - - - -
+
+  await reset(dut)
+
+  # Check Traces
+
+  await check_trace(dut, x)
+  await check_trace(dut, x)
+  await check_trace(dut, x)
+
+  for i in range(3):
+    await check_trace(dut, 0x0a0)
+    await check_trace(dut, 0x000)
+    await check_trace(dut, 0x000)
+    await RisingEdge(dut.clk)
+    await RisingEdge(dut.clk)
+
+    await check_trace(dut, 0x0a0)
+    await check_trace(dut, 0x0b0)
+    await check_trace(dut, 0x001)
+    await check_trace(dut, 0x000)
+    await RisingEdge(dut.clk)
+    await RisingEdge(dut.clk)
+    await RisingEdge(dut.clk)
+    await RisingEdge(dut.clk)
+
+#===========================================================
 
 if __name__ == "__main__":
   test_case = int(sys.argv[1])
@@ -388,3 +441,5 @@ if __name__ == "__main__":
     run("Proc_bne_test", "test_add_bne")
   if (test_case < 0) | (test_case == 6):
     run("Proc_bne_test", "test_mul_bne")
+  if (test_case < 0) | (test_case == 7):
+    run("Proc_bne_test", "test_lw_bne")
