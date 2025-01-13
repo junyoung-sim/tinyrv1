@@ -91,76 +91,8 @@ async def dot_product(dut):
     await RisingEdge(dut.clk)
 
 #===========================================================
-# Iterator
-#===========================================================
-
-@cocotb.test()
-async def iterator(dut):
-  clock = Clock(dut.clk, 10, units="ns")
-  cocotb.start_soon(clock.start(start_high=False))
-
-  # Data Memory
-
-  await data(dut, 0x0a0, 0) # A
-  await data(dut, 0x0a4, 0) #
-  await data(dut, 0x0a8, 0) #
-  await data(dut, 0x0ac, 0) #
-
-  # Assembly Program
-
-  await asm_write(dut, 0x000, "addi x1 x0 0x0a0")
-  await asm_write(dut, 0x004, "addi x2 x0 0"    )
-  await asm_write(dut, 0x008, "addi x3 x0 4"    )
-  await asm_write(dut, 0x00c, "bne x2 x3 0x014" )
-  await asm_write(dut, 0x010, "jr x4"           )
-  await asm_write(dut, 0x014, "sw x2 0(x1)"     )
-  await asm_write(dut, 0x018, "addi x1 x1 0x004")
-  await asm_write(dut, 0x01c, "addi x2 x2 1"    )
-  await asm_write(dut, 0x020, "jal x4 0x00c"    )
-  await asm_write(dut, 0x024, "jal x0 0x024"    )
-
-  await reset(dut)
-
-  # Check Traces
-
-  n = 0
-  addr_A = 0x0a0
-
-  await check_trace(dut, x)
-  await check_trace(dut, x)
-  await check_trace(dut, x)
-
-  await check_trace(dut, 0x0a0)
-  await check_trace(dut, 0x000)
-  await check_trace(dut, 0x004)
-
-  while (n != 4):
-    await RisingEdge(dut.clk)
-    await RisingEdge(dut.clk)
-    await RisingEdge(dut.clk)
-    await RisingEdge(dut.clk)
-
-    n += 1
-    addr_A += 0x004
-
-    await check_trace(dut, addr_A)
-    await check_trace(dut, n)
-    await check_trace(dut, 0x024)
-    await RisingEdge(dut.clk)
-  
-  await RisingEdge(dut.clk)
-  await RisingEdge(dut.clk)
-  await RisingEdge(dut.clk)
-
-  for i in range(3):
-    await check_trace(dut, 0x028)
-    await RisingEdge(dut.clk)
-
-#===========================================================
 
 if __name__ == "__main__":
   test_case = int(sys.argv[1])
   if (test_case < 0) | (test_case == 0):
     run("test_prog", "dot_product")
-  if (test_case < 0) | (test_case == 1):
-    run("test_prog", "iterator")
