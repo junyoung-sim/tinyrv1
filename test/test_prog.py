@@ -48,19 +48,19 @@ async def dot_product(dut):
 
   # Check Traces
 
-  await check_trace(dut, x)
-  await check_trace(dut, x)
-  await check_trace(dut, x)
-
-  await check_trace(dut, 0x0a0)
-  await check_trace(dut, 0x0b0)
-  await check_trace(dut, 0x004)
-  await check_trace(dut, 0x000)
-
-  n = 4
-  dot    = 0x000
   addr_A = 0x0a0
   addr_B = 0x0b0
+  size   = 0x004
+  dot    = 0x000
+
+  await check_trace(dut, x)
+  await check_trace(dut, x)
+  await check_trace(dut, x)
+
+  await check_trace(dut, addr_A)
+  await check_trace(dut, addr_B)
+  await check_trace(dut, size)
+  await check_trace(dut, dot)
 
   for i in range(4):
     await check_trace(dut, A[i])
@@ -68,15 +68,15 @@ async def dot_product(dut):
     await RisingEdge(dut.clk)
     await check_trace(dut, A[i] * B[i])
 
-    n -= 1
     dot    += A[i] * B[i]
     addr_A += 0x004
     addr_B += 0x004
+    size   -= 1
 
     await check_trace(dut, dot)
     await check_trace(dut, addr_A)
     await check_trace(dut, addr_B)
-    await check_trace(dut, n)
+    await check_trace(dut, size)
 
     await RisingEdge(dut.clk)
     if (i != 3):
