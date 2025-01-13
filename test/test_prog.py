@@ -71,7 +71,7 @@ async def dot_product(dut):
     dot    += A[i] * B[i]
     addr_A += 0x004
     addr_B += 0x004
-    size   -= 1
+    size   -= 0x001
 
     await check_trace(dut, dot)
     await check_trace(dut, addr_A)
