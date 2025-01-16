@@ -48,23 +48,23 @@ async def test_simple(dut):
   await check_trace(dut, 0x080)
   await check_trace(dut, 0x001)
 
-  await check_trace(dut, 0x000)
+  await check_trace(dut, x)
   await RisingEdge(dut.clk)
   await check_trace(dut, 0x001)
 
-  await check_trace(dut, 0x000)
+  await check_trace(dut, x)
   await RisingEdge(dut.clk)
   await check_trace(dut, 0x001)
   
-  await check_trace(dut, 0x000)
+  await check_trace(dut, x)
   await RisingEdge(dut.clk)
   await check_trace(dut, 0x001)
 
-  await check_trace(dut, 0x000)
+  await check_trace(dut, x)
   await RisingEdge(dut.clk)
   await check_trace(dut, 0x001)
 
-  await check_trace(dut, 0x000)
+  await check_trace(dut, x)
   await RisingEdge(dut.clk)
   await check_trace(dut, 0x001)
 

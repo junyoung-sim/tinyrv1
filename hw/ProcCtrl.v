@@ -43,8 +43,8 @@ module ProcCtrl
   logic [31:0] inst_M;
   logic [31:0] inst_W;
 
-  logic val_D0;
   logic val_D;
+  logic val_X;
   logic val_M;
   logic val_W;
 
@@ -108,10 +108,8 @@ module ProcCtrl
     .rst(rst),
     .en(1'b1),
     .d(~squash_F | stall_D),
-    .q(val_D0)
+    .q(val_D)
   );
-
-  assign val_D = val_D0 & (inst_D != 0);
 
   Register#(1) val_DX (
     .clk(clk),

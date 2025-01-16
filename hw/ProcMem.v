@@ -33,13 +33,9 @@ module ProcMem
 
   always_ff @(posedge clk) begin
     if(rst) begin
-      // replace with default assembly program sequence
-      for(int i = 0; i < memsize; i++) begin
-        if(mem[i])
-          mem[i] <= mem[i];
-        else
-          mem[i] <= 32'b0;
-      end
+      //
+      // write default instruction and data memory
+      //
     end
     else if(dmemreq_val && (dmemreq_type == 1)) begin
       mem[dmemreq_addr[$clog2(memsize)+1:2]] <= dmemreq_wdata;
