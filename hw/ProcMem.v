@@ -47,8 +47,12 @@ module ProcMem
   always_comb begin
     if(imemreq_val)
       imemresp_data = mem[imemreq_addr[$clog2(memsize)+1:2]];
+    //else
+    //  imemresp_data = 32'bx;
     if(dmemreq_val && (dmemreq_type == 0))
       dmemresp_rdata = mem[dmemreq_addr[$clog2(memsize)+1:2]];
+    //else
+    //  imemresp_data = 32'bx;
   end
 
 endmodule
