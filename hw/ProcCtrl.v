@@ -263,7 +263,6 @@ module ProcCtrl
   end
 
   always_comb begin
-    // rs2
     if(bypass_waddr_X_rs2_D)
       c2d_op2_byp_sel_D = 1; // X -> D (rs2)
     else if(bypass_waddr_M_rs2_D)
