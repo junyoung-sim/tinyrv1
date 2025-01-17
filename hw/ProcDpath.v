@@ -27,6 +27,12 @@ module ProcDpath
   (* keep=1 *) output logic [31:0] dmemreq_wdata,
   (* keep=1 *) input  logic [31:0] dmemresp_rdata,
 
+  // I/O Interface
+
+  (* keep=1 *) input  logic [31:0] in0,
+  (* keep=1 *) input  logic [31:0] in1,
+  (* keep=1 *) input  logic [31:0] in2,
+
   // Control Signals
 
   (* keep=1 *) input  logic        c2d_imemreq_val_F,
@@ -38,8 +44,9 @@ module ProcDpath
   (* keep=1 *) input  logic [1:0]  c2d_op2_byp_sel_D,
   (* keep=1 *) input  logic        c2d_op1_sel_D,
   (* keep=1 *) input  logic [1:0]  c2d_op2_sel_D,
+  (* keep=1 *) input  logic [1:0]  c2d_csrr_sel_D,
   (* keep=1 *) input  logic        c2d_alu_fn_X,
-  (* keep=1 *) input  logic        c2d_result_sel_X,
+  (* keep=1 *) input  logic [1:0]  c2d_result_sel_X,
   (* keep=1 *) input  logic        c2d_dmemreq_val_M,
   (* keep=1 *) input  logic        c2d_dmemreq_type_M,
   (* keep=1 *) input  logic        c2d_wb_sel_M,
@@ -271,6 +278,29 @@ module ProcDpath
     .q(sd_X)
   );
 
+  // CSR I/O
+
+  logic [31:0] csrr_next;
+
+  Mux4#(32) csrr_mux (
+    .sel(c2d_csrr_sel_D),
+    .in0(in0),
+    .in1(in1),
+    .in2(in2),
+    .in3(32'b0),
+    .out(csrr_next)
+  );
+
+  logic [31:0] csrr;
+
+  Register#(32) csrr_DX (
+    .clk(clk),
+    .rst(rst),
+    .en(1'b1),
+    .d(csrr_next),
+    .q(csrr)
+  );
+
   //==========================================================
   // Stage X
   //==========================================================
@@ -300,10 +330,12 @@ module ProcDpath
 
   // Result Selection
 
-  Mux2#(32) result_X_mux (
+  Mux4#(32) result_X_mux (
     .sel(c2d_result_sel_X),
     .in0(alu_out),
     .in1(mul_out),
+    .in2(csrr),
+    .in3(32'b0),
     .out(result_X_next)
   );
 

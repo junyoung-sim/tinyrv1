@@ -18,6 +18,12 @@ module Proc
   (* keep=1 *) input  logic [31:0] ext_dmemreq_wdata,
   (* keep=1 *) output logic [31:0] ext_dmemresp_rdata,
 
+  // I/O Interface
+
+  (* keep=1 *) input  logic [31:0] in0,
+  (* keep=1 *) input  logic [31:0] in1,
+  (* keep=1 *) input  logic [31:0] in2,
+
   // Trace Data
 
   (* keep=1 *) output logic [31:0] trace_data
@@ -46,8 +52,9 @@ module Proc
   logic [1:0]  c2d_op2_byp_sel_D;
   logic        c2d_op1_sel_D;
   logic [1:0]  c2d_op2_sel_D;
+  logic [1:0]  c2d_csrr_sel_D;
   logic        c2d_alu_fn_X;
-  logic        c2d_result_sel_X;
+  logic [1:0]  c2d_result_sel_X;
   logic        c2d_dmemreq_val_M;
   logic        c2d_dmemreq_type_M;
   logic        c2d_wb_sel_M;

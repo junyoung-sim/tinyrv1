@@ -211,6 +211,11 @@ async def reset(dut):
   dut.ext_dmemreq_type.value  = 0
   dut.ext_dmemreq_addr.value  = 0
   dut.ext_dmemreq_wdata.value = 0
+  
+  dut.in0.value = 0
+  dut.in1.value = 0
+  dut.in2.value = 0
+  
   await RisingEdge(dut.clk)
   
   dut.rst.value = 0

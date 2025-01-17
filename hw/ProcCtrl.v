@@ -20,8 +20,9 @@ module ProcCtrl
   (* keep=1 *) output logic [1:0]  c2d_op2_byp_sel_D,
   (* keep=1 *) output logic        c2d_op1_sel_D,
   (* keep=1 *) output logic [1:0]  c2d_op2_sel_D,
+  (* keep=1 *) output logic [1:0]  c2d_csrr_sel_D,
   (* keep=1 *) output logic        c2d_alu_fn_X,
-  (* keep=1 *) output logic        c2d_result_sel_X,
+  (* keep=1 *) output logic [1:0]  c2d_result_sel_X,
   (* keep=1 *) output logic        c2d_dmemreq_val_M,
   (* keep=1 *) output logic        c2d_dmemreq_type_M,
   (* keep=1 *) output logic        c2d_wb_sel_M,
@@ -48,11 +49,12 @@ module ProcCtrl
   logic val_M;
   logic val_W;
 
-  logic rs1_en_D;
-  logic rs2_en_D;
-  logic rf_wen_X;
-  logic rf_wen_M;
-  logic rf_wen_W;
+  logic       rs1_en_D;
+  logic       rs2_en_D;
+  logic       rf_wen_X;
+  logic       rf_wen_M;
+  logic       rf_wen_W;
+  logic [4:0] rf_waddr_W;
 
   logic bypass_waddr_X_rs1_D;
   logic bypass_waddr_X_rs2_D;
@@ -68,6 +70,9 @@ module ProcCtrl
 
   logic squash_D;
   logic squash_F;
+
+  logic [11:0] csr_num;
+  logic [1:0]  csrr_sel;
 
   //==========================================================
   // Instruction Registers
@@ -150,13 +155,13 @@ module ProcCtrl
     // RF Write Instructions
     rf_wen_X = (inst_X ==? `ADD) | (inst_X ==? `ADDI) |
                (inst_X ==? `MUL) | (inst_X ==? `LW  ) |
-               (inst_X ==? `JAL) ;
+               (inst_X ==? `JAL) | (inst_X ==? `CSRR) ;
     rf_wen_M = (inst_M ==? `ADD) | (inst_M ==? `ADDI) |
                (inst_M ==? `MUL) | (inst_M ==? `LW  ) |
-               (inst_M ==? `JAL) ;
+               (inst_M ==? `JAL) | (inst_M ==? `CSRR) ;
     rf_wen_W = (inst_W ==? `ADD) | (inst_W ==? `ADDI) |
                (inst_W ==? `MUL) | (inst_W ==? `LW  ) |
-               (inst_W ==? `JAL) ;
+               (inst_W ==? `JAL) | (inst_W ==? `CSRR) ;
   end
 
   // Bypass
@@ -273,36 +278,55 @@ module ProcCtrl
       c2d_op2_byp_sel_D = 0;
   end
 
-  // Operand Selection
+  // Immediate, Operand, CSRR/W Selection
+
+  always_comb begin
+    if(val_D & (inst_D ==? `CSRR)) begin
+      csr_num = inst_D[`CSR];
+      case(csr_num)
+        'hfc2 :  csrr_sel = 0;
+        'hfc3 :  csrr_sel = 1;
+        'hfc4 :  csrr_sel = 2;
+        default: csrr_sel = 'x;
+      endcase
+    end
+    else begin
+      csr_num  = 'x;
+      csrr_sel = 'x;
+    end
+  end
 
   task automatic cs_D
   (
-    input logic [1:0] imm_type,
+    input logic [1:0] imm_type_D,
     input logic       op1_sel_D,
-    input logic [1:0] op2_sel_D
+    input logic [1:0] op2_sel_D,
+    input logic [1:0] csrr_sel_D
   );
-    c2d_imm_type_D = imm_type;
+    c2d_imm_type_D = imm_type_D;
     c2d_op1_sel_D  = op1_sel_D;
     c2d_op2_sel_D  = op2_sel_D;
+    c2d_csrr_sel_D = csrr_sel_D;
   endtask
 
   always_comb begin
     if(val_D) begin
       casez(inst_D)
-        //             imm op1 op2
-        `ADD  :  cs_D( 'x,  0,  0 ); // -, RF, RF
-        `ADDI :  cs_D(  0,  0,  1 ); // I, RF, Imm
-        `MUL  :  cs_D( 'x,  0,  0 ); // -, RF, RF
-        `LW   :  cs_D(  0,  0,  1 ); // I, RF, Imm
-        `SW   :  cs_D(  1,  0,  1 ); // S, RF, Imm
-        `JR   :  cs_D( 'x,  0, 'x ); // -, RF, ---
-        `JAL  :  cs_D(  2,  1,  2 ); // J, PC, +4
-        `BNE  :  cs_D(  3,  0,  0 ); // B, RF, RF
-        default: cs_D( 'x, 'x, 'x );
+        //             imm op1 op2   csrr
+        `ADD  :  cs_D( 'x,  0,  0,   'x     );
+        `ADDI :  cs_D(  0,  0,  1,   'x     );
+        `MUL  :  cs_D( 'x,  0,  0,   'x     );
+        `LW   :  cs_D(  0,  0,  1,   'x     );
+        `SW   :  cs_D(  1,  0,  1,   'x     );
+        `JR   :  cs_D( 'x,  0, 'x,   'x     );
+        `JAL  :  cs_D(  2,  1,  2,   'x     );
+        `BNE  :  cs_D(  3,  0,  0,   'x     );
+        `CSRR :  cs_D( 'x, 'x, 'x, csrr_sel );
+        default: cs_D( 'x, 'x, 'x,   'x     );
       endcase
     end
     else
-      cs_D( 'x, 'x, 'x );
+      cs_D( 'x, 'x, 'x, 'x );
   end
 
   //==========================================================
@@ -313,8 +337,8 @@ module ProcCtrl
 
   task automatic cs_X
   (
-    input logic alu_fn_X,
-    input logic result_sel_X
+    input logic       alu_fn_X,
+    input logic [1:0] result_sel_X
   );
     c2d_alu_fn_X     = alu_fn_X;
     c2d_result_sel_X = result_sel_X;
@@ -324,14 +348,15 @@ module ProcCtrl
     if(val_X) begin
       casez(inst_X)
         //             alu res
-        `ADD  :  cs_X(  0,  0 ); // add, alu_out
-        `ADDI :  cs_X(  0,  0 ); // add, alu_out
-        `MUL  :  cs_X( 'x,  1 ); // mul, mul_out
-        `LW   :  cs_X(  0,  0 ); // add, alu_out
-        `SW   :  cs_X(  0,  0 ); // add, alu_out
-        `JR   :  cs_X( 'x, 'x ); // ---, -------
-        `JAL  :  cs_X(  0,  0 ); // add, alu_out
-        `BNE  :  cs_X(  1, 'x ); // cmp, -------
+        `ADD  :  cs_X(  0,  0 );
+        `ADDI :  cs_X(  0,  0 );
+        `MUL  :  cs_X( 'x,  1 );
+        `LW   :  cs_X(  0,  0 );
+        `SW   :  cs_X(  0,  0 );
+        `JR   :  cs_X( 'x, 'x );
+        `JAL  :  cs_X(  0,  0 );
+        `BNE  :  cs_X(  1, 'x );
+        `CSRR :  cs_X( 'x,  2 );
         default: cs_X( 'x, 'x );
       endcase
     end
@@ -343,16 +368,16 @@ module ProcCtrl
   // Stage M
   //==========================================================
 
-  // Write Selection
+  // Data Memory Request & Writeback Selection
 
   task automatic cs_M
   (
-    input logic dmemreq_val,
-    input logic dmemreq_type,
+    input logic dmemreq_val_M,
+    input logic dmemreq_type_M,
     input logic wb_sel_M
   );
-    c2d_dmemreq_val_M  = dmemreq_val;
-    c2d_dmemreq_type_M = dmemreq_type;
+    c2d_dmemreq_val_M  = dmemreq_val_M;
+    c2d_dmemreq_type_M = dmemreq_type_M;
     c2d_wb_sel_M       = wb_sel_M;
   endtask
 
@@ -360,14 +385,15 @@ module ProcCtrl
     if(val_M) begin
       casez(inst_M)
         //             dval dtype wb
-        `ADD  :  cs_M(  0,  'x,   0 ); // result_X
-        `ADDI :  cs_M(  0,  'x,   0 ); // result_X
-        `MUL  :  cs_M(  0,  'x,   0 ); // result_X
-        `LW   :  cs_M(  1,   0,   1 ); // mem  (r)
-        `SW   :  cs_M(  1,   1,  'x ); // mem  (w)
-        `JR   :  cs_M(  0,  'x,  'x ); // --------
-        `JAL  :  cs_M(  0,  'x,   0 ); // result_X
-        `BNE  :  cs_M(  0,  'x,  'x ); // --------
+        `ADD  :  cs_M(  0,  'x,   0 );
+        `ADDI :  cs_M(  0,  'x,   0 );
+        `MUL  :  cs_M(  0,  'x,   0 );
+        `LW   :  cs_M(  1,   0,   1 );
+        `SW   :  cs_M(  1,   1,  'x );
+        `JR   :  cs_M(  0,  'x,  'x );
+        `JAL  :  cs_M(  0,  'x,   0 );
+        `BNE  :  cs_M(  0,  'x,  'x );
+        `CSRR :  cs_M(  0,  'x,   0 );
         default: cs_M( 'x,  'x,  'x );
       endcase
     end
@@ -384,25 +410,27 @@ module ProcCtrl
   task automatic cs_W
   (
     input logic       _rf_wen_W,
-    input logic [4:0] rf_waddr_W
+    input logic [4:0] _rf_waddr_W
   );
     c2d_rf_wen_W   = _rf_wen_W;
-    c2d_rf_waddr_W = rf_waddr_W;
+    c2d_rf_waddr_W = _rf_waddr_W;
   endtask
 
   always_comb begin
     if(val_W) begin
+      rf_waddr_W = inst_W[`RD];
       casez(inst_W)
         //             wen rf_waddr
-        `ADD  :  cs_W(  1, inst_W[`RD] );
-        `ADDI :  cs_W(  1, inst_W[`RD] );
-        `MUL  :  cs_W(  1, inst_W[`RD] );
-        `LW   :  cs_W(  1, inst_W[`RD] );
-        `SW   :  cs_W(  0, 'x          );
-        `JR   :  cs_W(  0, 'x          );
-        `JAL  :  cs_W(  1, inst_W[`RD] );
-        `BNE  :  cs_W(  0, 'x          );
-        default: cs_W( 'x, 'x          );
+        `ADD  :  cs_W(  1, rf_waddr_W );
+        `ADDI :  cs_W(  1, rf_waddr_W );
+        `MUL  :  cs_W(  1, rf_waddr_W );
+        `LW   :  cs_W(  1, rf_waddr_W );
+        `SW   :  cs_W(  0, 'x         );
+        `JR   :  cs_W(  0, 'x         );
+        `JAL  :  cs_W(  1, rf_waddr_W );
+        `BNE  :  cs_W(  0, 'x         );
+        `CSRR :  cs_W(  1, rf_waddr_W );
+        default: cs_W( 'x, 'x         );
       endcase
     end
     else
