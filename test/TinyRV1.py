@@ -237,17 +237,18 @@ async def asm_write(dut, addr, inst_s):
   dut.ext_dmemreq_wdata.value = asm(addr, inst_s)
   await RisingEdge(dut.clk)
 
+async def proc_in(dut, in0, in1, in2):
+  dut.in0.value = in0
+  dut.in1.value = in1
+  dut.in2.value = in2
+  await RisingEdge(dut.clk)
+
 async def reset(dut):
   dut.rst.value = 1
   dut.ext_dmemreq_val.value   = 0
   dut.ext_dmemreq_type.value  = 0
   dut.ext_dmemreq_addr.value  = 0
-  dut.ext_dmemreq_wdata.value = 0
-  
-  dut.in0.value = 0
-  dut.in1.value = 0
-  dut.in2.value = 0
-  
+  dut.ext_dmemreq_wdata.value = 0  
   await RisingEdge(dut.clk)
   
   dut.rst.value = 0
