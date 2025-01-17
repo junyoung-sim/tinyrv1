@@ -252,13 +252,12 @@ module ProcCtrl
   // Bypass
 
   always_comb begin
-    // rs1
     if(bypass_waddr_X_rs1_D)
-      c2d_op1_byp_sel_D = 1; // X -> D
+      c2d_op1_byp_sel_D = 1; // X -> D (rs1)
     else if(bypass_waddr_M_rs1_D)
-      c2d_op1_byp_sel_D = 2; // M -> D
+      c2d_op1_byp_sel_D = 2; // M -> D (rs1)
     else if(bypass_waddr_W_rs1_D)
-      c2d_op1_byp_sel_D = 3; // W -> D
+      c2d_op1_byp_sel_D = 3; // W -> D (rs1)
     else
       c2d_op1_byp_sel_D = 0;
   end
@@ -266,11 +265,11 @@ module ProcCtrl
   always_comb begin
     // rs2
     if(bypass_waddr_X_rs2_D)
-      c2d_op2_byp_sel_D = 1; // X -> D
+      c2d_op2_byp_sel_D = 1; // X -> D (rs2)
     else if(bypass_waddr_M_rs2_D)
-      c2d_op2_byp_sel_D = 2; // M -> D
+      c2d_op2_byp_sel_D = 2; // M -> D (rs2)
     else if(bypass_waddr_W_rs2_D)
-      c2d_op2_byp_sel_D = 3; // W -> D
+      c2d_op2_byp_sel_D = 3; // W -> D (rs2)
     else
       c2d_op2_byp_sel_D = 0;
   end
