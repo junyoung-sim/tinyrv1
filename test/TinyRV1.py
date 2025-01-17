@@ -11,6 +11,7 @@ x = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 
 IMM_J  = 0b11111111111111111111000000000000 # 31:12
 IMM_I  = 0b11111111111100000000000000000000 # 31:20
+CSR    = 0b11111111111100000000000000000000 # 31:20
 FUNCT7 = 0b11111110000000000000000000000000 # 31:25
 RS2    = 0b00000001111100000000000000000000 # 24:20
 RS1    = 0b00000000000011111000000000000000 # 19:15
@@ -85,6 +86,17 @@ def get_imm_b(addr, targ):
   i4 = (imm & 0b0100000000000) >> 11
 
   return get_funct7(i1 | i2) | get_RD(i3 | i4)
+
+#===========================================================
+# Coprocessor Registers
+#===========================================================
+
+CSR_IN0 = (0xfc2 & 0b111111111111)
+CSR_IN1 = (0xfc3 & 0b111111111111)
+CSR_IN2 = (0xfc4 & 0b111111111111)
+
+def get_csr_num(csr_num):
+  return (csr_num << 20) & CSR
 
 #===========================================================
 # Instruction Assembly
@@ -165,6 +177,24 @@ def asm_bne(addr, inst_s):
   opcode = get_opcode(0b1100011)
   return imm_b | rs1 | rs2 | funct3 | opcode
 
+# csrr rd csr
+def asm_csrr(addr, inst_s):
+  if (inst_s[2] == "in0"):
+    csr_num = CSR_IN0
+  elif (inst_s[2] == "in1"):
+    csr_num = CSR_IN1
+  elif (inst_s[2] == "in2"):
+    csr_num = CSR_IN2
+  else:
+    csr_num = int(inst_s, 16)
+  
+  csr_num = get_csr_num(csr_num)
+  rs1     = get_RS1(0b00000)
+  funct3  = get_funct3(0b010)
+  rd      = get_RD(int(inst_s[1][1:]))
+  opcode  = get_opcode(0b1110011)
+  return csr_num | rs1 | funct3 | rd | opcode
+
 def asm(addr, inst_s):
   inst_s = inst_s.split()
 
@@ -184,6 +214,8 @@ def asm(addr, inst_s):
     inst = asm_jal(addr, inst_s)
   elif inst_s[0] == "bne":
     inst = asm_bne(addr, inst_s)
+  elif inst_s[0] == "csrr":
+    inst = asm_csrr(addr, inst_s)
   
   return inst
 
