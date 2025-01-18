@@ -57,9 +57,6 @@ module Proc
   logic        c2d_op1_sel_D;
   logic [1:0]  c2d_op2_sel_D;
   logic [1:0]  c2d_csrr_sel_D;
-  logic        c2d_csrw_out0_en_D;
-  logic        c2d_csrw_out1_en_D;
-  logic        c2d_csrw_out2_en_D;
   logic        c2d_alu_fn_X;
   logic [1:0]  c2d_result_sel_X;
   logic        c2d_dmemreq_val_M;
@@ -67,6 +64,9 @@ module Proc
   logic        c2d_wb_sel_M;
   logic        c2d_rf_wen_W;
   logic [4:0]  c2d_rf_waddr_W;
+  logic        c2d_csrw_out0_en_W;
+  logic        c2d_csrw_out1_en_W;
+  logic        c2d_csrw_out2_en_W;
 
   // Status Signals
 

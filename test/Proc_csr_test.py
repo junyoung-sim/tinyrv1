@@ -49,10 +49,10 @@ async def test_simple_csrw(dut):
 
   # Assembly Program
 
-  await asm_write(dut, 0x000, "addi x1 x0 1")
-  await asm_write(dut, 0x004, "csrw out0 x1")
-  await asm_write(dut, 0x008, "csrw out1 x1")
-  await asm_write(dut, 0x00c, "csrw out2 x1")
+  await asm_write(dut, 0x000, "addi x1 x0 1") # F D X M W
+  await asm_write(dut, 0x004, "csrw out0 x1") #   F D X M W
+  await asm_write(dut, 0x008, "csrw out1 x1") #     F D X M W
+  await asm_write(dut, 0x00c, "csrw out2 x1") #       F D X M W
 
   await reset(dut)
 
@@ -63,9 +63,13 @@ async def test_simple_csrw(dut):
   await check_trace(dut, x)
   await check_trace(dut, 1)
 
+  await RisingEdge(dut.clk)
+  await RisingEdge(dut.clk)
+  await RisingEdge(dut.clk)
+
   # Check Outputs
 
-  await proc_out(dut, 1, 1, 1)
+  await check_proc_out(dut, 1, 1, 1)
 
 if __name__ == "__main__":
   test_case = int(sys.argv[1])

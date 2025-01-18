@@ -49,9 +49,6 @@ module ProcDpath
   (* keep=1 *) input  logic        c2d_op1_sel_D,
   (* keep=1 *) input  logic [1:0]  c2d_op2_sel_D,
   (* keep=1 *) input  logic [1:0]  c2d_csrr_sel_D,
-  (* keep=1 *) input  logic        c2d_csrw_out0_en_D,
-  (* keep=1 *) input  logic        c2d_csrw_out1_en_D,
-  (* keep=1 *) input  logic        c2d_csrw_out2_en_D,
   (* keep=1 *) input  logic        c2d_alu_fn_X,
   (* keep=1 *) input  logic [1:0]  c2d_result_sel_X,
   (* keep=1 *) input  logic        c2d_dmemreq_val_M,
@@ -59,6 +56,9 @@ module ProcDpath
   (* keep=1 *) input  logic        c2d_wb_sel_M,
   (* keep=1 *) input  logic        c2d_rf_wen_W,
   (* keep=1 *) input  logic [4:0]  c2d_rf_waddr_W,
+  (* keep=1 *) input  logic        c2d_csrw_out0_en_W,
+  (* keep=1 *) input  logic        c2d_csrw_out1_en_W,
+  (* keep=1 *) input  logic        c2d_csrw_out2_en_W,
   
   // Status Signals
 
@@ -285,7 +285,7 @@ module ProcDpath
     .q(sd_X)
   );
 
-  // CSR I/O
+  // CSRR
 
   logic [31:0] csrr_next;
 
@@ -308,28 +308,34 @@ module ProcDpath
     .q(csrr)
   );
 
+  // CSRW (DX)
+
+  logic [31:0] out0_DX;
+  logic [31:0] out1_DX;
+  logic [31:0] out2_DX;
+
   Register#(32) csrw_out0_DX (
     .clk(clk),
     .rst(rst),
-    .en(c2d_csrw_out0_en_D),
+    .en(1'b1),
     .d(op1_bypass),
-    .q(out0)
+    .q(out0_DX)
   );
 
   Register#(32) csrw_out1_DX (
     .clk(clk),
     .rst(rst),
-    .en(c2d_csrw_out1_en_D),
+    .en(1'b1),
     .d(op1_bypass),
-    .q(out1)
+    .q(out1_DX)
   );
 
   Register#(32) csrw_out2_DX (
     .clk(clk),
     .rst(rst),
-    .en(c2d_csrw_out2_en_D),
+    .en(1'b1),
     .d(op1_bypass),
-    .q(out2)
+    .q(out2_DX)
   );
 
   //==========================================================
@@ -392,6 +398,36 @@ module ProcDpath
     .q(sd_M)
   );
 
+  // CSRW (XM)
+
+  logic [31:0] out0_XM;
+  logic [31:0] out1_XM;
+  logic [31:0] out2_XM;
+
+  Register#(32) csrw_out0_XM (
+    .clk(clk),
+    .rst(rst),
+    .en(1'b1),
+    .d(out0_DX),
+    .q(out0_XM)
+  );
+
+  Register#(32) csrw_out1_XM (
+    .clk(clk),
+    .rst(rst),
+    .en(1'b1),
+    .d(out1_DX),
+    .q(out1_XM)
+  );
+
+  Register#(32) csrw_out2_XM (
+    .clk(clk),
+    .rst(rst),
+    .en(1'b1),
+    .d(out2_DX),
+    .q(out2_XM)
+  );
+
   //==========================================================
   // Stage M
   //==========================================================
@@ -422,9 +458,41 @@ module ProcDpath
     .q(result_M)
   );
 
+  // CSRW (MW)
+
+  logic [31:0] out0_MW;
+  logic [31:0] out1_MW;
+  logic [31:0] out2_MW;
+
+  Register#(32) csrw_out0_MW (
+    .clk(clk),
+    .rst(rst),
+    .en(1'b1),
+    .d(out0_XM),
+    .q(out0_MW)
+  );
+
+  Register#(32) csrw_out1_MW (
+    .clk(clk),
+    .rst(rst),
+    .en(1'b1),
+    .d(out1_XM),
+    .q(out1_MW)
+  );
+
+  Register#(32) csrw_out2_MW (
+    .clk(clk),
+    .rst(rst),
+    .en(1'b1),
+    .d(out2_XM),
+    .q(out2_MW)
+  );
+
   //==========================================================
   // Stage W
   //==========================================================
+
+  // RF Writeback
 
   assign result_W_next = result_M;
 
@@ -432,11 +500,35 @@ module ProcDpath
   assign rf_waddr = c2d_rf_waddr_W;
   assign rf_wdata = result_W_next;
 
-  //==========================================================
   // Trace Data
-  //==========================================================
 
   assign trace_data = rf_wdata;
+
+  // CSRW (Output)
+
+  Register#(32) csrw_out0 (
+    .clk(clk),
+    .rst(rst),
+    .en(c2d_csrw_out0_en_W),
+    .d(out0_MW),
+    .q(out0)
+  );
+
+  Register#(32) csrw_out1 (
+    .clk(clk),
+    .rst(rst),
+    .en(c2d_csrw_out1_en_W),
+    .d(out1_MW),
+    .q(out1)
+  );
+
+  Register#(32) csrw_out2 (
+    .clk(clk),
+    .rst(rst),
+    .en(c2d_csrw_out2_en_W),
+    .d(out2_MW),
+    .q(out2)
+  );
 
 endmodule
 

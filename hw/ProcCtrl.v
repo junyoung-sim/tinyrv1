@@ -21,9 +21,6 @@ module ProcCtrl
   (* keep=1 *) output logic        c2d_op1_sel_D,
   (* keep=1 *) output logic [1:0]  c2d_op2_sel_D,
   (* keep=1 *) output logic [1:0]  c2d_csrr_sel_D,
-  (* keep=1 *) output logic        c2d_csrw_out0_en_D,
-  (* keep=1 *) output logic        c2d_csrw_out1_en_D,
-  (* keep=1 *) output logic        c2d_csrw_out2_en_D,
   (* keep=1 *) output logic        c2d_alu_fn_X,
   (* keep=1 *) output logic [1:0]  c2d_result_sel_X,
   (* keep=1 *) output logic        c2d_dmemreq_val_M,
@@ -31,6 +28,9 @@ module ProcCtrl
   (* keep=1 *) output logic        c2d_wb_sel_M,
   (* keep=1 *) output logic        c2d_rf_wen_W,
   (* keep=1 *) output logic [4:0]  c2d_rf_waddr_W,
+  (* keep=1 *) output logic        c2d_csrw_out0_en_W,
+  (* keep=1 *) output logic        c2d_csrw_out1_en_W,
+  (* keep=1 *) output logic        c2d_csrw_out2_en_W,
 
   // Status Signals
 
@@ -281,7 +281,7 @@ module ProcCtrl
       c2d_op2_byp_sel_D = 0;
   end
 
-  // Immediate, Operand, CSRR/W Selection
+  // Immediate, Operand, CSRR Selection
 
   always_comb begin
     if(val_D & (inst_D ==? `CSRR)) begin
@@ -296,40 +296,6 @@ module ProcCtrl
     else begin
       csr_num  = 'x;
       csrr_sel = 'x;
-    end
-  end
-
-  always_comb begin
-    if(val_D & (inst_D ==? `CSRW)) begin
-      csr_num = inst_D[`CSR];
-      case(csr_num)
-        'h7c2 : begin
-          c2d_csrw_out0_en_D = 1;
-          c2d_csrw_out1_en_D = 0;
-          c2d_csrw_out2_en_D = 0;
-        end
-        'h7c3 : begin
-          c2d_csrw_out0_en_D = 0;
-          c2d_csrw_out1_en_D = 1;
-          c2d_csrw_out2_en_D = 0;
-        end
-        'h7c4 : begin
-          c2d_csrw_out0_en_D = 0;
-          c2d_csrw_out1_en_D = 0;
-          c2d_csrw_out2_en_D = 1;
-        end
-        default: begin
-          c2d_csrw_out0_en_D = 0;
-          c2d_csrw_out1_en_D = 0;
-          c2d_csrw_out2_en_D = 0;
-        end
-      endcase
-    end
-    else begin
-      csr_num = 'x;
-      c2d_csrw_out0_en_D = 0;
-      c2d_csrw_out1_en_D = 0;
-      c2d_csrw_out2_en_D = 0;
     end
   end
 
@@ -445,7 +411,7 @@ module ProcCtrl
   // Stage W
   //==========================================================
 
-  // RF Write
+  // RF Writeback
 
   task automatic cs_W
   (
@@ -477,6 +443,42 @@ module ProcCtrl
     else begin
       rf_waddr_W = 'x;
       cs_W( 'x, 'x );
+    end
+  end
+
+  // CSRW Selection
+
+  always_comb begin
+    if(val_W & (inst_W ==? `CSRW)) begin
+      csr_num = inst_W[`CSR];
+      case(csr_num)
+        'h7c2 : begin
+          c2d_csrw_out0_en_W = 1;
+          c2d_csrw_out1_en_W = 0;
+          c2d_csrw_out2_en_W = 0;
+        end
+        'h7c3 : begin
+          c2d_csrw_out0_en_W = 0;
+          c2d_csrw_out1_en_W = 1;
+          c2d_csrw_out2_en_W = 0;
+        end
+        'h7c4 : begin
+          c2d_csrw_out0_en_W = 0;
+          c2d_csrw_out1_en_W = 0;
+          c2d_csrw_out2_en_W = 1;
+        end
+        default: begin
+          c2d_csrw_out0_en_W = 0;
+          c2d_csrw_out1_en_W = 0;
+          c2d_csrw_out2_en_W = 0;
+        end
+      endcase
+    end
+    else begin
+      csr_num = 'x;
+      c2d_csrw_out0_en_W = 0;
+      c2d_csrw_out1_en_W = 0;
+      c2d_csrw_out2_en_W = 0;
     end
   end
 

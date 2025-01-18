@@ -280,7 +280,7 @@ def proc_in(dut, in0, in1, in2):
   dut.in1.value = in1
   dut.in2.value = in2
 
-async def proc_out(dut, out0, out1, out2):
+async def check_proc_out(dut, out0, out1, out2):
   await RisingEdge(dut.clk)
   assert dut.out0.value == out0, "FAILED (out0)"
   assert dut.out1.value == out1, "FAILED (out1)"
