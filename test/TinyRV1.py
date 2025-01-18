@@ -91,9 +91,12 @@ def get_imm_b(addr, targ):
 # Coprocessor Registers
 #===========================================================
 
-CSR_IN0 = (0xfc2 & 0b111111111111)
-CSR_IN1 = (0xfc3 & 0b111111111111)
-CSR_IN2 = (0xfc4 & 0b111111111111)
+CSR_IN0  = (0xfc2 & 0b111111111111)
+CSR_IN1  = (0xfc3 & 0b111111111111)
+CSR_IN2  = (0xfc4 & 0b111111111111)
+CSR_OUT0 = (0x7c2 & 0b111111111111)
+CSR_OUT1 = (0x7c3 & 0b111111111111)
+CSR_OUT2 = (0x7c4 & 0b111111111111)
 
 def get_csr_num(csr_num):
   return (csr_num << 20) & CSR
@@ -186,12 +189,30 @@ def asm_csrr(addr, inst_s):
   elif (inst_s[2] == "in2"):
     csr_num = CSR_IN2
   else:
-    csr_num = int(inst_s, 16)
+    csr_num = int(inst_s[2], 16)
   
   csr_num = get_csr_num(csr_num)
   rs1     = get_RS1(0b00000)
   funct3  = get_funct3(0b010)
   rd      = get_RD(int(inst_s[1][1:]))
+  opcode  = get_opcode(0b1110011)
+  return csr_num | rs1 | funct3 | rd | opcode
+
+# csrw csr rs1
+def asm_csrw(addr, inst_s):
+  if (inst_s[1] == "out0"):
+    csr_num = CSR_OUT0
+  elif (inst_s[1] == "out1"):
+    csr_num = CSR_OUT1
+  elif (inst_s[1] == "out2"):
+    csr_num = CSR_OUT2
+  else:
+    csr_num = int(inst_s[1], 16)
+  
+  csr_num = get_csr_num(csr_num)
+  rs1     = get_RS1(int(inst_s[2][1:]))
+  funct3  = get_funct3(0b001)
+  rd      = get_RD(0b00000)
   opcode  = get_opcode(0b1110011)
   return csr_num | rs1 | funct3 | rd | opcode
 
@@ -216,6 +237,8 @@ def asm(addr, inst_s):
     inst = asm_bne(addr, inst_s)
   elif inst_s[0] == "csrr":
     inst = asm_csrr(addr, inst_s)
+  elif inst_s[0] == "csrw":
+    inst = asm_csrw(addr, inst_s)
   
   return inst
 
@@ -237,11 +260,6 @@ async def asm_write(dut, addr, inst_s):
   dut.ext_dmemreq_wdata.value = asm(addr, inst_s)
   await RisingEdge(dut.clk)
 
-async def proc_in(dut, in0, in1, in2):
-  dut.in0.value = in0
-  dut.in1.value = in1
-  dut.in2.value = in2
-
 async def reset(dut):
   dut.rst.value = 1
   dut.ext_dmemreq_val.value   = 0
@@ -256,6 +274,17 @@ async def reset(dut):
 async def check_trace(dut, trace_data):
   await RisingEdge(dut.clk)
   assert dut.trace_data.value == trace_data
+
+async def proc_in(dut, in0, in1, in2):
+  dut.in0.value = in0
+  dut.in1.value = in1
+  dut.in2.value = in2
+
+async def proc_out(dut, out0, out1, out2):
+  await RisingEdge(dut.clk)
+  assert dut.out0.value == out0, "FAILED (out0)"
+  assert dut.out1.value == out1, "FAILED (out1)"
+  assert dut.out2.value == out2, "FAILED (out2)"
 
 #===========================================================
 # Test Call
