@@ -21,6 +21,9 @@ module ProcCtrl
   (* keep=1 *) output logic        c2d_op1_sel_D,
   (* keep=1 *) output logic [1:0]  c2d_op2_sel_D,
   (* keep=1 *) output logic [1:0]  c2d_csrr_sel_D,
+  (* keep=1 *) output logic        c2d_csrw_out0_en_D,
+  (* keep=1 *) output logic        c2d_csrw_out1_en_D,
+  (* keep=1 *) output logic        c2d_csrw_out2_en_D,
   (* keep=1 *) output logic        c2d_alu_fn_X,
   (* keep=1 *) output logic [1:0]  c2d_result_sel_X,
   (* keep=1 *) output logic        c2d_dmemreq_val_M,
@@ -149,7 +152,7 @@ module ProcCtrl
     rs1_en_D = (inst_D ==? `ADD) | (inst_D ==? `ADDI) |
                (inst_D ==? `MUL) | (inst_D ==? `LW  ) |
                (inst_D ==? `SW ) | (inst_D ==? `JR  ) |
-               (inst_D ==? `BNE) ;
+               (inst_D ==? `BNE) | (inst_D ==? `CSRW) ;
     rs2_en_D = (inst_D ==? `ADD) | (inst_D ==? `MUL ) |
                (inst_D ==? `SW ) | (inst_D ==? `BNE ) ;
     // RF Write Instructions
@@ -296,6 +299,39 @@ module ProcCtrl
     end
   end
 
+  always_comb begin
+    if(val_D & (inst_D ==? `CSRW)) begin
+      csr_num = inst_D[`CSR];
+      case(csr_num)
+        'h7c2 : begin
+          c2d_csrw_out0_en_D = 1;
+          c2d_csrw_out1_en_D = 0;
+          c2d_csrw_out2_en_D = 0;
+        end
+        'h7c3 : begin
+          c2d_csrw_out0_en_D = 0;
+          c2d_csrw_out1_en_D = 1;
+          c2d_csrw_out2_en_D = 0;
+        end
+        'h7c4 : begin
+          c2d_csrw_out0_en_D = 0;
+          c2d_csrw_out1_en_D = 0;
+          c2d_csrw_out2_en_D = 1;
+        end
+        default: begin
+          c2d_csrw_out0_en_D = 0;
+          c2d_csrw_out1_en_D = 0;
+          c2d_csrw_out2_en_D = 0;
+        end
+      endcase
+    end
+    else begin
+      c2d_csrw_out0_en_D = 0;
+      c2d_csrw_out1_en_D = 0;
+      c2d_csrw_out2_en_D = 0;
+    end
+  end
+
   task automatic cs_D
   (
     input logic [1:0] imm_type_D,
@@ -322,6 +358,7 @@ module ProcCtrl
         `JAL  :  cs_D(  2,  1,  2,   'x     );
         `BNE  :  cs_D(  3,  0,  0,   'x     );
         `CSRR :  cs_D( 'x, 'x, 'x, csrr_sel );
+        `CSRW :  cs_D( 'x, 'x, 'x,   'x     );
         default: cs_D( 'x, 'x, 'x,   'x     );
       endcase
     end
@@ -357,6 +394,7 @@ module ProcCtrl
         `JAL  :  cs_X(  0,  0 );
         `BNE  :  cs_X(  1, 'x );
         `CSRR :  cs_X( 'x,  2 );
+        `CSRW :  cs_X( 'x, 'x );
         default: cs_X( 'x, 'x );
       endcase
     end
@@ -394,6 +432,7 @@ module ProcCtrl
         `JAL  :  cs_M(  0,  'x,   0 );
         `BNE  :  cs_M(  0,  'x,  'x );
         `CSRR :  cs_M(  0,  'x,   0 );
+        `CSRW :  cs_M(  0,  'x,  'x );
         default: cs_M( 'x,  'x,  'x );
       endcase
     end
@@ -430,6 +469,7 @@ module ProcCtrl
         `JAL  :  cs_W(  1, rf_waddr_W );
         `BNE  :  cs_W(  0, 'x         );
         `CSRR :  cs_W(  1, rf_waddr_W );
+        `CSRW :  cs_W(  0, 'x         );
         default: cs_W( 'x, 'x         );
       endcase
     end

@@ -4,11 +4,11 @@ import sys
 from TinyRV1 import *
 
 #===========================================================
-# CSRR: test_simple
+# CSRR: test_simple_csrr
 #===========================================================
 
 @cocotb.test()
-async def test_simple(dut):
+async def test_simple_csrr(dut):
   clock = Clock(dut.clk, 10, units="ns")
   cocotb.start_soon(clock.start(start_high=False))
 
@@ -41,4 +41,4 @@ async def test_simple(dut):
 if __name__ == "__main__":
   test_case = int(sys.argv[1])
   if (test_case < 0) | (test_case == 0):
-    run("Proc_csrr_test", "test_simple")
+    run("Proc_csrr_test", "test_simple_csrr")

@@ -33,6 +33,10 @@ module ProcDpath
   (* keep=1 *) input  logic [31:0] in1,
   (* keep=1 *) input  logic [31:0] in2,
 
+  (* keep=1 *) output logic [31:0] out0,
+  (* keep=1 *) output logic [31:0] out1,
+  (* keep=1 *) output logic [31:0] out2,
+
   // Control Signals
 
   (* keep=1 *) input  logic        c2d_imemreq_val_F,
@@ -45,6 +49,9 @@ module ProcDpath
   (* keep=1 *) input  logic        c2d_op1_sel_D,
   (* keep=1 *) input  logic [1:0]  c2d_op2_sel_D,
   (* keep=1 *) input  logic [1:0]  c2d_csrr_sel_D,
+  (* keep=1 *) input  logic        c2d_csrw_out0_en_D,
+  (* keep=1 *) input  logic        c2d_csrw_out1_en_D,
+  (* keep=1 *) input  logic        c2d_csrw_out2_en_D,
   (* keep=1 *) input  logic        c2d_alu_fn_X,
   (* keep=1 *) input  logic [1:0]  c2d_result_sel_X,
   (* keep=1 *) input  logic        c2d_dmemreq_val_M,
@@ -299,6 +306,30 @@ module ProcDpath
     .en(1'b1),
     .d(csrr_next),
     .q(csrr)
+  );
+
+  Register#(32) csrw_out0_DX (
+    .clk(clk),
+    .rst(rst),
+    .en(c2d_csrw_out0_en_D),
+    .d(op1_bypass),
+    .q(out0)
+  );
+
+  Register#(32) csrw_out1_DX (
+    .clk(clk),
+    .rst(rst),
+    .en(c2d_csrw_out1_en_D),
+    .d(op1_bypass),
+    .q(out1)
+  );
+
+  Register#(32) csrw_out2_DX (
+    .clk(clk),
+    .rst(rst),
+    .en(c2d_csrw_out2_en_D),
+    .d(op1_bypass),
+    .q(out2)
   );
 
   //==========================================================

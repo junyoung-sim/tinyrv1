@@ -24,6 +24,10 @@ module Proc
   (* keep=1 *) input  logic [31:0] in1,
   (* keep=1 *) input  logic [31:0] in2,
 
+  (* keep=1 *) output logic [31:0] out0,
+  (* keep=1 *) output logic [31:0] out1,
+  (* keep=1 *) output logic [31:0] out2,
+
   // Trace Data
 
   (* keep=1 *) output logic [31:0] trace_data
@@ -53,6 +57,9 @@ module Proc
   logic        c2d_op1_sel_D;
   logic [1:0]  c2d_op2_sel_D;
   logic [1:0]  c2d_csrr_sel_D;
+  logic        c2d_csrw_out0_en_D;
+  logic        c2d_csrw_out1_en_D;
+  logic        c2d_csrw_out2_en_D;
   logic        c2d_alu_fn_X;
   logic [1:0]  c2d_result_sel_X;
   logic        c2d_dmemreq_val_M;
