@@ -10,6 +10,14 @@ module Proc
   (* keep=1 *) input  logic        clk,
   (* keep=1 *) input  logic        rst,
 
+  // External Memory Interface (Cocotb)
+
+  (* keep=1 *) input  logic        ext_dmemreq_val,
+  (* keep=1 *) input  logic        ext_dmemreq_type,
+  (* keep=1 *) input  logic [31:0] ext_dmemreq_addr,
+  (* keep=1 *) input  logic [31:0] ext_dmemreq_wdata,
+  (* keep=1 *) output logic [31:0] ext_dmemresp_rdata,
+
   // I/O Interface
 
   (* keep=1 *) input  logic [31:0] in0,
@@ -25,7 +33,7 @@ module Proc
   (* keep=1 *) output logic [31:0] trace_data
 );
 
-  // Memory Interface
+  // Internal Memory Interface
 
   logic        imemreq_val;
   logic [31:0] imemreq_addr;
@@ -49,9 +57,6 @@ module Proc
   logic        c2d_op1_sel_D;
   logic [1:0]  c2d_op2_sel_D;
   logic [1:0]  c2d_csrr_sel_D;
-  logic        c2d_csrw_out0_en_D;
-  logic        c2d_csrw_out1_en_D;
-  logic        c2d_csrw_out2_en_D;
   logic        c2d_alu_fn_X;
   logic [1:0]  c2d_result_sel_X;
   logic        c2d_dmemreq_val_M;
@@ -59,6 +64,9 @@ module Proc
   logic        c2d_wb_sel_M;
   logic        c2d_rf_wen_W;
   logic [4:0]  c2d_rf_waddr_W;
+  logic        c2d_csrw_out0_en_W;
+  logic        c2d_csrw_out1_en_W;
+  logic        c2d_csrw_out2_en_W;
 
   // Status Signals
 
@@ -69,9 +77,43 @@ module Proc
   // Processor Memory
   //==========================================================
 
+  logic        dval;
+  logic        dtype;
+  logic [31:0] daddr;
+  logic [31:0] wdata;
+
+  always_comb begin
+
+    dval = (dmemreq_val | ext_dmemreq_val);
+    
+    if(ext_dmemreq_val) begin
+      dtype = ext_dmemreq_type;
+      daddr = ext_dmemreq_addr;
+      wdata = ext_dmemreq_wdata;
+    end
+
+    if(dmemreq_val) begin
+      dtype = dmemreq_type;
+      daddr = dmemreq_addr;
+      wdata = dmemreq_wdata;
+    end
+
+    ext_dmemresp_rdata = dmemresp_rdata;
+  
+  end
+
   ProcMem mem
   (
-    .*
+    .clk(clk),
+    .rst(rst),
+    .imemreq_val(imemreq_val),
+    .imemreq_addr(imemreq_addr),
+    .imemresp_data(imemresp_data),
+    .dmemreq_val(dval),
+    .dmemreq_type(dtype),
+    .dmemreq_addr(daddr),
+    .dmemreq_wdata(wdata),
+    .dmemresp_rdata(dmemresp_rdata)
   );
 
   //==========================================================

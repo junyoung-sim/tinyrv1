@@ -1,3 +1,7 @@
+//========================================================================
+// BinaryToSevenSeg_GL
+//========================================================================
+
 `ifndef BINARY_TO_SEVEN_SEG_GL_V
 `define BINARY_TO_SEVEN_SEG_GL_V
 
@@ -28,4 +32,5 @@ module BinaryToSevenSeg_GL
 
 endmodule
 
-`endif
+`endif /* BINARY_TO_SEVEN_SEG_GL_V */
+
