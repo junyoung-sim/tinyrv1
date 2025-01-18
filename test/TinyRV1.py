@@ -275,7 +275,7 @@ async def check_trace(dut, trace_data):
   await RisingEdge(dut.clk)
   assert dut.trace_data.value == trace_data
 
-async def proc_in(dut, in0, in1, in2):
+def proc_in(dut, in0, in1, in2):
   dut.in0.value = in0
   dut.in1.value = in1
   dut.in2.value = in2

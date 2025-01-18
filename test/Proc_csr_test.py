@@ -14,7 +14,7 @@ async def test_simple_csrr(dut):
 
   # I/O Interface
 
-  await proc_in(dut, 1, 1, 1)
+  proc_in(dut, 1, 1, 1)
 
   # Assembly Program
 
