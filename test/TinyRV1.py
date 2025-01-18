@@ -241,7 +241,6 @@ async def proc_in(dut, in0, in1, in2):
   dut.in0.value = in0
   dut.in1.value = in1
   dut.in2.value = in2
-  await RisingEdge(dut.clk)
 
 async def reset(dut):
   dut.rst.value = 1
