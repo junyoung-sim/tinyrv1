@@ -1,8 +1,8 @@
 `ifndef PROCCTRL_V
 `define PROCCTRL_V
 
-`include "../hw/TinyRV1.v"
-`include "../hw/Register.v"
+`include "TinyRV1.v"
+`include "Register.v"
 
 module ProcCtrl
 (
@@ -326,7 +326,7 @@ module ProcCtrl
       endcase
     end
     else begin
-      csr_num = 'x;
+		csr_num = 'x;
       c2d_csrw_out0_en_D = 0;
       c2d_csrw_out1_en_D = 0;
       c2d_csrw_out2_en_D = 0;
@@ -475,9 +475,9 @@ module ProcCtrl
       endcase
     end
     else begin
-      rf_waddr_W = 'x;
+		rf_waddr_W = 'x;
       cs_W( 'x, 'x );
-    end
+	 end
   end
 
 endmodule
