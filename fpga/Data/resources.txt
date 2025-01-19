@@ -1,0 +1,66 @@
+Logic utilization (ALMs needed / total ALMs on device)	4,292 / 18,480	23 %
+ALMs needed [=A-B+C]	4,292	
+[A] ALMs used in final placement [=a+b+c+d]	5,000 / 18,480	27 %
+[a] ALMs used for LUT logic and registers	634	
+[b] ALMs used for LUT logic	3,238	
+[c] ALMs used for registers	1,128	
+[d] ALMs used for memory (up to half of total ALMs)	0	
+[B] Estimate of ALMs recoverable by dense packing	744 / 18,480	4 %
+[C] Estimate of ALMs unavailable [=a+b+c+d]	36 / 18,480	< 1 %
+[a] Due to location constrained logic	0	
+[b] Due to LAB-wide signal conflicts	31	
+[c] Due to LAB input limits	5	
+[d] Due to virtual I/Os	0	
+ 	 	
+Difficulty packing design	Low	
+ 	 	
+Total LABs:  partially or completely used	828 / 1,848	45 %
+-- Logic LABs	828	
+-- Memory LABs (up to half of total LABs)	0	
+ 	 	
+Combinational ALUT usage for logic	5,987	
+-- 7 input functions	0	
+-- 6 input functions	2,574	
+-- 5 input functions	189	
+-- 4 input functions	156	
+-- <=3 input functions	3,068	
+Combinational ALUT usage for route-throughs	3,178	
+ 	 	
+Dedicated logic registers	3,808	
+-- By type:	 	
+-- Primary logic registers	3,524 / 36,960	10 %
+-- Secondary logic registers	284 / 36,960	< 1 %
+-- By function:	 	
+-- Design implementation registers	3,541	
+-- Routing optimization registers	267	
+ 	 	
+Virtual pins	0	
+I/O pins	206 / 224	92 %
+-- Clock pins 	8 / 9	89 %
+-- Dedicated input pins 	0 / 11	0 %
+ 	 	
+M10K blocks	0 / 308	0 %
+Total MLAB memory bits	0	
+Total block memory bits	0 / 3,153,920	0 %
+Total block memory implementation bits	0 / 3,153,920	0 %
+ 	 	
+Total DSP Blocks	2 / 66	3 %
+ 	 	
+Fractional PLLs	0 / 4	0 %
+Global signals 	1	
+-- Global clocks	1 / 16	6 %
+-- Quadrant clocks	0 / 88	0 %
+SERDES Transmitters	0 / 68	0 %
+SERDES Receivers	0 / 68	0 %
+JTAGs	0 / 1	0 %
+ASMI blocks	0 / 1	0 %
+CRC blocks	0 / 1	0 %
+Remote update blocks	0 / 1	0 %
+Oscillator blocks	0 / 1	0 %
+Impedance control blocks	0 / 3	0 %
+Average interconnect usage (total/H/V)	9.6% / 9.6% / 9.8%	
+Peak interconnect usage (total/H/V)	30.7% / 30.5% / 31.4%	
+Maximum fan-out	2213	
+Highest non-global fan-out	2213	
+Total fan-out	34743	
+Average fan-out	3.15	

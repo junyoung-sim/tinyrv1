@@ -310,32 +310,14 @@ module ProcDpath
 
   // CSRW (DX)
 
-  logic [31:0] out0_DX;
-  logic [31:0] out1_DX;
-  logic [31:0] out2_DX;
+  logic [31:0] out_DX;
 
-  Register#(32) csrw_out0_DX (
+  Register#(32) csrw_out_DX (
     .clk(clk),
     .rst(rst),
     .en(1'b1),
     .d(op1_bypass),
-    .q(out0_DX)
-  );
-
-  Register#(32) csrw_out1_DX (
-    .clk(clk),
-    .rst(rst),
-    .en(1'b1),
-    .d(op1_bypass),
-    .q(out1_DX)
-  );
-
-  Register#(32) csrw_out2_DX (
-    .clk(clk),
-    .rst(rst),
-    .en(1'b1),
-    .d(op1_bypass),
-    .q(out2_DX)
+    .q(out_DX)
   );
 
   //==========================================================
@@ -400,32 +382,14 @@ module ProcDpath
 
   // CSRW (XM)
 
-  logic [31:0] out0_XM;
-  logic [31:0] out1_XM;
-  logic [31:0] out2_XM;
+  logic [31:0] out_XM;
 
-  Register#(32) csrw_out0_XM (
+  Register#(32) csrw_out_XM (
     .clk(clk),
     .rst(rst),
     .en(1'b1),
-    .d(out0_DX),
-    .q(out0_XM)
-  );
-
-  Register#(32) csrw_out1_XM (
-    .clk(clk),
-    .rst(rst),
-    .en(1'b1),
-    .d(out1_DX),
-    .q(out1_XM)
-  );
-
-  Register#(32) csrw_out2_XM (
-    .clk(clk),
-    .rst(rst),
-    .en(1'b1),
-    .d(out2_DX),
-    .q(out2_XM)
+    .d(out_DX),
+    .q(out_XM)
   );
 
   //==========================================================
@@ -460,32 +424,14 @@ module ProcDpath
 
   // CSRW (MW)
 
-  logic [31:0] out0_MW;
-  logic [31:0] out1_MW;
-  logic [31:0] out2_MW;
+  logic [31:0] out_MW;
 
-  Register#(32) csrw_out0_MW (
+  Register#(32) csrw_out_MW (
     .clk(clk),
     .rst(rst),
     .en(1'b1),
-    .d(out0_XM),
-    .q(out0_MW)
-  );
-
-  Register#(32) csrw_out1_MW (
-    .clk(clk),
-    .rst(rst),
-    .en(1'b1),
-    .d(out1_XM),
-    .q(out1_MW)
-  );
-
-  Register#(32) csrw_out2_MW (
-    .clk(clk),
-    .rst(rst),
-    .en(1'b1),
-    .d(out2_XM),
-    .q(out2_MW)
+    .d(out_XM),
+    .q(out_MW)
   );
 
   //==========================================================
@@ -510,7 +456,7 @@ module ProcDpath
     .clk(clk),
     .rst(rst),
     .en(c2d_csrw_out0_en_W),
-    .d(out0_MW),
+    .d(out_MW),
     .q(out0)
   );
 
@@ -518,7 +464,7 @@ module ProcDpath
     .clk(clk),
     .rst(rst),
     .en(c2d_csrw_out1_en_W),
-    .d(out1_MW),
+    .d(out_MW),
     .q(out1)
   );
 
@@ -526,7 +472,7 @@ module ProcDpath
     .clk(clk),
     .rst(rst),
     .en(c2d_csrw_out2_en_W),
-    .d(out2_MW),
+    .d(out_MW),
     .q(out2)
   );
 

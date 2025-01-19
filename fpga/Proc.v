@@ -10,14 +10,6 @@ module Proc
   (* keep=1 *) input  logic        clk,
   (* keep=1 *) input  logic        rst,
 
-  // External Memory Interface (Cocotb)
-
-  (* keep=1 *) input  logic        ext_dmemreq_val,
-  (* keep=1 *) input  logic        ext_dmemreq_type,
-  (* keep=1 *) input  logic [31:0] ext_dmemreq_addr,
-  (* keep=1 *) input  logic [31:0] ext_dmemreq_wdata,
-  (* keep=1 *) output logic [31:0] ext_dmemresp_rdata,
-
   // I/O Interface
 
   (* keep=1 *) input  logic [31:0] in0,
@@ -33,7 +25,7 @@ module Proc
   (* keep=1 *) output logic [31:0] trace_data
 );
 
-  // Internal Memory Interface
+  // Memory Interface
 
   logic        imemreq_val;
   logic [31:0] imemreq_addr;
@@ -77,43 +69,9 @@ module Proc
   // Processor Memory
   //==========================================================
 
-  logic        dval;
-  logic        dtype;
-  logic [31:0] daddr;
-  logic [31:0] wdata;
-
-  always_comb begin
-
-    dval = (dmemreq_val | ext_dmemreq_val);
-    
-    if(ext_dmemreq_val) begin
-      dtype = ext_dmemreq_type;
-      daddr = ext_dmemreq_addr;
-      wdata = ext_dmemreq_wdata;
-    end
-
-    if(dmemreq_val) begin
-      dtype = dmemreq_type;
-      daddr = dmemreq_addr;
-      wdata = dmemreq_wdata;
-    end
-
-    ext_dmemresp_rdata = dmemresp_rdata;
-  
-  end
-
   ProcMem mem
   (
-    .clk(clk),
-    .rst(rst),
-    .imemreq_val(imemreq_val),
-    .imemreq_addr(imemreq_addr),
-    .imemresp_data(imemresp_data),
-    .dmemreq_val(dval),
-    .dmemreq_type(dtype),
-    .dmemreq_addr(daddr),
-    .dmemreq_wdata(wdata),
-    .dmemresp_rdata(dmemresp_rdata)
+    .*
   );
 
   //==========================================================
