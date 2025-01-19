@@ -9,15 +9,14 @@ chmod +x Proc_xxxx_test.py
 make clean_all
 ./Proc_xxxx_test.py N
 ```
-Replace xxxx with TinyRV1 instruction name in lower case. Replace N with an integer for specific test cases.
+Replace `xxxx` with intended testing target. Replace `N` with an integer for specific test cases. Run the same commands for mixed instruction tests and kernels in `test_prog.py`.
 
-Similarly, run the same commands for mixed instruction tests and kernels in `test_prog.py`.
 ### Building Blocks
 ```
 cd test
 make TOPLEVEL=xxxx MODULE=xxxx_test TESTCASE=????
 ```
-Replace xxxx with hardware name and ???? with test case name.
+Replace `xxxx` with hardware name and `????` with test case name.
 
 ## Documentation
 Contains TinyRV1 notes and FPGA synthesis results from Quartus.
