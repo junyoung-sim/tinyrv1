@@ -15,8 +15,9 @@ Similarly, run the same commands for mixed instruction tests and kernels in `tes
 ### Building Blocks
 ```
 cd test
-make TOPLEVEL=xxxx MODULE=xxxx_test TESTCASE=???? (replace xxxx with hardware name and ???? with test case name)
+make TOPLEVEL=xxxx MODULE=xxxx_test TESTCASE=????
 ```
+Replace xxxx with hardware name and ???? with test case name.
 
 ## Documentation
 Contains TinyRV1 notes and FPGA synthesis results from Quartus.
