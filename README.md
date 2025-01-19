@@ -5,7 +5,7 @@
 ### Processor
 ```
 cd test
-chmod +x ./Proc_xxxx_test.py (replace xxxx with TinyRV1 instruction)
+chmod +x Proc_xxxx_test.py (replace xxxx with TinyRV1 instruction)
 make clean_all (makes sure RTL changes are applied)
 ./Proc_xxxx_test.py N (replace N with an integer for specific test cases)
 ```
