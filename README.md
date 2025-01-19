@@ -5,10 +5,12 @@
 ### Processor
 ```
 cd test
-chmod +x Proc_xxxx_test.py //replace xxxx with TinyRV1 instruction
-make clean_all (makes sure RTL changes are applied)
-./Proc_xxxx_test.py N (replace N with an integer for specific test cases)
+chmod +x Proc_xxxx_test.py
+make clean_all
+./Proc_xxxx_test.py N
 ```
+Replace xxxx with TinyRV1 instruction name in lower case. Replace N with an integer for specific test cases.
+
 Similarly, run the same commands for mixed instruction tests and kernels in `test_prog.py`.
 ### Building Blocks
 ```
