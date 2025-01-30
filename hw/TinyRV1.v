@@ -30,6 +30,21 @@
 `define OPCODE 6:0
 
 //==========================================================
+// Field Sizes
+//==========================================================
+
+`define NBITS        32
+`define IMM_J_NBITS  20
+`define IMM_I_NBITS  12
+`define CSR_NBITS    12
+`define FUNCT7_NBITS 7
+`define RS2_NBITS    5
+`define RS1_NBITS    5
+`define FUNCT3_NBITS 3
+`define RD_NBITS     5
+`define OPCODE_NBITS 7
+
+//==========================================================
 // Instruction Opcodes
 //==========================================================
 
@@ -44,4 +59,680 @@
 `define CSRR 32'b???????_?????_?????_010_?????_1110011
 `define CSRW 32'b???????_?????_?????_001_?????_1110011
 
-`endif
+//==========================================================
+// Coprocessor Registers
+//==========================================================
+
+`define CSR_IN0  12'hfc2
+`define CSR_IN1  12'hfc3
+`define CSR_IN2  12'hfc4
+`define CSR_OUT0 12'h7c2
+`define CSR_OUT1 12'h7c3
+`define CSR_OUT2 12'h7c4
+
+`ifndef SYNTHESIS
+
+module TinyRV1();
+
+  //==========================================================
+  // Global signals
+  //==========================================================
+
+  integer e;
+
+  //==========================================================
+  // check_imm
+  //==========================================================
+  // Verify immediate can be stored in nbits. Assume decimal immediates
+  // are signed and hexadecimal immediates are unsigned.
+
+  function check_imm
+  (
+    input integer nbits,
+    input integer is_dec,
+    input integer value
+  );
+
+    check_imm = 1;
+    if ( is_dec == 1 ) begin
+      if (( value > (2**(nbits-1))-1 ) || (value < -(2**(nbits-1)))) begin
+        $display( " ERROR: Immediate (%d) outside valid range [%d,%d]",
+                  value, -(2**(nbits-1)), (2**(nbits-1))-1 );
+        check_imm = 0;
+      end
+    end
+    else if (( value > (2**nbits)-1 ) || (value < 0)) begin
+      $display( " ERROR: Immediate (%x) outside valid range [0x000,%x]",
+                value, (2**nbits)-1 );
+      check_imm = 0;
+    end
+
+  endfunction
+
+  //==========================================================
+  // asm_csrr
+  //==========================================================
+
+  logic [`CSR_NBITS-1:0] asm_csrr_csr;
+
+  function [`NBITS-1:0] asm_csrr
+  (
+    input logic [`RD_NBITS-1:0] rd,
+    input logic [20*8-1:0]                   csr_s
+  );
+
+    asm_csrr_csr = 'x;
+
+    // Parse CSR specifier
+
+    case ( csr_s )
+      "in0" : asm_csrr_csr = `CSR_IN0;
+      "in1" : asm_csrr_csr = `CSR_IN1;
+      "in2" : asm_csrr_csr = `CSR_IN2;
+      default: begin
+        // if nothing matches, just assume CSR is specified in hex
+        e = $sscanf( csr_s, "%x", asm_csrr_csr );
+      end
+    endcase
+
+    // Check for valid CSR specifier
+
+    if (    ( asm_csrr_csr != `CSR_IN0 )
+         && ( asm_csrr_csr != `CSR_IN1 )
+         && ( asm_csrr_csr != `CSR_IN2 ) ) begin
+      $display( " ERROR: Invalid CSR specifier 0x%x", asm_csrr_csr );
+      e = 0;
+    end
+
+    // Assemble the instruction
+
+    asm_csrr[`CSR]     = asm_csrr_csr;
+    asm_csrr[`RS1]     = 5'b00000;
+    asm_csrr[`FUNCT3]  = 3'b010;
+    asm_csrr[`RD]      = rd;
+    asm_csrr[`OPCODE]  = 7'b1110011;
+
+  endfunction
+
+  //==========================================================
+  // asm_csrw
+  //==========================================================
+  // Notice that we have a comma when we try to parse the register
+  // specifier. This is because when sscanf reads a string it will read
+  // until it finds a space which means it will include the comma in the
+  // string. We then need to factor that comma in when parsing the
+  // CSR specifier.
+
+  logic [`CSR_NBITS-1:0] asm_csrw_csr;
+
+  function [`NBITS-1:0] asm_csrw
+  (
+    input logic [20*8-1:0]                    csr_s,
+    input logic [`RS1_NBITS-1:0] rs1
+  );
+
+    asm_csrw_csr = 'x;
+
+    // Parse CSR specifier
+
+    case ( csr_s )
+      "out0," : asm_csrw_csr = `CSR_OUT0;
+      "out1," : asm_csrw_csr = `CSR_OUT1;
+      "out2," : asm_csrw_csr = `CSR_OUT2;
+      default: begin
+        // if nothing matches, just assume CSR is specified in hex
+        e = $sscanf( csr_s, "%x,", asm_csrw_csr );
+      end
+    endcase
+
+    // Check for valid CSR specifier
+
+    if (    ( asm_csrw_csr != `CSR_OUT0 )
+         && ( asm_csrw_csr != `CSR_OUT1 )
+         && ( asm_csrw_csr != `CSR_OUT2 ) ) begin
+      $display( " ERROR: Invalid CSR specifier 0x%x", asm_csrw_csr );
+      e = 0;
+    end
+
+    // Assemble the instruction
+
+    asm_csrw[`CSR]    = asm_csrw_csr;
+    asm_csrw[`RS1]    = rs1;
+    asm_csrw[`FUNCT3] = 3'b001;
+    asm_csrw[`RD]     = 5'b00000;
+    asm_csrw[`OPCODE] = 7'b1110011;
+
+  endfunction
+
+  //==========================================================
+  // asm_add
+  //==========================================================
+
+  function [`NBITS-1:0] asm_add
+  (
+    input logic [`RD_NBITS-1:0]  rd,
+    input logic [`RS1_NBITS-1:0] rs1,
+    input logic [`RS2_NBITS-1:0] rs2
+  );
+
+    asm_add[`FUNCT7] = 7'b0000000;
+    asm_add[`RS2]    = rs2;
+    asm_add[`RS1]    = rs1;
+    asm_add[`FUNCT3] = 3'b000;
+    asm_add[`RD]     = rd;
+    asm_add[`OPCODE] = 7'b0110011;
+
+  endfunction
+
+  //==========================================================
+  // asm_addi
+  //==========================================================
+
+  integer asm_addi_e;
+  integer asm_addi_imm_i;
+  integer asm_addi_imm_is_dec;
+  logic [`IMM_I_NBITS-1:0] asm_addi_imm;
+
+  function [`NBITS-1:0] asm_addi
+  (
+    input logic [`RD_NBITS-1:0]  rd,
+    input logic [`RS1_NBITS-1:0] rs1,
+    input logic [20*8-1:0]                    imm_s
+  );
+
+    // Parse immediate
+
+    asm_addi_imm_is_dec = 0;
+    asm_addi_e = $sscanf( imm_s, "0x%x", asm_addi_imm_i );
+    if ( asm_addi_e == 0 )
+      asm_addi_e = $sscanf( imm_s, "0b%b", asm_addi_imm_i );
+    if ( asm_addi_e == 0 ) begin
+      asm_addi_e = $sscanf( imm_s, "%d", asm_addi_imm_i );
+      asm_addi_imm_is_dec = 1;
+    end
+    if ( asm_addi_e == 0 )
+      e = 0;
+
+    // Check for valid immediate
+
+    e = 32'(check_imm( 12, asm_addi_imm_is_dec, asm_addi_imm_i ));
+
+    if ( e != 0 )
+      asm_addi_imm = `IMM_I_NBITS'(asm_addi_imm_i);
+    else
+      asm_addi_imm = 'x;
+
+    // Assemble the instruction
+
+    asm_addi[`IMM_I]  = asm_addi_imm;
+    asm_addi[`RS1]    = rs1;
+    asm_addi[`FUNCT3] = 3'b000;
+    asm_addi[`RD]     = rd;
+    asm_addi[`OPCODE] = 7'b0010011;
+
+  endfunction
+
+  //==========================================================
+  // asm_mul
+  //==========================================================
+
+  function [`NBITS-1:0] asm_mul
+  (
+    input logic [`RD_NBITS-1:0]  rd,
+    input logic [`RS1_NBITS-1:0] rs1,
+    input logic [`RS2_NBITS-1:0] rs2
+  );
+
+    asm_mul[`FUNCT7] = 7'b0000001;
+    asm_mul[`RS2]    = rs2;
+    asm_mul[`RS1]    = rs1;
+    asm_mul[`FUNCT3] = 3'b000;
+    asm_mul[`RD]     = rd;
+    asm_mul[`OPCODE] = 7'b0110011;
+
+  endfunction
+
+  //==========================================================
+  // asm_lw
+  //==========================================================
+
+  integer asm_lw_e;
+  integer asm_lw_imm_i;
+  integer asm_lw_imm_is_dec;
+  logic [`IMM_I_NBITS-1:0] asm_lw_imm;
+  logic [`RS1_NBITS-1:0]   asm_lw_rs1;
+
+  function [`NBITS-1:0] asm_lw
+  (
+    input logic [`RD_NBITS-1:0] rd,
+    input logic [20*8-1:0]                   addr_s
+  );
+
+    // Parse address
+
+    asm_lw_imm_is_dec = 0;
+    asm_lw_e = $sscanf( addr_s, "0x%x(x%d)", asm_lw_imm_i, asm_lw_rs1 );
+    if ( asm_lw_e == 0 ) begin
+      asm_lw_e = $sscanf( addr_s, "%d(x%d)", asm_lw_imm_i, asm_lw_rs1 );
+      asm_lw_imm_is_dec = 1;
+    end
+    if ( asm_lw_e == 0 )
+      e = 0;
+
+    // Check for valid immediate
+
+    e = 32'(check_imm( 12, asm_lw_imm_is_dec, asm_lw_imm_i ));
+
+    if ( e != 0 )
+      asm_lw_imm = `IMM_I_NBITS'(asm_lw_imm_i);
+    else
+      asm_lw_imm = 'x;
+
+    // Assemble the instruction
+
+    asm_lw[`IMM_I]  = asm_lw_imm;
+    asm_lw[`RS1]    = asm_lw_rs1;
+    asm_lw[`FUNCT3] = 3'b010;
+    asm_lw[`RD]     = rd;
+    asm_lw[`OPCODE] = 7'b0000011;
+
+  endfunction
+
+  //==========================================================
+  // asm_sw
+  //==========================================================
+
+  integer asm_sw_e;
+  integer asm_sw_imm_i;
+  integer asm_sw_imm_is_dec;
+  logic [`IMM_I_NBITS-1:0] asm_sw_imm;
+  logic [`RS1_NBITS-1:0]   asm_sw_rs1;
+
+  function [`NBITS-1:0] asm_sw
+  (
+    input logic [`RS2_NBITS-1:0] rs2,
+    input logic [20*8-1:0]                    addr_s
+  );
+
+    // Parse address
+
+    asm_sw_imm_is_dec = 0;
+    asm_sw_e = $sscanf( addr_s, "0x%x(x%d)", asm_sw_imm_i, asm_sw_rs1 );
+    if ( asm_sw_e == 0 ) begin
+      asm_sw_e = $sscanf( addr_s, "%d(x%d)", asm_sw_imm_i, asm_sw_rs1 );
+      asm_sw_imm_is_dec = 1;
+    end
+    if ( asm_sw_e == 0 )
+      e = 0;
+
+    // Check for valid immediate
+
+    e = 32'(check_imm( 12, asm_sw_imm_is_dec, asm_sw_imm_i ));
+
+    if ( e != 0 )
+      asm_sw_imm = `IMM_I_NBITS'(asm_sw_imm_i);
+    else
+      asm_sw_imm = 'x;
+
+    // Assemble the instruction
+
+    asm_sw[`FUNCT7] = asm_sw_imm[11:5];
+    asm_sw[`RS2]    = rs2;
+    asm_sw[`RS1]    = asm_sw_rs1;
+    asm_sw[`FUNCT3] = 3'b010;
+    asm_sw[`RD]     = asm_sw_imm[4:0];
+    asm_sw[`OPCODE] = 7'b0100011;
+
+  endfunction
+
+  //==========================================================
+  // asm_jal
+  //==========================================================
+
+  integer asm_jal_e;
+  integer asm_jal_jtarg_i;
+  integer asm_jal_imm_i;
+  logic [`IMM_J_NBITS:0] asm_jal_imm;
+  logic asm_jal_imm_unused;
+
+  function [`NBITS-1:0] asm_jal
+  (
+    input logic [31:0]                       addr,
+    input logic [`RD_NBITS-1:0] rd,
+    input logic [20*8-1:0]                   jtarg_s
+  );
+
+    // Parse jump target address
+
+    asm_jal_e = $sscanf( jtarg_s, "0x%x", asm_jal_jtarg_i );
+    if ( asm_jal_e == 0 )
+      asm_jal_e = $sscanf( jtarg_s, "%d", asm_jal_jtarg_i );
+    if ( asm_jal_e == 0 )
+      e = 0;
+
+    if ( (asm_jal_jtarg_i % 4 ) != 0 ) begin
+      $display( " ERROR: Jump target (%x) must be evenly divisible by four",
+                asm_jal_imm_i );
+      e = 0;
+    end
+
+    // Calculate immediate
+
+    asm_jal_imm_i = asm_jal_jtarg_i - addr;
+
+    // Check for valid immediate
+
+    e = 32'(check_imm( 21, 1, asm_jal_imm_i ));
+
+    if ( e != 0 )
+      asm_jal_imm = 21'(asm_jal_imm_i);
+    else
+      asm_jal_imm = 'x;
+
+    // Assemble the instruction
+
+    asm_jal[`IMM_J]  = { asm_jal_imm[20], asm_jal_imm[10:1], asm_jal_imm[11], asm_jal_imm[19:12] };
+    asm_jal[`RD]     = rd;
+    asm_jal[`OPCODE] = 7'b1101111;
+
+    // Least signficant bit will always be zero in TinyRV1
+
+    asm_jal_imm_unused = asm_jal_imm[0];
+
+  endfunction
+
+  //==========================================================
+  // asm_jr
+  //==========================================================
+
+  function [`NBITS-1:0] asm_jr
+  (
+    input logic [`RS1_NBITS-1:0] rs1
+  );
+
+    asm_jr[`FUNCT7] = 7'b0000000;
+    asm_jr[`RS2]    = 5'b00000;
+    asm_jr[`RS1]    = rs1;
+    asm_jr[`FUNCT3] = 3'b000;
+    asm_jr[`RD]     = 5'b00000;
+    asm_jr[`OPCODE] = 7'b1100111;
+
+  endfunction
+
+  //==========================================================
+  // asm_bne
+  //==========================================================
+
+  integer asm_bne_e;
+  integer asm_bne_btarg_i;
+  integer asm_bne_imm_i;
+  logic [12:0] asm_bne_imm;
+  logic asm_bne_imm_unused;
+
+  function [`NBITS-1:0] asm_bne
+  (
+    input logic [31:0]                        addr,
+    input logic [`RS1_NBITS-1:0] rs1,
+    input logic [`RS2_NBITS-1:0] rs2,
+    input logic [20*8-1:0]                    btarg_s
+  );
+
+    // Parse branch target address
+
+    asm_bne_e = $sscanf( btarg_s, "0x%x", asm_bne_btarg_i );
+    if ( asm_bne_e == 0 )
+      asm_bne_e = $sscanf( btarg_s, "%d", asm_bne_btarg_i );
+    if ( asm_bne_e == 0 )
+      e = 0;
+
+    if ( (asm_bne_btarg_i % 4 ) != 0 ) begin
+      $display( " ERROR: Branch target (%x) must be evenly divisible by four",
+                asm_bne_imm_i );
+      e = 0;
+    end
+
+    // Calculate immediate
+
+    asm_bne_imm_i = asm_bne_btarg_i - addr;
+
+    // Check for valid immediate
+
+    e = 32'(check_imm( 13, 1, asm_bne_imm_i ));
+
+    if ( e != 0 )
+      asm_bne_imm = 13'(asm_bne_imm_i);
+    else
+      asm_bne_imm = 'x;
+
+    // Assemble the instruction
+
+    asm_bne[`FUNCT7] = { asm_bne_imm[12], asm_bne_imm[10:5] };
+    asm_bne[`RS1]    = rs1;
+    asm_bne[`RS2]    = rs2;
+    asm_bne[`FUNCT3] = 3'b001;
+    asm_bne[`RD]     = { asm_bne_imm[4:1], asm_bne_imm[11] };
+    asm_bne[`OPCODE] = 7'b1100011;
+
+    // Least signficant bit will always be zero in TinyRV1
+
+    asm_bne_imm_unused = asm_bne_imm[0];
+
+  endfunction
+
+  //==========================================================
+  // asm
+  //==========================================================
+  // This function takes as input an assembly instruction as a string
+  // along with the address of this instruction in memory and then
+  // returns the corresponding machine instruction.
+
+  logic [10*8-1:0] inst_s;
+  logic [20*8-1:0] csr_s;
+  logic [20*8-1:0] imm_s;
+  logic [20*8-1:0] addr_s;
+  logic [20*8-1:0] jtarg_s;
+  logic [20*8-1:0] btarg_s;
+
+  logic [`RS1_NBITS-1:0] rs1;
+  logic [`RS2_NBITS-1:0] rs2;
+  logic [`RD_NBITS-1:0]  rd;
+  logic [`CSR_NBITS-1:0] csr;
+
+  function [`NBITS-1:0] asm
+  (
+    input [31:0] addr,
+    input string str
+  );
+
+    e = $sscanf( str, "%s ", inst_s );
+    case ( inst_s )
+
+      "csrr" : begin e = $sscanf( str, "csrr x%d, %s",       rd, csr_s         ); asm = asm_csrr( rd, csr_s );               end
+      "csrw" : begin e = $sscanf( str, "csrw %s x%d",        csr_s, rs1        ); asm = asm_csrw( csr_s, rs1 );              end // see note above
+      "add"  : begin e = $sscanf( str, "add  x%d, x%d, x%d", rd, rs1, rs2      ); asm = asm_add ( rd, rs1, rs2 );            end
+      "addi" : begin e = $sscanf( str, "addi x%d, x%d, %s",  rd, rs1, imm_s    ); asm = asm_addi( rd, rs1, imm_s );          end
+      "mul"  : begin e = $sscanf( str, "mul  x%d, x%d, x%d", rd, rs1, rs2      ); asm = asm_mul ( rd, rs1, rs2 );            end
+      "lw"   : begin e = $sscanf( str, "lw   x%d, %s",       rd, addr_s        ); asm = asm_lw  ( rd, addr_s );              end
+      "sw"   : begin e = $sscanf( str, "sw   x%d, %s",       rs2, addr_s       ); asm = asm_sw  ( rs2, addr_s );             end
+      "jal"  : begin e = $sscanf( str, "jal  x%d, %s",       rd, jtarg_s       ); asm = asm_jal ( addr, rd, jtarg_s );       end
+      "jr"   : begin e = $sscanf( str, "jr   x%d",           rs1               ); asm = asm_jr  ( rs1 );                     end
+      "bne"  : begin e = $sscanf( str, "bne  x%d, x%d, %s",  rs1, rs2, btarg_s ); asm = asm_bne ( addr, rs1, rs2, btarg_s ); end
+
+      default : asm = 'x;
+    endcase
+
+    if ( e == 0 )
+      asm = 'x;
+
+    inst_s  = 'x;
+    csr_s   = 'x;
+    imm_s   = 'x;
+    addr_s  = 'x;
+    jtarg_s = 'x;
+    btarg_s = 'x;
+    rs1     = 'x;
+    rs2     = 'x;
+    rd      = 'x;
+
+    // If asm has any Xs then |(asm ^ asm)) will not equal zero, in which
+    // case we will stop the simulation with an error since something
+    // went wrong in the assembly process.
+
+    if ((|(asm ^ asm)) == 1'b0);
+    else begin
+      $display( " ERROR: Could not assemble \"%s\"\n", str );
+      $finish;
+    end
+
+  endfunction
+
+  //==========================================================
+  // disasm immediates
+  //==========================================================
+
+  logic [31:0] inst_unused;
+
+  function [11:0] disasm_imm_i
+  (
+    input [`NBITS-1:0] inst
+  );
+    disasm_imm_i = { inst[31], inst[30:25], inst[24:21], inst[20] };
+    inst_unused = inst;
+  endfunction
+
+  function [11:0] disasm_imm_s
+  (
+    input [`NBITS-1:0] inst
+  );
+    disasm_imm_s = { inst[31], inst[30:25], inst[11:8], inst[7] };
+    inst_unused = inst;
+  endfunction
+
+  function [31:0] disasm_imm_b
+  (
+    input [31:0] addr,
+    input [`NBITS-1:0] inst
+  );
+    disasm_imm_b = { {19{inst[31]}}, inst[31], inst[7], inst[30:25], inst[11:8], 1'b0 };
+    disasm_imm_b = addr + disasm_imm_b;
+    inst_unused = inst;
+  endfunction
+
+  function [31:0] disasm_imm_j
+  (
+    input [31:0] addr,
+    input [`NBITS-1:0] inst
+  );
+    disasm_imm_j = { {11{inst[31]}}, inst[31], inst[19:12], inst[20], inst[30:25], inst[24:21], 1'b0 };
+    disasm_imm_j = addr + disasm_imm_j;
+    inst_unused = inst;
+  endfunction
+
+  //==========================================================
+  // disasm
+  //==========================================================
+  // This function takes as input a machine instruction and returns the
+  // corresponding assembly instruction as a string.
+
+  // logic [4*8-1:0]  rs1_s;
+  // logic [4*8-1:0]  rs2_s;
+  // logic [4*8-1:0]  rd_s;
+  logic [22*8-1:0] disasm_;
+
+  function [22*8-1:0] disasm
+  (
+    input [31:0]                    addr,
+    input [`NBITS-1:0] inst
+  );
+
+    // Unpack the fields
+
+    rs1 = inst[`RS1];
+    rs2 = inst[`RS2];
+    rd  = inst[`RD];
+    csr = inst[`CSR];
+
+    // Create fixed-width register specifiers
+
+    // if ( rs1 <= 9 )
+    //   $sformat( rs1_s, "x%0d, ", rs1 );
+    // else
+    //   $sformat( rs1_s, "x%d,",  rs1 );
+
+    // if ( rs2 <= 9 )
+    //   $sformat( rs2_s, "x%0d, ", rs2 );
+    // else
+    //   $sformat( rs2_s, "x%d,",  rs2 );
+
+    // if ( rd <= 9 )
+    //   $sformat( rd_s, "x%0d, ", rd );
+    // else
+    //   $sformat( rd_s, "x%d,",  rd );
+
+    // Actual disassembly
+
+    casez ( inst )
+      `CSRR:
+        begin
+          case ( csr )
+            `CSR_IN0 : $sformat( disasm_, "csrr x%-0d, in0", rd );
+            `CSR_IN1 : $sformat( disasm_, "csrr x%-0d, in1", rd );
+            `CSR_IN2 : $sformat( disasm_, "csrr x%-0d, in2", rd );
+            default          : $sformat( disasm_, "csrr x%-0d, 0x%x", rd, csr );
+          endcase
+        end
+      `CSRW:
+        begin
+          case ( csr )
+            `CSR_OUT0 : $sformat( disasm_, "csrw out0, x%-0d", rs1 );
+            `CSR_OUT1 : $sformat( disasm_, "csrw out1, x%-0d", rs1 );
+            `CSR_OUT2 : $sformat( disasm_, "csrw out2, x%-0d", rs1 );
+            default           : $sformat( disasm_, "csrw 0x%x, x%-0d", csr, rs1 );
+          endcase
+        end
+
+      `ADD   : $sformat( disasm_, "add  x%-0d, x%-0d, x%-0d", rd, rs1, rs2 );
+      `ADDI  : $sformat( disasm_, "addi x%-0d, x%-0d, 0x%x",  rd, rs1, disasm_imm_i(inst) );
+      `MUL   : $sformat( disasm_, "mul  x%-0d, x%-0d, x%-0d", rd, rs1, rs2 );
+      `LW    : $sformat( disasm_, "lw   x%-0d, 0x%x(x%-0d)",  rd, disasm_imm_i(inst), rs1 );
+      `SW    : $sformat( disasm_, "sw   x%-0d, 0x%x(x%-0d)",  rs2, disasm_imm_s(inst), rs1 );
+      `JAL   : $sformat( disasm_, "jal  x%-0d, 0x%x",         rd, 20'(disasm_imm_j(addr,inst)) );
+      `JR    : $sformat( disasm_, "jr   x%-0d",               rs1 );
+      `BNE   : $sformat( disasm_, "bne  x%-0d, x%-0d, 0x%x",  rs1, rs2, 20'(disasm_imm_b(addr,inst)) );
+      default             : $sformat( disasm_, "illegal inst" );
+    endcase
+
+    disasm = disasm_;
+
+  endfunction
+
+  //==========================================================
+  // Disasm Tiny
+  //==========================================================
+
+  function [4*8-1:0] disasm_tiny
+  (
+    input [`NBITS-1:0] inst
+  );
+
+    casez ( inst )
+      `CSRR : disasm_tiny = "csrr";
+      `CSRW : disasm_tiny = "csrw";
+      `ADD  : disasm_tiny = "add ";
+      `ADDI : disasm_tiny = "addi";
+      `MUL  : disasm_tiny = "mul ";
+      `LW   : disasm_tiny = "lw  ";
+      `SW   : disasm_tiny = "sw  ";
+      `JAL  : disasm_tiny = "jal ";
+      `JR   : disasm_tiny = "jr  ";
+      `BNE  : disasm_tiny = "bne ";
+      default            : disasm_tiny = "????";
+    endcase
+
+  endfunction
+
+endmodule
+
+`endif /* SYNTHESIS */
+
+`endif /* TINYRV1_V */
