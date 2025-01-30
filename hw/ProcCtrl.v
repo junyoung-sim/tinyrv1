@@ -287,9 +287,9 @@ module ProcCtrl
     if(val_D & (inst_D ==? `CSRR)) begin
       csr_num = inst_D[`CSR];
       case(csr_num)
-        'hfc2 :  csrr_sel = 0;
-        'hfc3 :  csrr_sel = 1;
-        'hfc4 :  csrr_sel = 2;
+        `CSR_IN0 : csrr_sel = 0;
+        `CSR_IN1 : csrr_sel = 1;
+        `CSR_IN2 : csrr_sel = 2;
         default: csrr_sel = 'x;
       endcase
     end
@@ -452,17 +452,17 @@ module ProcCtrl
     if(val_W & (inst_W ==? `CSRW)) begin
       csr_num = inst_W[`CSR];
       case(csr_num)
-        'h7c2 : begin
+        `CSR_OUT0 : begin
           c2d_csrw_out0_en_W = 1;
           c2d_csrw_out1_en_W = 0;
           c2d_csrw_out2_en_W = 0;
         end
-        'h7c3 : begin
+        `CSR_OUT1: begin
           c2d_csrw_out0_en_W = 0;
           c2d_csrw_out1_en_W = 1;
           c2d_csrw_out2_en_W = 0;
         end
-        'h7c4 : begin
+        `CSR_OUT2 : begin
           c2d_csrw_out0_en_W = 0;
           c2d_csrw_out1_en_W = 0;
           c2d_csrw_out2_en_W = 1;
