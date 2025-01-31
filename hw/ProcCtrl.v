@@ -457,7 +457,7 @@ module ProcCtrl
           c2d_csrw_out1_en_W = 0;
           c2d_csrw_out2_en_W = 0;
         end
-        `CSR_OUT1: begin
+        `CSR_OUT1 : begin
           c2d_csrw_out0_en_W = 0;
           c2d_csrw_out1_en_W = 1;
           c2d_csrw_out2_en_W = 0;
