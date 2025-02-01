@@ -64,7 +64,7 @@ module TestUtils
   //==========================================================
 
   task test_bench_begin(string filename);
-    $write({"\n", filename});
+    $write("\n", filename);
     #1;
   endtask
 
@@ -84,7 +84,7 @@ module TestUtils
   //==========================================================
 
   task test_case_begin(string taskname);
-    $write({"\n  ", taskname, " "});
+    $write("\n  ", taskname, " ");
     if(t.n != 0)
       $write("\n");
     

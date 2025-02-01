@@ -52,6 +52,68 @@ task test_addi_add();
 
 endtask
 
+//==========================================================
+// ADD: test_add_add
+//==========================================================
+
+task test_add_add();
+  t.test_case_begin( "test_add_add" );
+
+  // Assembly Program
+
+  asm( 'h000, "addi x1 x0 1" ); // F D X M W
+  asm( 'h004, "add x1 x1 x1" ); //   F D X M W
+  asm( 'h008, "add x1 x1 x1" ); //     F D X M W      (X-D)
+
+  asm( 'h00c, "addi x1 x0 1" ); // F D X M W
+  asm( 'h010, "add x1 x1 x1" ); //   F D X M W
+  asm( 'h014, "add x0 x0 x0" ); //     F D X M W
+  asm( 'h018, "add x1 x1 x1" ); //       F D X M W    (M-D)
+
+  asm( 'h01c, "addi x1 x0 1" ); // F D X M W
+  asm( 'h020, "add x1 x1 x1" ); //   F D X M W
+  asm( 'h024, "add x0 x0 x0" ); //     F D X M W
+  asm( 'h028, "add x0 x0 x0" ); //       F D X M W
+  asm( 'h02c, "add x1 x1 x1" ); //         F D X M W  (W-D)
+
+  asm( 'h030, "addi x1 x0 1" ); // F D X M W
+  asm( 'h034, "add x1 x1 x1" ); //   F D X M W
+  asm( 'h038, "add x0 x0 x0" ); //     F D X M W
+  asm( 'h03c, "add x0 x0 x0" ); //       F D X M W
+  asm( 'h040, "add x0 x0 x0" ); //         F D X M W
+  asm( 'h044, "add x1 x1 x1" ); //           F D X M W
+
+  // Check Traces
+
+  check_trace( 'x, 'x );
+  check_trace( 'x, 'x );
+  check_trace( 'x, 'x );
+  check_trace( 'x, 'x );
+
+  check_trace( 'h000, 1 );
+  check_trace( 'h004, 2 );
+  check_trace( 'h008, 4 );
+
+  check_trace( 'h00c, 1 );
+  check_trace( 'h010, 2 );
+  check_trace( 'h014, 0 );
+  check_trace( 'h018, 4 );
+
+  check_trace( 'h01c, 1 );
+  check_trace( 'h020, 2 );
+  check_trace( 'h024, 0 );
+  check_trace( 'h028, 0 );
+  check_trace( 'h02c, 4 );
+
+  check_trace( 'h030, 1 );
+  check_trace( 'h034, 2 );
+  check_trace( 'h038, 0 );
+  check_trace( 'h03c, 0 );
+  check_trace( 'h040, 0 );
+  check_trace( 'h044, 4 );
+
+endtask
+
 /*
 
 //===========================================================
@@ -306,5 +368,5 @@ async def test_jal_add(dut):
   check_trace( 0x000)
   check_trace( 0x000)
   check_trace( 0x060)
-  
+
 */

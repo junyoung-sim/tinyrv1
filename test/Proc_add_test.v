@@ -204,6 +204,7 @@ module Top();
     proc_in2 = 'x;
 
     if((t.n <= 0) || (t.n == 1)) test_addi_add();
+    if((t.n <= 0) || (t.n == 2)) test_add_add();
 
     t.test_bench_end();
   end
