@@ -67,6 +67,8 @@ module ProcDpath
 
   // Trace Data
 
+  (* keep=1 *) output logic [31:0] trace_addr,
+  (* keep=1 *) output logic [31:0] trace_inst,
   (* keep=1 *) output logic [31:0] trace_data
 );
 
@@ -446,10 +448,6 @@ module ProcDpath
   assign rf_waddr = c2d_rf_waddr_W;
   assign rf_wdata = result_W_next;
 
-  // Trace Data
-
-  assign trace_data = rf_wdata;
-
   // CSRW (Output)
 
   Register#(32) csrw_out0 (
@@ -475,6 +473,14 @@ module ProcDpath
     .d(out_MW),
     .q(out2)
   );
+
+  //==========================================================
+  // Trace Data
+  //==========================================================
+
+  assign trace_addr = pc;
+  assign trace_inst = imemresp_data;
+  assign trace_data = rf_wdata;
 
 endmodule
 

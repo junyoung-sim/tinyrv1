@@ -32,7 +32,7 @@ module TestUtils
     
     n = test_case;
 
-    if($value$plusargs("dump-vcd=%s", vcd_filename)) begin
+    if($value$plusargs("dump_vcd=%s", vcd_filename)) begin
       $dumpfile(vcd_filename);
       $dumpvars();
     end

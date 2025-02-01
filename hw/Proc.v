@@ -34,6 +34,8 @@ module Proc
 
   // Trace Data
 
+  (* keep=1 *) output logic [31:0] trace_addr,
+  (* keep=1 *) output logic [31:0] trace_inst,
   (* keep=1 *) output logic [31:0] trace_data
 );
 
