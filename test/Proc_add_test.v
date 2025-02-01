@@ -203,7 +203,7 @@ module Top();
     proc_in1 = 'x;
     proc_in2 = 'x;
 
-    if((t.n <= 0) || (t.n == 1)) test_simple();
+    if((t.n <= 0) || (t.n == 1)) test_addi_add();
 
     t.test_bench_end();
   end

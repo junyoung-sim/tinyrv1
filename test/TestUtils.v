@@ -27,12 +27,12 @@ module TestUtils
 
   initial begin
 
-    if(!$value$plusargs("test_case=%d", test_case))
+    if(!$value$plusargs("test-case=%d", test_case))
       test_case = 0;
     
     n = test_case;
 
-    if($value$plusargs("dump_vcd=%s", vcd_filename)) begin
+    if($value$plusargs("dump-vcd=%s", vcd_filename)) begin
       $dumpfile(vcd_filename);
       $dumpvars();
     end

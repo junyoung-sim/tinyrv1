@@ -1,329 +1,310 @@
+//==========================================================
+// ADD: test_addi_add
+//==========================================================
+
+task test_addi_add();
+  t.test_case_begin( "test_addi_add" );
+
+  // Assembly Program
+
+  asm( 'h000, "addi x1 x0 1" ); // F D X M W
+  asm( 'h004, "add x2 x1 x1" ); //   F D X M W       (X-D)
+  
+  asm( 'h008, "addi x1 x0 1" ); // F D X M W
+  asm( 'h00c, "add x0 x0 x0" ); //   F D X M W
+  asm( 'h010, "add x2 x1 x1" ); //     F D X M W     (M-D)
+  
+  asm( 'h014, "addi x1 x0 1" ); // F D X M W
+  asm( 'h018, "add x0 x0 x0" ); //   F D X M W
+  asm( 'h01c, "add x0 x0 x0" ); //     F D X M W
+  asm( 'h020, "add x2 x1 x1" ); //       F D X M W   (W-D)
+
+  asm( 'h024, "addi x1 x0 1" ); // F D X M W
+  asm( 'h028, "add x0 x0 x0" ); //   F D X M W
+  asm( 'h02c, "add x0 x0 x0" ); //     F D X M W
+  asm( 'h030, "add x0 x0 x0" ); //       F D X M W
+  asm( 'h034, "add x2 x1 x1" ); //         F D X M W
+
+  // Check Traces
+
+  check_trace( 'x, 'x );
+  check_trace( 'x, 'x );
+  check_trace( 'x, 'x );
+  check_trace( 'x, 'x );
+
+  check_trace( 'h000, 1 );
+  check_trace( 'h004, 2 );
+
+  check_trace( 'h008, 1 );
+  check_trace( 'h00c, 0 );
+  check_trace( 'h010, 2 );
+
+  check_trace( 'h014, 1 );
+  check_trace( 'h018, 0 );
+  check_trace( 'h01c, 0 );
+  check_trace( 'h020, 2 );
+
+  check_trace( 'h024, 1 );
+  check_trace( 'h028, 0 );
+  check_trace( 'h02c, 0 );
+  check_trace( 'h030, 0 );
+  check_trace( 'h034, 2 );
+
+endtask
+
 /*
-#!/usr/bin/env python3
 
-import sys
-from TinyRV1 import *
-
-#===========================================================
-# ADD: test_addi_add
-#===========================================================
-
-@cocotb.test()
-async def test_addi_add(dut):
-  clock = Clock(dut.clk, 10, units="ns")
-  cocotb.start_soon(clock.start(start_high=False))
-
-  # Assembly Program
-
-  await asm_write(dut, 0x000, "addi x1 x0 1") # F D X M W
-  await asm_write(dut, 0x004, "add x2 x1 x1") #   F D X M W       (X-D)
-  
-  await asm_write(dut, 0x008, "addi x1 x0 1") # F D X M W
-  await asm_write(dut, 0x00c, "add x0 x0 x0") #   F D X M W
-  await asm_write(dut, 0x010, "add x2 x1 x1") #     F D X M W     (M-D)
-  
-  await asm_write(dut, 0x014, "addi x1 x0 1") # F D X M W
-  await asm_write(dut, 0x018, "add x0 x0 x0") #   F D X M W
-  await asm_write(dut, 0x01c, "add x0 x0 x0") #     F D X M W
-  await asm_write(dut, 0x020, "add x2 x1 x1") #       F D X M W   (W-D)
-
-  await asm_write(dut, 0x024, "addi x1 x0 1") # F D X M W
-  await asm_write(dut, 0x028, "add x0 x0 x0") #   F D X M W
-  await asm_write(dut, 0x02c, "add x0 x0 x0") #     F D X M W
-  await asm_write(dut, 0x030, "add x0 x0 x0") #       F D X M W
-  await asm_write(dut, 0x034, "add x2 x1 x1") #         F D X M W
-
-  await reset(dut)
-
-  # Check Traces
-
-  await check_trace(dut, x)
-  await check_trace(dut, x)
-  await check_trace(dut, x)
-
-  await check_trace(dut, 1)
-  await check_trace(dut, 2)
-
-  await check_trace(dut, 1)
-  await check_trace(dut, 0)
-  await check_trace(dut, 2)
-
-  await check_trace(dut, 1)
-  await check_trace(dut, 0)
-  await check_trace(dut, 0)
-  await check_trace(dut, 2)
-
-  await check_trace(dut, 1)
-  await check_trace(dut, 0)
-  await check_trace(dut, 0)
-  await check_trace(dut, 0)
-  await check_trace(dut, 2)
-
-#===========================================================
-# ADD: test_add_add
-#===========================================================
+//===========================================================
+// ADD: test_add_add
+//===========================================================
 
 @cocotb.test()
 async def test_add_add(dut):
   clock = Clock(dut.clk, 10, units="ns")
   cocotb.start_soon(clock.start(start_high=False))
 
-  # Assembly Program
+  // Assembly Program
 
-  await asm_write(dut, 0x000, "addi x1 x0 1") # F D X M W
-  await asm_write(dut, 0x004, "add x1 x1 x1") #   F D X M W        (X-D)
-  await asm_write(dut, 0x008, "add x1 x1 x1") #     F D X M W      (X-D)
+  asm( 0x000, "addi x1 x0 1") // F D X M W
+  asm( 0x004, "add x1 x1 x1") //   F D X M W        (X-D)
+  asm( 0x008, "add x1 x1 x1") //     F D X M W      (X-D)
 
-  await asm_write(dut, 0x00c, "addi x1 x0 1") # F D X M W
-  await asm_write(dut, 0x010, "add x1 x1 x1") #   F D X M W        (X-D)
-  await asm_write(dut, 0x014, "add x0 x0 x0") #     F D X M W
-  await asm_write(dut, 0x018, "add x1 x1 x1") #       F D X M W    (M-D)
+  asm( 0x00c, "addi x1 x0 1") // F D X M W
+  asm( 0x010, "add x1 x1 x1") //   F D X M W        (X-D)
+  asm( 0x014, "add x0 x0 x0") //     F D X M W
+  asm( 0x018, "add x1 x1 x1") //       F D X M W    (M-D)
 
-  await asm_write(dut, 0x01c, "addi x1 x0 1") # F D X M W
-  await asm_write(dut, 0x020, "add x1 x1 x1") #   F D X M W        (X-D)
-  await asm_write(dut, 0x024, "add x0 x0 x0") #     F D X M W
-  await asm_write(dut, 0x028, "add x0 x0 x0") #       F D X M W
-  await asm_write(dut, 0x02c, "add x1 x1 x1") #         F D X M W  (W-D)
+  asm( 0x01c, "addi x1 x0 1") // F D X M W
+  asm( 0x020, "add x1 x1 x1") //   F D X M W        (X-D)
+  asm( 0x024, "add x0 x0 x0") //     F D X M W
+  asm( 0x028, "add x0 x0 x0") //       F D X M W
+  asm( 0x02c, "add x1 x1 x1") //         F D X M W  (W-D)
 
-  await asm_write(dut, 0x030, "addi x1 x0 1") # F D X M W
-  await asm_write(dut, 0x034, "add x1 x1 x1") #   F D X M W        (X-D)
-  await asm_write(dut, 0x038, "add x0 x0 x0") #     F D X M W
-  await asm_write(dut, 0x03c, "add x0 x0 x0") #       F D X M W
-  await asm_write(dut, 0x040, "add x0 x0 x0") #         F D X M W
-  await asm_write(dut, 0x044, "add x1 x1 x1") #           F D X M W
+  asm( 0x030, "addi x1 x0 1") // F D X M W
+  asm( 0x034, "add x1 x1 x1") //   F D X M W        (X-D)
+  asm( 0x038, "add x0 x0 x0") //     F D X M W
+  asm( 0x03c, "add x0 x0 x0") //       F D X M W
+  asm( 0x040, "add x0 x0 x0") //         F D X M W
+  asm( 0x044, "add x1 x1 x1") //           F D X M W
 
-  await reset(dut)
+  reset(dut)
 
-  # Check Traces
+  // Check Traces
 
-  await check_trace(dut, x)
-  await check_trace(dut, x)
-  await check_trace(dut, x)
+  check_trace( x)
+  check_trace( x)
+  check_trace( x)
 
-  await check_trace(dut, 1)
-  await check_trace(dut, 2)
-  await check_trace(dut, 4)
+  check_trace( 1)
+  check_trace( 2)
+  check_trace( 4)
 
-  await check_trace(dut, 1)
-  await check_trace(dut, 2)
-  await check_trace(dut, 0)
-  await check_trace(dut, 4)
+  check_trace( 1)
+  check_trace( 2)
+  check_trace( 0)
+  check_trace( 4)
 
-  await check_trace(dut, 1)
-  await check_trace(dut, 2)
-  await check_trace(dut, 0)
-  await check_trace(dut, 0)
-  await check_trace(dut, 4)
+  check_trace( 1)
+  check_trace( 2)
+  check_trace( 0)
+  check_trace( 0)
+  check_trace( 4)
 
-  await check_trace(dut, 1)
-  await check_trace(dut, 2)
-  await check_trace(dut, 0)
-  await check_trace(dut, 0)
-  await check_trace(dut, 0)
-  await check_trace(dut, 4)
+  check_trace( 1)
+  check_trace( 2)
+  check_trace( 0)
+  check_trace( 0)
+  check_trace( 0)
+  check_trace( 4)
 
-#===========================================================
-# ADD: test_mul_add
-#===========================================================
+//===========================================================
+// ADD: test_mul_add
+//===========================================================
 
 @cocotb.test()
 async def test_mul_add(dut):
   clock = Clock(dut.clk, 10, units="ns")
   cocotb.start_soon(clock.start(start_high=False))
 
-  # Assembly Program
+  // Assembly Program
 
-  await asm_write(dut, 0x000, "addi x1 x0 3") # F D X M W
-  await asm_write(dut, 0x004, "mul x1 x1 x1") #   F D X M W        (X-D)
-  await asm_write(dut, 0x008, "add x1 x1 x1") #     F D X M W      (X-D)
+  asm( 0x000, "addi x1 x0 3") // F D X M W
+  asm( 0x004, "mul x1 x1 x1") //   F D X M W        (X-D)
+  asm( 0x008, "add x1 x1 x1") //     F D X M W      (X-D)
 
-  await asm_write(dut, 0x00c, "addi x1 x0 3") # F D X M W
-  await asm_write(dut, 0x010, "mul x1 x1 x1") #   F D X M W        (X-D)
-  await asm_write(dut, 0x014, "add x0 x0 x0") #     F D X M W
-  await asm_write(dut, 0x018, "add x1 x1 x1") #       F D X M W    (M-D)
+  asm( 0x00c, "addi x1 x0 3") // F D X M W
+  asm( 0x010, "mul x1 x1 x1") //   F D X M W        (X-D)
+  asm( 0x014, "add x0 x0 x0") //     F D X M W
+  asm( 0x018, "add x1 x1 x1") //       F D X M W    (M-D)
 
-  await asm_write(dut, 0x01c, "addi x1 x0 3") # F D X M W
-  await asm_write(dut, 0x020, "mul x1 x1 x1") #   F D X M W        (X-D)
-  await asm_write(dut, 0x024, "add x0 x0 x0") #     F D X M W
-  await asm_write(dut, 0x028, "add x0 x0 x0") #       F D X M W
-  await asm_write(dut, 0x02c, "add x1 x1 x1") #         F D X M W  (W-D)
+  asm( 0x01c, "addi x1 x0 3") // F D X M W
+  asm( 0x020, "mul x1 x1 x1") //   F D X M W        (X-D)
+  asm( 0x024, "add x0 x0 x0") //     F D X M W
+  asm( 0x028, "add x0 x0 x0") //       F D X M W
+  asm( 0x02c, "add x1 x1 x1") //         F D X M W  (W-D)
 
-  await asm_write(dut, 0x030, "addi x1 x0 3") # F D X M W
-  await asm_write(dut, 0x034, "mul x1 x1 x1") #   F D X M W        (X-D)
-  await asm_write(dut, 0x038, "add x0 x0 x0") #     F D X M W
-  await asm_write(dut, 0x03c, "add x0 x0 x0") #       F D X M W
-  await asm_write(dut, 0x040, "add x0 x0 x0") #         F D X M W
-  await asm_write(dut, 0x044, "add x1 x1 x1") #           F D X M W
+  asm( 0x030, "addi x1 x0 3") // F D X M W
+  asm( 0x034, "mul x1 x1 x1") //   F D X M W        (X-D)
+  asm( 0x038, "add x0 x0 x0") //     F D X M W
+  asm( 0x03c, "add x0 x0 x0") //       F D X M W
+  asm( 0x040, "add x0 x0 x0") //         F D X M W
+  asm( 0x044, "add x1 x1 x1") //           F D X M W
 
-  await reset(dut)
+  reset(dut)
 
-  # Check Traces
+  // Check Traces
 
-  await check_trace(dut, x)
-  await check_trace(dut, x)
-  await check_trace(dut, x)
+  check_trace( x)
+  check_trace( x)
+  check_trace( x)
 
-  await check_trace(dut, 0x003)
-  await check_trace(dut, 0x009)
-  await check_trace(dut, 0x012)
+  check_trace( 0x003)
+  check_trace( 0x009)
+  check_trace( 0x012)
 
-  await check_trace(dut, 0x003)
-  await check_trace(dut, 0x009)
-  await check_trace(dut, 0x000)
-  await check_trace(dut, 0x012)
+  check_trace( 0x003)
+  check_trace( 0x009)
+  check_trace( 0x000)
+  check_trace( 0x012)
 
-  await check_trace(dut, 0x003)
-  await check_trace(dut, 0x009)
-  await check_trace(dut, 0x000)
-  await check_trace(dut, 0x000)
-  await check_trace(dut, 0x012)
+  check_trace( 0x003)
+  check_trace( 0x009)
+  check_trace( 0x000)
+  check_trace( 0x000)
+  check_trace( 0x012)
 
-  await check_trace(dut, 0x003)
-  await check_trace(dut, 0x009)
-  await check_trace(dut, 0x000)
-  await check_trace(dut, 0x000)
-  await check_trace(dut, 0x000)
-  await check_trace(dut, 0x012)
+  check_trace( 0x003)
+  check_trace( 0x009)
+  check_trace( 0x000)
+  check_trace( 0x000)
+  check_trace( 0x000)
+  check_trace( 0x012)
 
-#===========================================================
-# ADD: test_lw_add
-#===========================================================
+//===========================================================
+// ADD: test_lw_add
+//===========================================================
 
 @cocotb.test()
 async def test_lw_add(dut):
   clock = Clock(dut.clk, 10, units="ns")
   cocotb.start_soon(clock.start(start_high=False))
 
-  # Data Memory
+  // Data Memory
 
-  await data(dut, 0x0fc, 0x001)
+  data( 0x0fc, 0x001)
 
-  # Assembly Program
+  // Assembly Program
 
-  await asm_write(dut, 0x000, "addi x1 x0 0x0fc") # F D X M W
-  await asm_write(dut, 0x004, "lw x1 0(x1)"     ) #   F D X M W        (X-D)
-  await asm_write(dut, 0x008, "add x1 x1 x1"    ) #     F D D X M W    (M-D)
+  asm( 0x000, "addi x1 x0 0x0fc") // F D X M W
+  asm( 0x004, "lw x1 0(x1)"     ) //   F D X M W        (X-D)
+  asm( 0x008, "add x1 x1 x1"    ) //     F D D X M W    (M-D)
 
-  await asm_write(dut, 0x00c, "addi x1 x0 0x0fc") # F F D X M W
-  await asm_write(dut, 0x010, "lw x1 0(x1)"     ) #     F D X M W      (X-D)
-  await asm_write(dut, 0x014, "add x0 x0 x0"    ) #       F D X M W
-  await asm_write(dut, 0x018, "add x1 x1 x1"    ) #         F D X M W  (M-D)
+  asm( 0x00c, "addi x1 x0 0x0fc") // F F D X M W
+  asm( 0x010, "lw x1 0(x1)"     ) //     F D X M W      (X-D)
+  asm( 0x014, "add x0 x0 x0"    ) //       F D X M W
+  asm( 0x018, "add x1 x1 x1"    ) //         F D X M W  (M-D)
 
-  await asm_write(dut, 0x01c, "addi x1 x0 0x0fc") # F D X M W
-  await asm_write(dut, 0x020, "lw x1 0(x1)"     ) #   F D X M W        (X-D)
-  await asm_write(dut, 0x024, "add x0 x0 x0"    ) #     F D X M W
-  await asm_write(dut, 0x028, "add x0 x0 x0"    ) #       F D X M W
-  await asm_write(dut, 0x02c, "add x1 x1 x1"    ) #         F D X M W  (W-D)
+  asm( 0x01c, "addi x1 x0 0x0fc") // F D X M W
+  asm( 0x020, "lw x1 0(x1)"     ) //   F D X M W        (X-D)
+  asm( 0x024, "add x0 x0 x0"    ) //     F D X M W
+  asm( 0x028, "add x0 x0 x0"    ) //       F D X M W
+  asm( 0x02c, "add x1 x1 x1"    ) //         F D X M W  (W-D)
 
-  await asm_write(dut, 0x030, "addi x1 x0 0x0fc") # F D X M W
-  await asm_write(dut, 0x034, "lw x1 0(x1)"     ) #   F D X M W        (X-D)
-  await asm_write(dut, 0x038, "add x0 x0 x0"    ) #     F D X M W
-  await asm_write(dut, 0x03c, "add x0 x0 x0"    ) #       F D X M W
-  await asm_write(dut, 0x040, "add x0 x0 x0"    ) #         F D X M W
-  await asm_write(dut, 0x044, "add x1 x1 x1"    ) #           F D X M W
+  asm( 0x030, "addi x1 x0 0x0fc") // F D X M W
+  asm( 0x034, "lw x1 0(x1)"     ) //   F D X M W        (X-D)
+  asm( 0x038, "add x0 x0 x0"    ) //     F D X M W
+  asm( 0x03c, "add x0 x0 x0"    ) //       F D X M W
+  asm( 0x040, "add x0 x0 x0"    ) //         F D X M W
+  asm( 0x044, "add x1 x1 x1"    ) //           F D X M W
 
-  await reset(dut)
+  reset(dut)
 
-  # Check Traces
+  // Check Traces
 
-  await check_trace(dut, x)
-  await check_trace(dut, x)
-  await check_trace(dut, x)
+  check_trace( x)
+  check_trace( x)
+  check_trace( x)
 
-  await check_trace(dut, 0x0fc)
-  await check_trace(dut, 0x001)
-  await RisingEdge(dut.clk)
-  await check_trace(dut, 0x002)
+  check_trace( 0x0fc)
+  check_trace( 0x001)
+  RisingEdge(dut.clk)
+  check_trace( 0x002)
 
-  await check_trace(dut, 0x0fc)
-  await check_trace(dut, 0x001)
-  await check_trace(dut, 0x000)
-  await check_trace(dut, 0x002)
+  check_trace( 0x0fc)
+  check_trace( 0x001)
+  check_trace( 0x000)
+  check_trace( 0x002)
 
-  await check_trace(dut, 0x0fc)
-  await check_trace(dut, 0x001)
-  await check_trace(dut, 0x000)
-  await check_trace(dut, 0x000)
-  await check_trace(dut, 0x002)
+  check_trace( 0x0fc)
+  check_trace( 0x001)
+  check_trace( 0x000)
+  check_trace( 0x000)
+  check_trace( 0x002)
 
-  await check_trace(dut, 0x0fc)
-  await check_trace(dut, 0x001)
-  await check_trace(dut, 0x000)
-  await check_trace(dut, 0x000)
-  await check_trace(dut, 0x000)
-  await check_trace(dut, 0x002)
+  check_trace( 0x0fc)
+  check_trace( 0x001)
+  check_trace( 0x000)
+  check_trace( 0x000)
+  check_trace( 0x000)
+  check_trace( 0x002)
 
-#===========================================================
-# ADD: test_jal_add
-#===========================================================
+//===========================================================
+// ADD: test_jal_add
+//===========================================================
 
 @cocotb.test()
 async def test_jal_add(dut):
   clock = Clock(dut.clk, 10, units="ns")
   cocotb.start_soon(clock.start(start_high=False))
 
-  # Assembly Program
+  // Assembly Program
 
-  await asm_write(dut, 0x000, "jal x1 0x004") # F D X M W
-  await asm_write(dut, 0x004, "add x2 x1 x1") #   F F D X M W     (M-D)
+  asm( 0x000, "jal x1 0x004") // F D X M W
+  asm( 0x004, "add x2 x1 x1") //   F F D X M W     (M-D)
 
-  await asm_write(dut, 0x008, "jal x1 0x014") # F D X M W
-  await asm_write(dut, 0x00c, "add x0 x0 x0") #   F - - - -
-  await asm_write(dut, 0x010, "add x0 x0 x0") #
-  await asm_write(dut, 0x014, "add x2 x1 x1") #     F D X M W     (M-D)
+  asm( 0x008, "jal x1 0x014") // F D X M W
+  asm( 0x00c, "add x0 x0 x0") //   F - - - -
+  asm( 0x010, "add x0 x0 x0") //
+  asm( 0x014, "add x2 x1 x1") //     F D X M W     (M-D)
 
-  await asm_write(dut, 0x018, "jal x1 0x024") # F D X M W
-  await asm_write(dut, 0x01c, "add x0 x0 x0") #   F - - - -
-  await asm_write(dut, 0x020, "add x0 x0 x0") #
-  await asm_write(dut, 0x024, "add x0 x0 x0") #     F D X M W
-  await asm_write(dut, 0x028, "add x2 x1 x1") #       F D X M W   (W-D)
+  asm( 0x018, "jal x1 0x024") // F D X M W
+  asm( 0x01c, "add x0 x0 x0") //   F - - - -
+  asm( 0x020, "add x0 x0 x0") //
+  asm( 0x024, "add x0 x0 x0") //     F D X M W
+  asm( 0x028, "add x2 x1 x1") //       F D X M W   (W-D)
 
-  await asm_write(dut, 0x02c, "jal x1 0x038") # F D X M W
-  await asm_write(dut, 0x030, "add x0 x0 x0") #   F - - - -
-  await asm_write(dut, 0x034, "add x0 x0 x0") #
-  await asm_write(dut, 0x038, "add x0 x0 x0") #     F D X M W
-  await asm_write(dut, 0x03c, "add x0 x0 x0") #       F D X M W
-  await asm_write(dut, 0x040, "add x2 x1 x1") #         F D X M W
+  asm( 0x02c, "jal x1 0x038") // F D X M W
+  asm( 0x030, "add x0 x0 x0") //   F - - - -
+  asm( 0x034, "add x0 x0 x0") //
+  asm( 0x038, "add x0 x0 x0") //     F D X M W
+  asm( 0x03c, "add x0 x0 x0") //       F D X M W
+  asm( 0x040, "add x2 x1 x1") //         F D X M W
 
-  await reset(dut)
+  reset(dut)
 
-  # Check Traces
+  // Check Traces
 
-  await check_trace(dut, x)
-  await check_trace(dut, x)
-  await check_trace(dut, x)
+  check_trace( x)
+  check_trace( x)
+  check_trace( x)
 
-  await check_trace(dut, 0x004)
-  await RisingEdge(dut.clk)
-  await check_trace(dut, 0x008)
+  check_trace( 0x004)
+  RisingEdge(dut.clk)
+  check_trace( 0x008)
 
-  await check_trace(dut, 0x00c)
-  await RisingEdge(dut.clk)
-  await check_trace(dut, 0x018)
+  check_trace( 0x00c)
+  RisingEdge(dut.clk)
+  check_trace( 0x018)
 
-  await check_trace(dut, 0x01c)
-  await RisingEdge(dut.clk)
-  await check_trace(dut, 0x000)
-  await check_trace(dut, 0x038)
+  check_trace( 0x01c)
+  RisingEdge(dut.clk)
+  check_trace( 0x000)
+  check_trace( 0x038)
 
-  await check_trace(dut, 0x030)
-  await RisingEdge(dut.clk)
-  await check_trace(dut, 0x000)
-  await check_trace(dut, 0x000)
-  await check_trace(dut, 0x060)
-
-#===========================================================
-
-if __name__ == "__main__":
-  test_case = int(sys.argv[1])
-  if (test_case < 0) | (test_case == 0):
-    run("Proc_add_test", "test_addi_add")
-  if (test_case < 0) | (test_case == 1):
-    run("Proc_add_test", "test_add_add")
-  if (test_case < 0) | (test_case == 2):
-    run("Proc_add_test", "test_mul_add")
-  if (test_case < 0) | (test_case == 3):
-    run("Proc_add_test", "test_lw_add")
-  if (test_case < 0) | (test_case == 4):
-    run("Proc_add_test", "test_jal_add")
+  check_trace( 0x030)
+  RisingEdge(dut.clk)
+  check_trace( 0x000)
+  check_trace( 0x000)
+  check_trace( 0x060)
+  
 */
