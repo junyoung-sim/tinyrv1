@@ -176,74 +176,75 @@ task test_mul_add();
 
 endtask
 
-/*
 //===========================================================
 // ADD: test_lw_add
 //===========================================================
 
-@cocotb.test()
-async def test_lw_add(dut):
-  clock = Clock(dut.clk, 10, units="ns")
-  cocotb.start_soon(clock.start(start_high=False))
+task test_lw_add();
+  t.test_case_begin( "test_lw_add" );
 
-  // Data Memory
+  // Data
 
-  data( 0x0fc, 0x001)
+  data( 'h0fc, 'h001 );
 
   // Assembly Program
 
-  asm( 0x000, "addi x1 x0 0x0fc") // F D X M W
-  asm( 0x004, "lw x1 0(x1)"     ) //   F D X M W        (X-D)
-  asm( 0x008, "add x1 x1 x1"    ) //     F D D X M W    (M-D)
+  asm( 'h000, "addi x1 x0 0x0fc" ); // F D X M W
+  asm( 'h004, "lw x1 0(x1)"      ); //   F D X M W
+  asm( 'h008, "add x1 x1 x1"     ); //     F D D X M W    (M-D)
 
-  asm( 0x00c, "addi x1 x0 0x0fc") // F F D X M W
-  asm( 0x010, "lw x1 0(x1)"     ) //     F D X M W      (X-D)
-  asm( 0x014, "add x0 x0 x0"    ) //       F D X M W
-  asm( 0x018, "add x1 x1 x1"    ) //         F D X M W  (M-D)
+  asm( 'h00c, "addi x1 x0 0x0fc" ); // F F D X M W
+  asm( 'h010, "lw x1 0(x1)"      ); //     F D X M W
+  asm( 'h014, "add x0 x0 x0"     ); //       F D X M W
+  asm( 'h018, "add x1 x1 x1"     ); //         F D X M W  (M-D)
 
-  asm( 0x01c, "addi x1 x0 0x0fc") // F D X M W
-  asm( 0x020, "lw x1 0(x1)"     ) //   F D X M W        (X-D)
-  asm( 0x024, "add x0 x0 x0"    ) //     F D X M W
-  asm( 0x028, "add x0 x0 x0"    ) //       F D X M W
-  asm( 0x02c, "add x1 x1 x1"    ) //         F D X M W  (W-D)
+  asm( 'h01c, "addi x1 x0 0x0fc" ); // F D X M W
+  asm( 'h020, "lw x1 0(x1)"      ); //   F D X M W
+  asm( 'h024, "add x0 x0 x0"     ); //     F D X M W
+  asm( 'h028, "add x0 x0 x0"     ); //       F D X M W
+  asm( 'h02c, "add x1 x1 x1"     ); //         F D X M W  (W-D)
 
-  asm( 0x030, "addi x1 x0 0x0fc") // F D X M W
-  asm( 0x034, "lw x1 0(x1)"     ) //   F D X M W        (X-D)
-  asm( 0x038, "add x0 x0 x0"    ) //     F D X M W
-  asm( 0x03c, "add x0 x0 x0"    ) //       F D X M W
-  asm( 0x040, "add x0 x0 x0"    ) //         F D X M W
-  asm( 0x044, "add x1 x1 x1"    ) //           F D X M W
-
-  reset(dut)
+  asm( 'h030, "addi x1 x0 0x0fc" ); // F D X M W
+  asm( 'h034, "lw x1 0(x1)"      ); //   F D X M W
+  asm( 'h038, "add x0 x0 x0"     ); //     F D X M W
+  asm( 'h03c, "add x0 x0 x0"     ); //       F D X M W
+  asm( 'h040, "add x0 x0 x0"     ); //         F D X M W
+  asm( 'h044, "add x1 x1 x1"     ); //           F D X M W
 
   // Check Traces
 
-  check_trace( x)
-  check_trace( x)
-  check_trace( x)
+  check_trace( 'x, 'x );
+  check_trace( 'x, 'x );
+  check_trace( 'x, 'x );
+  check_trace( 'x, 'x );
 
-  check_trace( 0x0fc)
-  check_trace( 0x001)
-  RisingEdge(dut.clk)
-  check_trace( 0x002)
+  check_trace( 'h000, 'h0fc );
+  check_trace( 'h004, 'h001 );
+  check_trace( 'x,    'x    );
+  check_trace( 'h008, 'h002 );
 
-  check_trace( 0x0fc)
-  check_trace( 0x001)
-  check_trace( 0x000)
-  check_trace( 0x002)
+  check_trace( 'h00c, 'h0fc );
+  check_trace( 'h010, 'h001 );
+  check_trace( 'h014, 'h000 );
+  check_trace( 'h018, 'h002 );
 
-  check_trace( 0x0fc)
-  check_trace( 0x001)
-  check_trace( 0x000)
-  check_trace( 0x000)
-  check_trace( 0x002)
+  check_trace( 'h01c, 'h0fc );
+  check_trace( 'h020, 'h001 );
+  check_trace( 'h024, 'h000 );
+  check_trace( 'h028, 'h000 );
+  check_trace( 'h02c, 'h002 );
 
-  check_trace( 0x0fc)
-  check_trace( 0x001)
-  check_trace( 0x000)
-  check_trace( 0x000)
-  check_trace( 0x000)
-  check_trace( 0x002)
+  check_trace( 'h030, 'h0fc );
+  check_trace( 'h034, 'h001 );
+  check_trace( 'h038, 'h000 );
+  check_trace( 'h03c, 'h000 );
+  check_trace( 'h040, 'h000 );
+  check_trace( 'h044, 'h002 );
+
+endtask
+
+/*
+
 
 //===========================================================
 // ADD: test_jal_add
