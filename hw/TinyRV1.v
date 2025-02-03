@@ -551,7 +551,7 @@ module TinyRV1();
       "csrw" : begin e = $sscanf( str, "csrw %s x%d",        csr_s, rs1        ); asm = asm_csrw( csr_s, rs1 );              end // see note above
       "add"  : begin e = $sscanf( str, "add  x%d x%d x%d", rd, rs1, rs2      ); asm = asm_add ( rd, rs1, rs2 );            end
       "addi" : begin e = $sscanf( str, "addi x%d x%d %s",  rd, rs1, imm_s    ); asm = asm_addi( rd, rs1, imm_s );          end
-      "mul"  : begin e = $sscanf( str, "mul  x%d, x%d, x%d", rd, rs1, rs2      ); asm = asm_mul ( rd, rs1, rs2 );            end
+      "mul"  : begin e = $sscanf( str, "mul  x%d x%d x%d", rd, rs1, rs2      ); asm = asm_mul ( rd, rs1, rs2 );            end
       "lw"   : begin e = $sscanf( str, "lw   x%d, %s",       rd, addr_s        ); asm = asm_lw  ( rd, addr_s );              end
       "sw"   : begin e = $sscanf( str, "sw   x%d, %s",       rs2, addr_s       ); asm = asm_sw  ( rs2, addr_s );             end
       "jal"  : begin e = $sscanf( str, "jal  x%d, %s",       rd, jtarg_s       ); asm = asm_jal ( addr, rd, jtarg_s );       end
@@ -693,7 +693,7 @@ module TinyRV1();
 
       `ADD   : $sformat( disasm_, "add  x%-0d x%-0d x%-0d", rd, rs1, rs2 );
       `ADDI  : $sformat( disasm_, "addi x%-0d x%-0d 0x%x",  rd, rs1, disasm_imm_i(inst) );
-      `MUL   : $sformat( disasm_, "mul  x%-0d, x%-0d, x%-0d", rd, rs1, rs2 );
+      `MUL   : $sformat( disasm_, "mul  x%-0d x%-0d x%-0d", rd, rs1, rs2 );
       `LW    : $sformat( disasm_, "lw   x%-0d, 0x%x(x%-0d)",  rd, disasm_imm_i(inst), rs1 );
       `SW    : $sformat( disasm_, "sw   x%-0d, 0x%x(x%-0d)",  rs2, disasm_imm_s(inst), rs1 );
       `JAL   : $sformat( disasm_, "jal  x%-0d, 0x%x",         rd, 20'(disasm_imm_j(addr,inst)) );

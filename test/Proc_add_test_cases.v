@@ -114,134 +114,69 @@ task test_add_add();
 
 endtask
 
-/*
-
-//===========================================================
-// ADD: test_add_add
-//===========================================================
-
-@cocotb.test()
-async def test_add_add(dut):
-  clock = Clock(dut.clk, 10, units="ns")
-  cocotb.start_soon(clock.start(start_high=False))
-
-  // Assembly Program
-
-  asm( 0x000, "addi x1 x0 1") // F D X M W
-  asm( 0x004, "add x1 x1 x1") //   F D X M W        (X-D)
-  asm( 0x008, "add x1 x1 x1") //     F D X M W      (X-D)
-
-  asm( 0x00c, "addi x1 x0 1") // F D X M W
-  asm( 0x010, "add x1 x1 x1") //   F D X M W        (X-D)
-  asm( 0x014, "add x0 x0 x0") //     F D X M W
-  asm( 0x018, "add x1 x1 x1") //       F D X M W    (M-D)
-
-  asm( 0x01c, "addi x1 x0 1") // F D X M W
-  asm( 0x020, "add x1 x1 x1") //   F D X M W        (X-D)
-  asm( 0x024, "add x0 x0 x0") //     F D X M W
-  asm( 0x028, "add x0 x0 x0") //       F D X M W
-  asm( 0x02c, "add x1 x1 x1") //         F D X M W  (W-D)
-
-  asm( 0x030, "addi x1 x0 1") // F D X M W
-  asm( 0x034, "add x1 x1 x1") //   F D X M W        (X-D)
-  asm( 0x038, "add x0 x0 x0") //     F D X M W
-  asm( 0x03c, "add x0 x0 x0") //       F D X M W
-  asm( 0x040, "add x0 x0 x0") //         F D X M W
-  asm( 0x044, "add x1 x1 x1") //           F D X M W
-
-  reset(dut)
-
-  // Check Traces
-
-  check_trace( x)
-  check_trace( x)
-  check_trace( x)
-
-  check_trace( 1)
-  check_trace( 2)
-  check_trace( 4)
-
-  check_trace( 1)
-  check_trace( 2)
-  check_trace( 0)
-  check_trace( 4)
-
-  check_trace( 1)
-  check_trace( 2)
-  check_trace( 0)
-  check_trace( 0)
-  check_trace( 4)
-
-  check_trace( 1)
-  check_trace( 2)
-  check_trace( 0)
-  check_trace( 0)
-  check_trace( 0)
-  check_trace( 4)
-
 //===========================================================
 // ADD: test_mul_add
 //===========================================================
 
-@cocotb.test()
-async def test_mul_add(dut):
-  clock = Clock(dut.clk, 10, units="ns")
-  cocotb.start_soon(clock.start(start_high=False))
+task test_mul_add();
+  t.test_case_begin( "test_mul_add" );
 
   // Assembly Program
 
-  asm( 0x000, "addi x1 x0 3") // F D X M W
-  asm( 0x004, "mul x1 x1 x1") //   F D X M W        (X-D)
-  asm( 0x008, "add x1 x1 x1") //     F D X M W      (X-D)
+  asm( 'h000, "addi x1 x0 3" ); // F D X M W
+  asm( 'h004, "mul x1 x1 x1" ); //   F D X M W
+  asm( 'h008, "add x1 x1 x1" ); //     F D X M W      (X-D)
 
-  asm( 0x00c, "addi x1 x0 3") // F D X M W
-  asm( 0x010, "mul x1 x1 x1") //   F D X M W        (X-D)
-  asm( 0x014, "add x0 x0 x0") //     F D X M W
-  asm( 0x018, "add x1 x1 x1") //       F D X M W    (M-D)
+  asm( 'h00c, "addi x1 x0 3" ); // F D X M W
+  asm( 'h010, "mul x1 x1 x1" ); //   F D X M W
+  asm( 'h014, "add x0 x0 x0" ); //     F D X M W
+  asm( 'h018, "add x1 x1 x1" ); //       F D X M W    (M-D)
 
-  asm( 0x01c, "addi x1 x0 3") // F D X M W
-  asm( 0x020, "mul x1 x1 x1") //   F D X M W        (X-D)
-  asm( 0x024, "add x0 x0 x0") //     F D X M W
-  asm( 0x028, "add x0 x0 x0") //       F D X M W
-  asm( 0x02c, "add x1 x1 x1") //         F D X M W  (W-D)
+  asm( 'h01c, "addi x1 x0 3" ); // F D X M W
+  asm( 'h020, "mul x1 x1 x1" ); //   F D X M W
+  asm( 'h024, "add x0 x0 x0" ); //     F D X M W
+  asm( 'h028, "add x0 x0 x0" ); //       F D X M W
+  asm( 'h02c, "add x1 x1 x1" ); //         F D X M W  (W-D)
 
-  asm( 0x030, "addi x1 x0 3") // F D X M W
-  asm( 0x034, "mul x1 x1 x1") //   F D X M W        (X-D)
-  asm( 0x038, "add x0 x0 x0") //     F D X M W
-  asm( 0x03c, "add x0 x0 x0") //       F D X M W
-  asm( 0x040, "add x0 x0 x0") //         F D X M W
-  asm( 0x044, "add x1 x1 x1") //           F D X M W
-
-  reset(dut)
+  asm( 'h030, "addi x1 x0 3" ); // F D X M W
+  asm( 'h034, "mul x1 x1 x1" ); //   F D X M W
+  asm( 'h038, "add x0 x0 x0" ); //     F D X M W
+  asm( 'h03c, "add x0 x0 x0" ); //       F D X M W
+  asm( 'h040, "add x0 x0 x0" ); //         F D X M W
+  asm( 'h044, "add x1 x1 x1" ); //           F D X M W
 
   // Check Traces
 
-  check_trace( x)
-  check_trace( x)
-  check_trace( x)
+  check_trace( 'x, 'x );
+  check_trace( 'x, 'x );
+  check_trace( 'x, 'x );
+  check_trace( 'x, 'x );
 
-  check_trace( 0x003)
-  check_trace( 0x009)
-  check_trace( 0x012)
+  check_trace( 'h000, 'h003 );
+  check_trace( 'h004, 'h009 );
+  check_trace( 'h008, 'h012 );
 
-  check_trace( 0x003)
-  check_trace( 0x009)
-  check_trace( 0x000)
-  check_trace( 0x012)
+  check_trace( 'h00c, 'h003 );
+  check_trace( 'h010, 'h009 );
+  check_trace( 'h014, 'h000 );
+  check_trace( 'h018, 'h012 );
 
-  check_trace( 0x003)
-  check_trace( 0x009)
-  check_trace( 0x000)
-  check_trace( 0x000)
-  check_trace( 0x012)
+  check_trace( 'h01c, 'h003 );
+  check_trace( 'h020, 'h009 );
+  check_trace( 'h024, 'h000 );
+  check_trace( 'h028, 'h000 );
+  check_trace( 'h02c, 'h012 );
 
-  check_trace( 0x003)
-  check_trace( 0x009)
-  check_trace( 0x000)
-  check_trace( 0x000)
-  check_trace( 0x000)
-  check_trace( 0x012)
+  check_trace( 'h030, 'h003 );
+  check_trace( 'h034, 'h009 );
+  check_trace( 'h038, 'h000 );
+  check_trace( 'h03c, 'h000 );
+  check_trace( 'h040, 'h000 );
+  check_trace( 'h044, 'h012 );
 
+endtask
+
+/*
 //===========================================================
 // ADD: test_lw_add
 //===========================================================
