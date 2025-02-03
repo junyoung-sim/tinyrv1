@@ -36,7 +36,9 @@ module Proc
 
   (* keep=1 *) output logic [31:0] trace_addr,
   (* keep=1 *) output logic [31:0] trace_inst,
-  (* keep=1 *) output logic [31:0] trace_data
+  (* keep=1 *) output logic [31:0] trace_data,
+
+  (* keep=1 *) output logic        trace_stall
 );
 
   // Control Signals

@@ -42,6 +42,8 @@ module Top();
   logic [31:0] proc_trace_inst;
   logic [31:0] proc_trace_data;
 
+  logic        proc_trace_stall;
+
   Proc proc
   (
     .clk            (clk),
@@ -67,7 +69,8 @@ module Top();
 
     .trace_addr     (proc_trace_addr),
     .trace_inst     (proc_trace_inst),
-    .trace_data     (proc_trace_data)
+    .trace_data     (proc_trace_data),
+    .trace_stall    (proc_trace_stall)
   );
 
   TestMemory mem
@@ -108,14 +111,20 @@ module Top();
   assign proc_trace_inst_F = proc_trace_inst;
 
   always_ff @(posedge clk) begin
-    proc_trace_addr_D <= proc_trace_addr_F;
+    if(proc_trace_stall)
+      proc_trace_addr_D <= proc_trace_addr_D;
+    else
+      proc_trace_addr_D <= proc_trace_addr_F;
     proc_trace_addr_X <= proc_trace_addr_D;
     proc_trace_addr_M <= proc_trace_addr_X;
     proc_trace_addr_W <= proc_trace_addr_M;
   end
 
   always_ff @(posedge clk) begin
-    proc_trace_inst_D <= proc_trace_inst_F;
+    if(proc_trace_stall)
+      proc_trace_inst_D <= proc_trace_inst_D;
+    else
+      proc_trace_inst_D <= proc_trace_inst_F;
     proc_trace_inst_X <= proc_trace_inst_D;
     proc_trace_inst_M <= proc_trace_inst_X;
     proc_trace_inst_W <= proc_trace_inst_M;

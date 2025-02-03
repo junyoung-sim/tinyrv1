@@ -35,7 +35,11 @@ module ProcCtrl
   // Status Signals
 
   (* keep=1 *) input  logic        d2c_eq_X,
-  (* keep=1 *) input  logic [31:0] d2c_inst
+  (* keep=1 *) input  logic [31:0] d2c_inst,
+
+  // Trace Data
+
+  (* keep=1 *) output logic        trace_stall
 );
 
   //==========================================================
@@ -215,6 +219,8 @@ module ProcCtrl
     stall_D = val_D & (stall_lw_X_rs1_D | stall_lw_X_rs2_D);
     stall_F = stall_D;
   end
+
+  assign trace_stall = stall_F;
 
   // Squash
 
