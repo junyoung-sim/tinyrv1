@@ -4,10 +4,10 @@
 ## Verification
 ```
 cd test
-iverilog -Wall -g2012 -o Proc_xxxx_test Proc_xxxx_test.v
+iverilog -Wall -g2012 -I $TINYRV1/hw -o Proc_xxxx_test Proc_xxxx_test.v
 ./Proc_xxxx_test.v +test-case= +dump-vcd=waves.vcd
 ```
-Replace `xxxx` with TinyRV1 instruction. All test cases will run unless a particular test case number follows `+test-case=`. Waveforms are dumped by `+dump-vcd=waves.vcd`.
+Replace `xxxx` with TinyRV1 instruction. All test cases will run unless a particular test case number follows `+test-case=`. Waveforms are dumped by `+dump-vcd=waves.vcd`. This assumes a path variable for `$TINYRV1` is set in `~/.bashrc`.
 
 ## Documentation
 Contains TinyRV1 notes and FPGA synthesis results from Quartus.
