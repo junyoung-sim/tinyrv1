@@ -243,66 +243,60 @@ task test_lw_add();
 
 endtask
 
-/*
-
-
 //===========================================================
 // ADD: test_jal_add
 //===========================================================
 
-@cocotb.test()
-async def test_jal_add(dut):
-  clock = Clock(dut.clk, 10, units="ns")
-  cocotb.start_soon(clock.start(start_high=False))
+task test_jal_add();
+  t.test_case_begin( "test_jal_add" );
 
   // Assembly Program
 
-  asm( 0x000, "jal x1 0x004") // F D X M W
-  asm( 0x004, "add x2 x1 x1") //   F F D X M W     (M-D)
+  asm( 'h000, "jal x1 0x004" ); // F D X M W
+  asm( 'h004, "add x2 x1 x1" ); //   F F D X M W     (M-D)
 
-  asm( 0x008, "jal x1 0x014") // F D X M W
-  asm( 0x00c, "add x0 x0 x0") //   F - - - -
-  asm( 0x010, "add x0 x0 x0") //
-  asm( 0x014, "add x2 x1 x1") //     F D X M W     (M-D)
+  asm( 'h008, "jal x1 0x014" ); // F D X M W
+  asm( 'h00c, "add x0 x0 x0" ); //   F - - - -
+  asm( 'h010, "add x0 x0 x0" ); //
+  asm( 'h014, "add x2 x1 x1" ); //     F D X M W     (M-D)
 
-  asm( 0x018, "jal x1 0x024") // F D X M W
-  asm( 0x01c, "add x0 x0 x0") //   F - - - -
-  asm( 0x020, "add x0 x0 x0") //
-  asm( 0x024, "add x0 x0 x0") //     F D X M W
-  asm( 0x028, "add x2 x1 x1") //       F D X M W   (W-D)
+  asm( 'h018, "jal x1 0x024" ); // F D X M W
+  asm( 'h01c, "add x0 x0 x0" ); //   F - - - -
+  asm( 'h020, "add x0 x0 x0" ); //
+  asm( 'h024, "add x0 x0 x0" ); //     F D X M W
+  asm( 'h028, "add x2 x1 x1" ); //       F D X M W   (W-D)
 
-  asm( 0x02c, "jal x1 0x038") // F D X M W
-  asm( 0x030, "add x0 x0 x0") //   F - - - -
-  asm( 0x034, "add x0 x0 x0") //
-  asm( 0x038, "add x0 x0 x0") //     F D X M W
-  asm( 0x03c, "add x0 x0 x0") //       F D X M W
-  asm( 0x040, "add x2 x1 x1") //         F D X M W
-
-  reset(dut)
+  asm( 'h02c, "jal x1 0x038" ); // F D X M W
+  asm( 'h030, "add x0 x0 x0" ); //   F - - - -
+  asm( 'h034, "add x0 x0 x0" ); //
+  asm( 'h038, "add x0 x0 x0" ); //     F D X M W
+  asm( 'h03c, "add x0 x0 x0" ); //       F D X M W
+  asm( 'h040, "add x2 x1 x1" ); //         F D X M W
 
   // Check Traces
 
-  check_trace( x)
-  check_trace( x)
-  check_trace( x)
+  check_trace( 'x, 'x );
+  check_trace( 'x, 'x );
+  check_trace( 'x, 'x );
+  check_trace( 'x, 'x );
 
-  check_trace( 0x004)
-  RisingEdge(dut.clk)
-  check_trace( 0x008)
+  check_trace( 'h000, 'h004 );
+  check_trace( 'x,    'x    );
+  check_trace( 'h004, 'h008 );
 
-  check_trace( 0x00c)
-  RisingEdge(dut.clk)
-  check_trace( 0x018)
+  check_trace( 'h008, 'h00c );
+  check_trace( 'x,    'x    );
+  check_trace( 'h014, 'h018 );
 
-  check_trace( 0x01c)
-  RisingEdge(dut.clk)
-  check_trace( 0x000)
-  check_trace( 0x038)
+  check_trace( 'h018, 'h01c );
+  check_trace( 'x,    'x    );
+  check_trace( 'h024, 'h000 );
+  check_trace( 'h028, 'h038 );
 
-  check_trace( 0x030)
-  RisingEdge(dut.clk)
-  check_trace( 0x000)
-  check_trace( 0x000)
-  check_trace( 0x060)
+  check_trace( 'h02c, 'h030 );
+  check_trace( 'x,    'x    );
+  check_trace( 'h038, 'h000 );
+  check_trace( 'h03c, 'h000 );
+  check_trace( 'h040, 'h060 );
 
-*/
+endtask

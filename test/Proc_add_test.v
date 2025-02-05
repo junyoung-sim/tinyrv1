@@ -216,6 +216,7 @@ module Top();
     if((t.n <= 0) || (t.n == 2)) test_add_add();
     if((t.n <= 0) || (t.n == 3)) test_mul_add();
     if((t.n <= 0) || (t.n == 4)) test_lw_add();
+    if((t.n <= 0) || (t.n == 5)) test_jal_add();
 
     t.test_bench_end();
   end
