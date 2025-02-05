@@ -1,4 +1,3 @@
-test/__pycache__
-test/sim_build
-test/results.xml
+test/cocotb
+test/waves.vcd
 fpga/*.v.bak
