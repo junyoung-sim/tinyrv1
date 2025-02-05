@@ -1,8 +1,8 @@
 `ifndef PROCCTRL_V
 `define PROCCTRL_V
 
-`include "../hw/TinyRV1.v"
-`include "../hw/Register.v"
+`include "TinyRV1.v"
+`include "Register.v"
 
 module ProcCtrl
 (

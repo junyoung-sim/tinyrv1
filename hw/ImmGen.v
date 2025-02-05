@@ -1,8 +1,6 @@
 `ifndef IMMGEN_V
 `define IMMGEN_V
 
-`include "../hw/TinyRV1.v"
-
 // I: imm_type=0
 // S: imm_type=1
 // J: imm_type=2

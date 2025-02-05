@@ -1,4 +1,4 @@
-`include "../hw/Proc.v"
+`include "Proc.v"
 `include "TestMemory.v"
 `include "TestUtils.v"
 

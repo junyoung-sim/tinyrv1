@@ -1,14 +1,14 @@
 `ifndef PROCDPATH_V
 `define PROCDPATH_V
 
-`include "../hw/ALU.v"
-`include "../hw/Mux4.v"
-`include "../hw/Adder.v"
-`include "../hw/ImmGen.v"
-`include "../hw/TinyRV1.v"
-`include "../hw/Regfile.v"
-`include "../hw/Register.v"
-`include "../hw/Multiplier.v"
+`include "ALU.v"
+`include "Mux4.v"
+`include "Adder.v"
+`include "ImmGen.v"
+`include "TinyRV1.v"
+`include "Regfile.v"
+`include "Register.v"
+`include "Multiplier.v"
 
 module ProcDpath
 (

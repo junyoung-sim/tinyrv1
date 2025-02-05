@@ -1,9 +1,8 @@
 `ifndef PROC_V
 `define PROC_V
 
-`include "../hw/ProcMem.v"
-`include "../hw/ProcCtrl.v"
-`include "../hw/ProcDpath.v"
+`include "ProcCtrl.v"
+`include "ProcDpath.v"
 
 module Proc
 (

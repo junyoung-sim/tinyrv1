@@ -1,9 +1,9 @@
 `ifndef ALU_V
 `define ALU_V
 
-`include "../hw/Adder.v"
-`include "../hw/EqComp.v"
-`include "../hw/Mux2.v"
+`include "Adder.v"
+`include "EqComp.v"
+`include "Mux2.v"
 
 module ALU
 #(

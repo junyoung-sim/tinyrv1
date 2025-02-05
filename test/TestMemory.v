@@ -1,7 +1,7 @@
 `ifndef TEST_MEMORY_V
 `define TEST_MEMORY_V
 
-`include "../hw/TinyRV1.v"
+`include "TinyRV1.v"
 
 module TestMemory
 (
