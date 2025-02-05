@@ -1,7 +1,7 @@
 ## RTL
 `./hw` contains Verilog files in development. `./fpga` contains a copy of those files modified for synthesis in Quartus.
 
-## Testing
+## Verification
 ```
 cd test
 iverilog -Wall -g2012 -o Proc_xxxx_test Proc_xxxx_test.v
