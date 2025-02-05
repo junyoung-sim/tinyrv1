@@ -1,22 +1,13 @@
 ## RTL
-`./hw` contains Verilog hardware files in development. `./fpga` contains a copy of those files modified for synthesis in Quartus.
+`./hw` contains Verilog files in development. `./fpga` contains a copy of those files modified for synthesis in Quartus.
 
-## Testing (Cocotb)
-### Processor
+## Testing
 ```
 cd test
-chmod +x Proc_xxxx_test.py
-make clean_all
-./Proc_xxxx_test.py N
+iverilog -Wall -g2012 -o Proc_xxxx_test Proc_xxxx_test.v
+./Proc_xxxx_test.v +test-case= +dump-vcd=waves.vcd
 ```
-Replace `xxxx` with intended testing target. Replace `N` with an integer for specific test cases. Run the same commands for mixed instruction tests and kernels in `test_prog.py`.
-
-### Building Blocks
-```
-cd test
-make TOPLEVEL=xxxx MODULE=xxxx_test TESTCASE=????
-```
-Replace `xxxx` with hardware name and `????` with test case name.
+Replace `xxxx` with TinyRV1 instruction. All test cases will run unless a particular test case number follows `+test-case=`. Waveforms are dumped by `+dump-vcd=waves.vcd`.
 
 ## Documentation
 Contains TinyRV1 notes and FPGA synthesis results from Quartus.
