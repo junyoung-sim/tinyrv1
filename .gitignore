@@ -1,3 +1,4 @@
-test/cocotb
+test/cocotb/*.py
+test/cocotb/Makefile
 test/waves.vcd
 fpga/*.v.bak
