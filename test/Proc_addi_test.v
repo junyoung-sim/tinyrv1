@@ -213,6 +213,11 @@ module Top();
     proc_in2 = 'x;
 
     if((t.n <= 0) || (t.n == 1)) test_immediate();
+    if((t.n <= 0) || (t.n == 2)) test_addi_addi();
+    if((t.n <= 0) || (t.n == 3)) test_add_addi();
+    if((t.n <= 0) || (t.n == 4)) test_mul_addi();
+    if((t.n <= 0) || (t.n == 5)) test_lw_addi();
+    if((t.n <= 0) || (t.n == 6)) test_jal_addi();
 
     t.test_bench_end();
   end
