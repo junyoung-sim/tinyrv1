@@ -1,9 +1,9 @@
 //===========================================================
-// ADDI: test_immediate
+// ADDI: test_addi_simple
 //===========================================================
 
-task test_immediate();
-  t.test_case_begin( "test_immediate" );
+task test_addi_simple();
+  t.test_case_begin( "test_addi_simple" );
 
   // Assembly Program
 
