@@ -1,3 +1,5 @@
+make clean
+make
 ./Proc_add_test
 ./Proc_addi_test
 ./Proc_bne_test
