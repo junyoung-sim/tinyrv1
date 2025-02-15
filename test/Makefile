@@ -12,5 +12,8 @@ all: $(EXECS)
 $(EXECS): %: %.v
 	$(IVERILOG) $(IVERILOG_FLAGS) -o $@ $<
 
+%_test: $(TEST_DIR)/%_test.v
+	$(IVERILOG) $(IVERILOG_FLAGS) -o $@ $<
+
 clean:
 	rm -f $(EXECS)
