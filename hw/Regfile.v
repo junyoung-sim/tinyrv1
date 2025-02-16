@@ -3,16 +3,16 @@
 
 module Regfile
 (
-  (* keep=1 *) input  logic        clk,
+  input  logic        clk,
 
-  (* keep=1 *) input  logic        wen,
-  (* keep=1 *) input  logic [4:0]  waddr,
-  (* keep=1 *) input  logic [31:0] wdata,
+  input  logic        wen,
+  input  logic [4:0]  waddr,
+  input  logic [31:0] wdata,
 
-  (* keep=1 *) input  logic [4:0]  raddr0,
-  (* keep=1 *) output logic [31:0] rdata0,
-  (* keep=1 *) input  logic [4:0]  raddr1,
-  (* keep=1 *) output logic [31:0] rdata1
+  input  logic [4:0]  raddr0,
+  output logic [31:0] rdata0,
+  input  logic [4:0]  raddr1,
+  output logic [31:0] rdata1
 );
 
   logic [31:0] R [32];

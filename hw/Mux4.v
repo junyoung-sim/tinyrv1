@@ -5,12 +5,12 @@ module Mux4
 #(
   parameter nbits=32
 )(
-  (* keep=1 *) input  logic [1:0]       sel,
-  (* keep=1 *) input  logic [nbits-1:0] in0,
-  (* keep=1 *) input  logic [nbits-1:0] in1,
-  (* keep=1 *) input  logic [nbits-1:0] in2,
-  (* keep=1 *) input  logic [nbits-1:0] in3,
-  (* keep=1 *) output logic [nbits-1:0] out
+  input  logic [1:0]       sel,
+  input  logic [nbits-1:0] in0,
+  input  logic [nbits-1:0] in1,
+  input  logic [nbits-1:0] in2,
+  input  logic [nbits-1:0] in3,
+  output logic [nbits-1:0] out
 );
 
   always_comb begin

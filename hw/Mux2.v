@@ -5,10 +5,10 @@ module Mux2
 #(
   parameter nbits=32
 )(
-  (* keep=1 *) input  logic             sel,
-  (* keep=1 *) input  logic [nbits-1:0] in0,
-  (* keep=1 *) input  logic [nbits-1:0] in1,
-  (* keep=1 *) output logic [nbits-1:0] out
+  input  logic             sel,
+  input  logic [nbits-1:0] in0,
+  input  logic [nbits-1:0] in1,
+  output logic [nbits-1:0] out
 );
 
   always_comb begin

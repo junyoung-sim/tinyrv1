@@ -8,9 +8,9 @@
 
 module ImmGen
 (
-  (* keep=1 *) input  logic [31:0] inst,
-  (* keep=1 *) input  logic [1:0]  imm_type,
-  (* keep=1 *) output logic [31:0] imm
+  input  logic [31:0] inst,
+  input  logic [1:0]  imm_type,
+  output logic [31:0] imm
 );
 
   logic [6:0] inst_unused;

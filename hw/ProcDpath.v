@@ -86,15 +86,16 @@ module ProcDpath
   logic [31:0] rs1;
   logic [31:0] rs2;
 
-  Regfile RF (
-    .clk(clk),
-    .wen(rf_wen),
-    .waddr(rf_waddr),
-    .wdata(rf_wdata),
-    .raddr0(rs1_addr),
-    .rdata0(rs1),
-    .raddr1(rs2_addr),
-    .rdata1(rs2)
+  Regfile RF
+  (
+    .clk    (clk),
+    .wen    (rf_wen),
+    .waddr  (rf_waddr),
+    .wdata  (rf_wdata),
+    .raddr0 (rs1_addr),
+    .rdata0 (rs1),
+    .raddr1 (rs2_addr),
+    .rdata1 (rs2)
   );
 
   //==========================================================
@@ -117,20 +118,22 @@ module ProcDpath
   logic [31:0] pc;
   logic [31:0] pc_next;
 
-  Register#(32) pc_F (
-    .clk(clk),
-    .rst(rst),
-    .en(c2d_reg_en_F),
-    .d(pc_next),
-    .q(pc)
+  Register #(32) pc_F
+  (
+    .clk (clk),
+    .rst (rst),
+    .en  (c2d_reg_en_F),
+    .d   (pc_next),
+    .q   (pc)
   );
 
   logic [31:0] pc_plus4;
 
-  Adder#(32) pc_plus4_adder (
-    .in0(pc),
-    .in1(32'h00000004),
-    .sum(pc_plus4)
+  Adder #(32) pc_plus4_adder
+  (
+    .in0 (pc),
+    .in1 (32'h00000004),
+    .sum (pc_plus4)
   );
 
   logic [31:0] pc_jr;
@@ -141,13 +144,14 @@ module ProcDpath
   assign pc_jr    = op1_bypass;
   assign pc_jtarg = pc_targ;
 
-  Mux4#(32) pc_mux (
-    .sel(c2d_pc_sel_F),
-    .in0(pc_plus4),
-    .in1(pc_jr),
-    .in2(pc_jtarg),
-    .in3(pc_btarg),
-    .out(pc_next)
+  Mux4 #(32) pc_mux
+  (
+    .sel (c2d_pc_sel_F),
+    .in0 (pc_plus4),
+    .in1 (pc_jr),
+    .in2 (pc_jtarg),
+    .in3 (pc_btarg),
+    .out (pc_next)
   );
 
   // Fetch
@@ -160,12 +164,13 @@ module ProcDpath
 
   assign inst_next = imemresp_data;
 
-  Register#(32) ir_FD (
-    .clk(clk),
-    .rst(rst),
-    .en(c2d_reg_en_D),
-    .d(inst_next),
-    .q(inst)
+  Register #(32) ir_FD
+  (
+    .clk (clk),
+    .rst (rst),
+    .en  (c2d_reg_en_D),
+    .d   (inst_next),
+    .q   (inst)
   );
 
   assign d2c_inst = inst;
@@ -174,12 +179,13 @@ module ProcDpath
 
   logic [31:0] inst_pc;
 
-  Register#(32) pc_FD (
-    .clk(clk),
-    .rst(rst),
-    .en(c2d_reg_en_D),
-    .d(pc),
-    .q(inst_pc)
+  Register #(32) pc_FD
+  (
+    .clk (clk),
+    .rst (rst),
+    .en  (c2d_reg_en_D),
+    .d   (pc),
+    .q   (inst_pc)
   );
 
   //==========================================================
@@ -193,31 +199,34 @@ module ProcDpath
 
   logic [31:0] imm;
 
-  ImmGen immgen (
-    .inst(inst),
-    .imm_type(c2d_imm_type_D),
-    .imm(imm)
+  ImmGen immgen
+  (
+    .inst     (inst),
+    .imm_type (c2d_imm_type_D),
+    .imm      (imm)
   );
 
   // Jump & Branch Target
 
-  Adder#(32) pc_targ_adder (
-    .in0(inst_pc),
-    .in1(imm),
-    .sum(pc_targ)
+  Adder #(32) pc_targ_adder
+  (
+    .in0 (inst_pc),
+    .in1 (imm),
+    .sum (pc_targ)
   );
 
-  Register#(32) btarg_DX (
-    .clk(clk),
-    .rst(rst),
-    .en(1'b1),
-    .d(pc_targ),
-    .q(pc_btarg)
+  Register #(32) btarg_DX
+  (
+    .clk (clk),
+    .rst (rst),
+    .en  (1'b1),
+    .d   (pc_targ),
+    .q   (pc_btarg)
   );
 
   // Operand Bypass Selection
 
-  Mux4#(32) op1_bypass_mux (
+  Mux4 #(32) op1_bypass_mux (
     .sel(c2d_op1_byp_sel_D),
     .in0(rs1),
     .in1(result_X_next),
@@ -226,13 +235,14 @@ module ProcDpath
     .out(op1_bypass)
   );
 
-  Mux4#(32) op2_bypass_mux (
-    .sel(c2d_op2_byp_sel_D),
-    .in0(rs2),
-    .in1(result_X_next),
-    .in2(result_M_next),
-    .in3(result_W_next),
-    .out(op2_bypass)
+  Mux4 #(32) op2_bypass_mux
+  (
+    .sel (c2d_op2_byp_sel_D),
+    .in0 (rs2),
+    .in1 (result_X_next),
+    .in2 (result_M_next),
+    .in3 (result_W_next),
+    .out (op2_bypass)
   );
 
   // Operand Selection
@@ -243,83 +253,91 @@ module ProcDpath
   logic [31:0] op1_next;
   logic [31:0] op2_next;
 
-  Mux2#(32) op1_mux (
-    .sel(c2d_op1_sel_D),
-    .in0(op1_bypass),
-    .in1(inst_pc),
-    .out(op1_next)
+  Mux2 #(32) op1_mux
+  (
+    .sel (c2d_op1_sel_D),
+    .in0 (op1_bypass),
+    .in1 (inst_pc),
+    .out (op1_next)
   );
 
-  Mux4#(32) op2_mux (
-    .sel(c2d_op2_sel_D),
-    .in0(op2_bypass),
-    .in1(imm),
-    .in2(32'h00000004),
-    .in3(32'h00000000),
-    .out(op2_next)
+  Mux4 #(32) op2_mux
+  (
+    .sel (c2d_op2_sel_D),
+    .in0 (op2_bypass),
+    .in1 (imm),
+    .in2 (32'h00000004),
+    .in3 (32'h00000000),
+    .out (op2_next)
   );
 
-  Register#(32) op1_DX (
-    .clk(clk),
-    .rst(rst),
-    .en(1'b1),
-    .d(op1_next),
-    .q(op1)
+  Register #(32) op1_DX
+  (
+    .clk (clk),
+    .rst (rst),
+    .en  (1'b1),
+    .d   (op1_next),
+    .q   (op1)
   );
 
-  Register#(32) op2_DX (
-    .clk(clk),
-    .rst(rst),
-    .en(1'b1),
-    .d(op2_next),
-    .q(op2)
+  Register #(32) op2_DX
+  (
+    .clk (clk),
+    .rst (rst),
+    .en  (1'b1),
+    .d   (op2_next),
+    .q   (op2)
   );
 
   // Store Data
 
   logic [31:0] sd_X;
 
-  Register#(32) sd_DX (
-    .clk(clk),
-    .rst(rst),
-    .en(1'b1),
-    .d(op2_bypass),
-    .q(sd_X)
+  Register #(32) sd_DX
+  (
+    .clk (clk),
+    .rst (rst),
+    .en  (1'b1),
+    .d   (op2_bypass),
+    .q   (sd_X)
   );
 
   // CSRR
 
   logic [31:0] csrr_next;
 
-  Mux4#(32) csrr_mux (
-    .sel(c2d_csrr_sel_D),
-    .in0(in0),
-    .in1(in1),
-    .in2(in2),
-    .in3(32'b0),
-    .out(csrr_next)
+  Mux4 #(32) csrr_mux
+  (
+    .sel (c2d_csrr_sel_D),
+    .in0 (in0),
+    .in1 (in1),
+    .in2 (in2),
+    .in3 (32'b0),
+    .out (csrr_next)
   );
 
   logic [31:0] csrr;
 
-  Register#(32) csrr_DX (
-    .clk(clk),
-    .rst(rst),
-    .en(1'b1),
-    .d(csrr_next),
-    .q(csrr)
+  Register #(32) csrr_DX
+  (
+    .clk (clk),
+    .rst (rst),
+    .en  (1'b1),
+    .d   (csrr_next),
+    .q   (csrr)
   );
 
   // CSRW (DX)
 
   logic [31:0] out_DX;
 
-  Register#(32) csrw_out_DX (
-    .clk(clk),
-    .rst(rst),
-    .en(1'b1),
-    .d(op1_bypass),
-    .q(out_DX)
+  Register #(32) csrw_out_DX
+  (
+    .clk (clk),
+    .rst (rst),
+    .en  (1'b1),
+    .d   (op1_bypass),
+    .q   (out_DX)
   );
 
   //==========================================================
@@ -330,11 +348,12 @@ module ProcDpath
 
   logic [31:0] alu_out;
 
-  ALU alu (
-    .op(c2d_alu_fn_X),
-    .in0(op1),
-    .in1(op2),
-    .out(alu_out)
+  ALU #(32) alu
+  (
+    .op  (c2d_alu_fn_X),
+    .in0 (op1),
+    .in1 (op2),
+    .out (alu_out)
   );
 
   assign d2c_eq_X = alu_out[0];
@@ -343,55 +362,60 @@ module ProcDpath
 
   logic [31:0] mul_out;
 
-  Multiplier#(32) mul (
-    .in0(op1),
-    .in1(op2),
-    .prod(mul_out)
+  Multiplier #(32) mul
+  (
+    .in0  (op1),
+    .in1  (op2),
+    .prod (mul_out)
   );
 
   // Result Selection
 
-  Mux4#(32) result_X_mux (
-    .sel(c2d_result_sel_X),
-    .in0(alu_out),
-    .in1(mul_out),
-    .in2(csrr),
-    .in3(32'b0),
-    .out(result_X_next)
+  Mux4 #(32) result_X_mux
+  (
+    .sel (c2d_result_sel_X),
+    .in0 (alu_out),
+    .in1 (mul_out),
+    .in2 (csrr),
+    .in3 (32'b0),
+    .out (result_X_next)
   );
 
   logic [31:0] result_X;
 
-  Register#(32) result_XM (
-    .clk(clk),
-    .rst(rst),
-    .en(1'b1),
-    .d(result_X_next),
-    .q(result_X)
+  Register #(32) result_XM
+  (
+    .clk (clk),
+    .rst (rst),
+    .en  (1'b1),
+    .d   (result_X_next),
+    .q   (result_X)
   );
 
   // Store Data
 
   logic [31:0] sd_M;
 
-  Register#(32) sd_XM (
-    .clk(clk),
-    .rst(rst),
-    .en(1'b1),
-    .d(sd_X),
-    .q(sd_M)
+  Register #(32) sd_XM
+  (
+    .clk (clk),
+    .rst (rst),
+    .en  (1'b1),
+    .d   (sd_X),
+    .q   (sd_M)
   );
 
   // CSRW (XM)
 
   logic [31:0] out_XM;
 
-  Register#(32) csrw_out_XM (
-    .clk(clk),
-    .rst(rst),
-    .en(1'b1),
-    .d(out_DX),
-    .q(out_XM)
+  Register #(32) csrw_out_XM
+  (
+    .clk (clk),
+    .rst (rst),
+    .en  (1'b1),
+    .d   (out_DX),
+    .q   (out_XM)
   );
 
   //==========================================================
@@ -407,33 +431,36 @@ module ProcDpath
 
   // Writeback Selection
 
-  Mux2#(32) wb_mux (
-    .sel(c2d_wb_sel_M),
-    .in0(result_X),
-    .in1(dmemresp_rdata),
-    .out(result_M_next)
+  Mux2 #(32) wb_mux
+  (
+    .sel (c2d_wb_sel_M),
+    .in0 (result_X),
+    .in1 (dmemresp_rdata),
+    .out (result_M_next)
   );
 
   logic [31:0] result_M;
 
-  Register#(32) result_MW (
-    .clk(clk),
-    .rst(rst),
-    .en(1'b1),
-    .d(result_M_next),
-    .q(result_M)
+  Register #(32) result_MW
+  (
+    .clk (clk),
+    .rst (rst),
+    .en  (1'b1),
+    .d   (result_M_next),
+    .q   (result_M)
   );
 
   // CSRW (MW)
 
   logic [31:0] out_MW;
 
-  Register#(32) csrw_out_MW (
-    .clk(clk),
-    .rst(rst),
-    .en(1'b1),
-    .d(out_XM),
-    .q(out_MW)
+  Register #(32) csrw_out_MW
+  (
+    .clk (clk),
+    .rst (rst),
+    .en  (1'b1),
+    .d   (out_XM),
+    .q   (out_MW)
   );
 
   //==========================================================
@@ -450,28 +477,31 @@ module ProcDpath
 
   // CSRW (Output)
 
-  Register#(32) csrw_out0 (
-    .clk(clk),
-    .rst(rst),
-    .en(c2d_csrw_out0_en_W),
-    .d(out_MW),
-    .q(out0)
+  Register #(32) csrw_out0
+  (
+    .clk (clk),
+    .rst (rst),
+    .en  (c2d_csrw_out0_en_W),
+    .d   (out_MW),
+    .q   (out0)
   );
 
-  Register#(32) csrw_out1 (
-    .clk(clk),
-    .rst(rst),
-    .en(c2d_csrw_out1_en_W),
-    .d(out_MW),
-    .q(out1)
+  Register #(32) csrw_out1
+  (
+    .clk (clk),
+    .rst (rst),
+    .en  (c2d_csrw_out1_en_W),
+    .d   (out_MW),
+    .q   (out1)
   );
 
-  Register#(32) csrw_out2 (
-    .clk(clk),
-    .rst(rst),
-    .en(c2d_csrw_out2_en_W),
-    .d(out_MW),
-    .q(out2)
+  Register #(32) csrw_out2
+  (
+    .clk (clk),
+    .rst (rst),
+    .en  (c2d_csrw_out2_en_W),
+    .d   (out_MW),
+    .q   (out2)
   );
 
   //==========================================================

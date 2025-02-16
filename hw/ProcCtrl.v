@@ -94,64 +94,71 @@ module ProcCtrl
 
   assign inst_D = d2c_inst;
 
-  Register#(32) ir_DX (
-    .clk(clk),
-    .rst(rst),
-    .en(1'b1),
-    .d(inst_D),
-    .q(inst_X)
+  Register #(32) ir_DX
+  (
+    .clk (clk),
+    .rst (rst),
+    .en  (1'b1),
+    .d   (inst_D),
+    .q   (inst_X)
   );
 
-  Register#(32) ir_XM (
-    .clk(clk),
-    .rst(rst),
-    .en(1'b1),
-    .d(inst_X),
-    .q(inst_M)
+  Register #(32) ir_XM
+  (
+    .clk (clk),
+    .rst (rst),
+    .en  (1'b1),
+    .d   (inst_X),
+    .q   (inst_M)
   );
 
-  Register#(32) ir_MW (
-    .clk(clk),
-    .rst(rst),
-    .en(1'b1),
-    .d(inst_M),
-    .q(inst_W)
+  Register #(32) ir_MW
+  (
+    .clk (clk),
+    .rst (rst),
+    .en  (1'b1),
+    .d   (inst_M),
+    .q   (inst_W)
   );
 
   //==========================================================
   // Validation Registers
   //==========================================================
 
-  Register#(1) val_FD (
-    .clk(clk),
-    .rst(rst),
-    .en(1'b1),
-    .d(~squash_F | stall_D),
-    .q(val_D)
+  Register #(1) val_FD
+  (
+    .clk (clk),
+    .rst (rst),
+    .en  (1'b1),
+    .d   (~squash_F | stall_D),
+    .q   (val_D)
   );
 
-  Register#(1) val_DX (
-    .clk(clk),
-    .rst(rst),
-    .en(1'b1),
-    .d(val_D & ~stall_D & ~squash_D),
-    .q(val_X)
+  Register #(1) val_DX
+  (
+    .clk (clk),
+    .rst (rst),
+    .en  (1'b1),
+    .d   (val_D & ~stall_D & ~squash_D),
+    .q   (val_X)
   );
 
-  Register#(1) val_XM (
-    .clk(clk),
-    .rst(rst),
-    .en(1'b1),
-    .d(val_X),
-    .q(val_M)
+  Register #(1) val_XM
+  (
+    .clk (clk),
+    .rst (rst),
+    .en  (1'b1),
+    .d   (val_X),
+    .q   (val_M)
   );
 
-  Register#(1) val_MW (
-    .clk(clk),
-    .rst(rst),
-    .en(1'b1),
-    .d(val_M),
-    .q(val_W)
+  Register #(1) val_MW
+  (
+    .clk (clk),
+    .rst (rst),
+    .en  (1'b1),
+    .d   (val_M),
+    .q   (val_W)
   );
 
   //==========================================================

@@ -3,18 +3,18 @@
 
 module ProcMem
 (
-  (* keep=1 *) input  logic        clk,
-  (* keep=1 *) input  logic        rst,
+  input  logic        clk,
+  input  logic        rst,
 
-  (* keep=1 *) input  logic        imemreq_val,
-  (* keep=1 *) input  logic [31:0] imemreq_addr,
-  (* keep=1 *) output logic [31:0] imemresp_data,
+  input  logic        imemreq_val,
+  input  logic [31:0] imemreq_addr,
+  output logic [31:0] imemresp_data,
 
-  (* keep=1 *) input  logic        dmemreq_val,
-  (* keep=1 *) input  logic        dmemreq_type,
-  (* keep=1 *) input  logic [31:0] dmemreq_addr,
-  (* keep=1 *) input  logic [31:0] dmemreq_wdata,
-  (* keep=1 *) output logic [31:0] dmemresp_rdata
+  input  logic        dmemreq_val,
+  input  logic        dmemreq_type,
+  input  logic [31:0] dmemreq_addr,
+  input  logic [31:0] dmemreq_wdata,
+  output logic [31:0] dmemresp_rdata
 );
 
   localparam memsize = 2**6;
