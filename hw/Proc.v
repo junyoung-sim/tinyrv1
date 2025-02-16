@@ -6,38 +6,37 @@
 
 module Proc
 (
-  (* keep=1 *) input  logic        clk,
-  (* keep=1 *) input  logic        rst,
+  input  logic        clk,
+  input  logic        rst,
 
   // Memory Interface
 
-  (* keep=1 *) output logic        imemreq_val,
-  (* keep=1 *) output logic [31:0] imemreq_addr,
-  (* keep=1 *) input  logic [31:0] imemresp_data,
+  output logic        imemreq_val,
+  output logic [31:0] imemreq_addr,
+  input  logic [31:0] imemresp_data,
 
-  (* keep=1 *) output logic        dmemreq_val,
-  (* keep=1 *) output logic        dmemreq_type,
-  (* keep=1 *) output logic [31:0] dmemreq_addr,
-  (* keep=1 *) output logic [31:0] dmemreq_wdata,
-  (* keep=1 *) input  logic [31:0] dmemresp_rdata,
+  output logic        dmemreq_val,
+  output logic        dmemreq_type,
+  output logic [31:0] dmemreq_addr,
+  output logic [31:0] dmemreq_wdata,
+  input  logic [31:0] dmemresp_rdata,
 
   // I/O Interface
 
-  (* keep=1 *) input  logic [31:0] in0,
-  (* keep=1 *) input  logic [31:0] in1,
-  (* keep=1 *) input  logic [31:0] in2,
+  input  logic [31:0] in0,
+  input  logic [31:0] in1,
+  input  logic [31:0] in2,
 
-  (* keep=1 *) output logic [31:0] out0,
-  (* keep=1 *) output logic [31:0] out1,
-  (* keep=1 *) output logic [31:0] out2,
+  output logic [31:0] out0,
+  output logic [31:0] out1,
+  output logic [31:0] out2,
 
   // Trace Data
 
-  (* keep=1 *) output logic [31:0] trace_addr,
-  (* keep=1 *) output logic [31:0] trace_inst,
-  (* keep=1 *) output logic [31:0] trace_data,
-
-  (* keep=1 *) output logic        trace_stall
+  output logic [31:0] trace_addr,
+  output logic [31:0] trace_inst,
+  output logic [31:0] trace_data,
+  output logic        trace_stall
 );
 
   // Control Signals

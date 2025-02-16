@@ -6,40 +6,40 @@
 
 module ProcCtrl
 (
-  (* keep=1 *) input  logic        clk,
-  (* keep=1 *) input  logic        rst,
+  input  logic        clk,
+  input  logic        rst,
 
   // Control Signals
 
-  (* keep=1 *) output logic        c2d_imemreq_val_F,
-  (* keep=1 *) output logic        c2d_reg_en_F,
-  (* keep=1 *) output logic [1:0]  c2d_pc_sel_F,
-  (* keep=1 *) output logic        c2d_reg_en_D,
-  (* keep=1 *) output logic [1:0]  c2d_imm_type_D,
-  (* keep=1 *) output logic [1:0]  c2d_op1_byp_sel_D,
-  (* keep=1 *) output logic [1:0]  c2d_op2_byp_sel_D,
-  (* keep=1 *) output logic        c2d_op1_sel_D,
-  (* keep=1 *) output logic [1:0]  c2d_op2_sel_D,
-  (* keep=1 *) output logic [1:0]  c2d_csrr_sel_D,
-  (* keep=1 *) output logic        c2d_alu_fn_X,
-  (* keep=1 *) output logic [1:0]  c2d_result_sel_X,
-  (* keep=1 *) output logic        c2d_dmemreq_val_M,
-  (* keep=1 *) output logic        c2d_dmemreq_type_M,
-  (* keep=1 *) output logic        c2d_wb_sel_M,
-  (* keep=1 *) output logic        c2d_rf_wen_W,
-  (* keep=1 *) output logic [4:0]  c2d_rf_waddr_W,
-  (* keep=1 *) output logic        c2d_csrw_out0_en_W,
-  (* keep=1 *) output logic        c2d_csrw_out1_en_W,
-  (* keep=1 *) output logic        c2d_csrw_out2_en_W,
+  output logic        c2d_imemreq_val_F,
+  output logic        c2d_reg_en_F,
+  output logic [1:0]  c2d_pc_sel_F,
+  output logic        c2d_reg_en_D,
+  output logic [1:0]  c2d_imm_type_D,
+  output logic [1:0]  c2d_op1_byp_sel_D,
+  output logic [1:0]  c2d_op2_byp_sel_D,
+  output logic        c2d_op1_sel_D,
+  output logic [1:0]  c2d_op2_sel_D,
+  output logic [1:0]  c2d_csrr_sel_D,
+  output logic        c2d_alu_fn_X,
+  output logic [1:0]  c2d_result_sel_X,
+  output logic        c2d_dmemreq_val_M,
+  output logic        c2d_dmemreq_type_M,
+  output logic        c2d_wb_sel_M,
+  output logic        c2d_rf_wen_W,
+  output logic [4:0]  c2d_rf_waddr_W,
+  output logic        c2d_csrw_out0_en_W,
+  output logic        c2d_csrw_out1_en_W,
+  output logic        c2d_csrw_out2_en_W,
 
   // Status Signals
 
-  (* keep=1 *) input  logic        d2c_eq_X,
-  (* keep=1 *) input  logic [31:0] d2c_inst,
+  input  logic        d2c_eq_X,
+  input  logic [31:0] d2c_inst,
 
   // Trace Data
 
-  (* keep=1 *) output logic        trace_stall
+  output logic        trace_stall
 );
 
   //==========================================================
@@ -62,6 +62,13 @@ module ProcCtrl
   logic       rf_wen_M;
   logic       rf_wen_W;
   logic [4:0] rf_waddr_W;
+
+  logic [4:0] rs1_D;
+  logic [4:0] rs2_D;
+
+  logic [4:0] rd_X;
+  logic [4:0] rd_M;
+  logic [4:0] rd_W;
 
   logic bypass_waddr_X_rs1_D;
   logic bypass_waddr_X_rs2_D;
@@ -171,38 +178,45 @@ module ProcCtrl
                (inst_W ==? `JAL) | (inst_W ==? `CSRR) ;
   end
 
+  assign rs1_D = inst_D[`RS1];
+  assign rs2_D = inst_D[`RS2];
+
+  assign rd_X = inst_X[`RD];
+  assign rd_M = inst_M[`RD];
+  assign rd_W = inst_W[`RD];
+
   // Bypass
 
   always_comb begin
     // X -> D
     bypass_waddr_X_rs1_D =   val_D & rs1_en_D
                            & val_X & rf_wen_X
-                           & (inst_D[`RS1] == inst_X[`RD])
-                           & (inst_X[`RD] != 0)
+                           & (rs1_D == rd_X)
+                           & (rd_X != 0)
                            & (inst_X !=? `LW);
     bypass_waddr_X_rs2_D =   val_D & rs2_en_D
                            & val_X & rf_wen_X
-                           & (inst_D[`RS2] == inst_X[`RD])
-                           & (inst_X[`RD] != 0)
+                           & (rs2_D == rd_X)
+                           & (rd_X != 0)
                            & (inst_X !=? `LW);
     // M -> D
     bypass_waddr_M_rs1_D =   val_D & rs1_en_D
                            & val_M & rf_wen_M
-                           & (inst_D[`RS1] == inst_M[`RD])
-                           & (inst_M[`RD] != 0);
+                           & (rs1_D == rd_M)
+                           & (rd_M != 0);
     bypass_waddr_M_rs2_D =   val_D & rs2_en_D
                            & val_M & rf_wen_M
-                           & (inst_D[`RS2] == inst_M[`RD])
-                           & (inst_M[`RD] != 0);
+                           & (rs2_D == rd_M)
+                           & (rd_M != 0);
     // W -> D
     bypass_waddr_W_rs1_D =   val_D & rs1_en_D
                            & val_W & rf_wen_W
-                           & (inst_D[`RS1] == inst_W[`RD])
-                           & (inst_W[`RD] != 0);
+                           & (rs1_D == rd_W)
+                           & (rd_W != 0);
     bypass_waddr_W_rs2_D =   val_D & rs2_en_D
                            & val_W & rf_wen_W
-                           & (inst_D[`RS2] == inst_W[`RD])
-                           & (inst_W[`RD] != 0);
+                           & (rs2_D == rd_W)
+                           & (rd_W != 0);
   end
 
   // Stall
@@ -210,12 +224,12 @@ module ProcCtrl
   always_comb begin
     stall_lw_X_rs1_D =   val_D & rs1_en_D
                        & val_X & (inst_X ==? `LW)
-                       & (inst_D[`RS1] == inst_X[`RD])
-                       & (inst_X[`RD] != 0);
+                       & (rs1_D == rd_X)
+                       & (rd_X != 0);
     stall_lw_X_rs2_D =   val_D & rs2_en_D
                        & val_X & (inst_X ==? `LW)
-                       & (inst_D[`RS2] == inst_X[`RD])
-                       & (inst_X[`RD] != 0);
+                       & (rs2_D == rd_X)
+                       & (rd_X != 0);
     stall_D = val_D & (stall_lw_X_rs1_D | stall_lw_X_rs2_D);
     stall_F = stall_D;
   end
@@ -458,17 +472,17 @@ module ProcCtrl
     if(val_W & (inst_W ==? `CSRW)) begin
       csr_num = inst_W[`CSR];
       case(csr_num)
-        `CSR_OUT0 : begin
+        `CSR_OUT0: begin
           c2d_csrw_out0_en_W = 1;
           c2d_csrw_out1_en_W = 0;
           c2d_csrw_out2_en_W = 0;
         end
-        `CSR_OUT1 : begin
+        `CSR_OUT1: begin
           c2d_csrw_out0_en_W = 0;
           c2d_csrw_out1_en_W = 1;
           c2d_csrw_out2_en_W = 0;
         end
-        `CSR_OUT2 : begin
+        `CSR_OUT2: begin
           c2d_csrw_out0_en_W = 0;
           c2d_csrw_out1_en_W = 0;
           c2d_csrw_out2_en_W = 1;

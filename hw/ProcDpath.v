@@ -12,64 +12,64 @@
 
 module ProcDpath
 (
-  (* keep=1 *) input  logic        clk,
-  (* keep=1 *) input  logic        rst,
+  input  logic        clk,
+  input  logic        rst,
 
   // Memory Interface
 
-  (* keep=1 *) output logic        imemreq_val,
-  (* keep=1 *) output logic [31:0] imemreq_addr,
-  (* keep=1 *) input  logic [31:0] imemresp_data,
+  output logic        imemreq_val,
+  output logic [31:0] imemreq_addr,
+  input  logic [31:0] imemresp_data,
 
-  (* keep=1 *) output logic        dmemreq_val,
-  (* keep=1 *) output logic        dmemreq_type,
-  (* keep=1 *) output logic [31:0] dmemreq_addr,
-  (* keep=1 *) output logic [31:0] dmemreq_wdata,
-  (* keep=1 *) input  logic [31:0] dmemresp_rdata,
+  output logic        dmemreq_val,
+  output logic        dmemreq_type,
+  output logic [31:0] dmemreq_addr,
+  output logic [31:0] dmemreq_wdata,
+  input  logic [31:0] dmemresp_rdata,
 
   // I/O Interface
 
-  (* keep=1 *) input  logic [31:0] in0,
-  (* keep=1 *) input  logic [31:0] in1,
-  (* keep=1 *) input  logic [31:0] in2,
+  input  logic [31:0] in0,
+  input  logic [31:0] in1,
+  input  logic [31:0] in2,
 
-  (* keep=1 *) output logic [31:0] out0,
-  (* keep=1 *) output logic [31:0] out1,
-  (* keep=1 *) output logic [31:0] out2,
+  output logic [31:0] out0,
+  output logic [31:0] out1,
+  output logic [31:0] out2,
 
   // Control Signals
 
-  (* keep=1 *) input  logic        c2d_imemreq_val_F,
-  (* keep=1 *) input  logic        c2d_reg_en_F,
-  (* keep=1 *) input  logic [1:0]  c2d_pc_sel_F,
-  (* keep=1 *) input  logic        c2d_reg_en_D,
-  (* keep=1 *) input  logic [1:0]  c2d_imm_type_D,
-  (* keep=1 *) input  logic [1:0]  c2d_op1_byp_sel_D,
-  (* keep=1 *) input  logic [1:0]  c2d_op2_byp_sel_D,
-  (* keep=1 *) input  logic        c2d_op1_sel_D,
-  (* keep=1 *) input  logic [1:0]  c2d_op2_sel_D,
-  (* keep=1 *) input  logic [1:0]  c2d_csrr_sel_D,
-  (* keep=1 *) input  logic        c2d_alu_fn_X,
-  (* keep=1 *) input  logic [1:0]  c2d_result_sel_X,
-  (* keep=1 *) input  logic        c2d_dmemreq_val_M,
-  (* keep=1 *) input  logic        c2d_dmemreq_type_M,
-  (* keep=1 *) input  logic        c2d_wb_sel_M,
-  (* keep=1 *) input  logic        c2d_rf_wen_W,
-  (* keep=1 *) input  logic [4:0]  c2d_rf_waddr_W,
-  (* keep=1 *) input  logic        c2d_csrw_out0_en_W,
-  (* keep=1 *) input  logic        c2d_csrw_out1_en_W,
-  (* keep=1 *) input  logic        c2d_csrw_out2_en_W,
+  input  logic        c2d_imemreq_val_F,
+  input  logic        c2d_reg_en_F,
+  input  logic [1:0]  c2d_pc_sel_F,
+  input  logic        c2d_reg_en_D,
+  input  logic [1:0]  c2d_imm_type_D,
+  input  logic [1:0]  c2d_op1_byp_sel_D,
+  input  logic [1:0]  c2d_op2_byp_sel_D,
+  input  logic        c2d_op1_sel_D,
+  input  logic [1:0]  c2d_op2_sel_D,
+  input  logic [1:0]  c2d_csrr_sel_D,
+  input  logic        c2d_alu_fn_X,
+  input  logic [1:0]  c2d_result_sel_X,
+  input  logic        c2d_dmemreq_val_M,
+  input  logic        c2d_dmemreq_type_M,
+  input  logic        c2d_wb_sel_M,
+  input  logic        c2d_rf_wen_W,
+  input  logic [4:0]  c2d_rf_waddr_W,
+  input  logic        c2d_csrw_out0_en_W,
+  input  logic        c2d_csrw_out1_en_W,
+  input  logic        c2d_csrw_out2_en_W,
   
   // Status Signals
 
-  (* keep=1 *) output logic        d2c_eq_X,
-  (* keep=1 *) output logic [31:0] d2c_inst,
+  output logic        d2c_eq_X,
+  output logic [31:0] d2c_inst,
 
   // Trace Data
 
-  (* keep=1 *) output logic [31:0] trace_addr,
-  (* keep=1 *) output logic [31:0] trace_inst,
-  (* keep=1 *) output logic [31:0] trace_data
+  output logic [31:0] trace_addr,
+  output logic [31:0] trace_inst,
+  output logic [31:0] trace_data
 );
 
   //==========================================================
