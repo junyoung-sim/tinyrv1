@@ -176,12 +176,12 @@ module TinyRV1();
     // Parse CSR specifier
 
     case ( csr_s )
-      "out0," : asm_csrw_csr = `CSR_OUT0;
-      "out1," : asm_csrw_csr = `CSR_OUT1;
-      "out2," : asm_csrw_csr = `CSR_OUT2;
+      "out0" : asm_csrw_csr = `CSR_OUT0;
+      "out1" : asm_csrw_csr = `CSR_OUT1;
+      "out2" : asm_csrw_csr = `CSR_OUT2;
       default: begin
         // if nothing matches, just assume CSR is specified in hex
-        e = $sscanf( csr_s, "%x,", asm_csrw_csr );
+        e = $sscanf( csr_s, "%x", asm_csrw_csr );
       end
     endcase
 
@@ -547,7 +547,7 @@ module TinyRV1();
     e = $sscanf( str, "%s ", inst_s );
     case ( inst_s )
 
-      "csrr" : begin e = $sscanf( str, "csrr x%d, %s",     rd, csr_s         ); asm = asm_csrr( rd, csr_s );               end
+      "csrr" : begin e = $sscanf( str, "csrr x%d %s",      rd, csr_s         ); asm = asm_csrr( rd, csr_s );               end
       "csrw" : begin e = $sscanf( str, "csrw %s x%d",      csr_s, rs1        ); asm = asm_csrw( csr_s, rs1 );              end // see note above
       "add"  : begin e = $sscanf( str, "add  x%d x%d x%d", rd, rs1, rs2      ); asm = asm_add ( rd, rs1, rs2 );            end
       "addi" : begin e = $sscanf( str, "addi x%d x%d %s",  rd, rs1, imm_s    ); asm = asm_addi( rd, rs1, imm_s );          end
@@ -675,19 +675,19 @@ module TinyRV1();
       `CSRR:
         begin
           case ( csr )
-            `CSR_IN0 : $sformat( disasm_, "csrr x%-0d, in0", rd );
-            `CSR_IN1 : $sformat( disasm_, "csrr x%-0d, in1", rd );
-            `CSR_IN2 : $sformat( disasm_, "csrr x%-0d, in2", rd );
-            default          : $sformat( disasm_, "csrr x%-0d, 0x%x", rd, csr );
+            `CSR_IN0 : $sformat( disasm_, "csrr x%-0d in0" , rd );
+            `CSR_IN1 : $sformat( disasm_, "csrr x%-0d in1",  rd );
+            `CSR_IN2 : $sformat( disasm_, "csrr x%-0d in2",  rd );
+            default  : $sformat( disasm_, "csrr x%-0d 0x%x", rd, csr );
           endcase
         end
       `CSRW:
         begin
           case ( csr )
-            `CSR_OUT0 : $sformat( disasm_, "csrw out0, x%-0d", rs1 );
-            `CSR_OUT1 : $sformat( disasm_, "csrw out1, x%-0d", rs1 );
-            `CSR_OUT2 : $sformat( disasm_, "csrw out2, x%-0d", rs1 );
-            default           : $sformat( disasm_, "csrw 0x%x, x%-0d", csr, rs1 );
+            `CSR_OUT0 : $sformat( disasm_, "csrw out0 x%-0d", rs1 );
+            `CSR_OUT1 : $sformat( disasm_, "csrw out1 x%-0d", rs1 );
+            `CSR_OUT2 : $sformat( disasm_, "csrw out2 x%-0d", rs1 );
+            default   : $sformat( disasm_, "csrw 0x%x x%-0d", csr, rs1 );
           endcase
         end
 
