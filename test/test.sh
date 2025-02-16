@@ -3,6 +3,7 @@ make
 ./Proc_add_test
 ./Proc_addi_test
 ./Proc_bne_test
+./Proc_csr_test
 ./Proc_jal_test
 ./Proc_jr_test
 ./Proc_lw_test
