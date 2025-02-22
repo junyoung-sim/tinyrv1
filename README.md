@@ -1,10 +1,14 @@
 ## RTL
 
+This five-stage pipelined TinyRV1 processor was implemented and tested incrementally by stage and instruction as reflected in the RTL for `ProcDpath` (Data Path) and `ProcCtrl` (Controller) where data path components and control signal tables are laid out by pipeline stage. Additionally, `ProcCtrl` includes a "Hazard Management" section where all RAW and control flow hazard signals are generated.
 
+Below is a high-level RTL view of the top-level module `Proc` that contains `ProcDpath` and `ProcCtrl`. Further details can be explored in the `$TINYRV1/hw` directory.
+
+![RTL Viewer (Proc)](https://github.com/junyoung-sim/tinyrv1/blob/main/docs/RTL%20Viewer%20(Proc).png)
 
 ## Verification
 
-For the five-stage pipelined TinyRV1 processor, it is critical to test proper bypassing between all stages, memory load latency stalling, and squashing to prevent RAW (read-after-write) and control flow hazards. Thus, test cases for each TinyRV1 instruction focus on all bypass paths between all possible pair of instructions; LW stalling for all possible instructions; and critical cases of jumping and branching.
+For the five-stage pipelined TinyRV1 processor, it is critical to test proper bypassing between all stages, memory load latency stalling, and squashing to prevent RAW and control flow hazards. Thus, test cases for each TinyRV1 instruction focus on all bypass paths between all possible pair of instructions; LW stalling for all possible instructions; and critical cases of jumping and branching.
 
 Use the following steps to build and run tests:
 
