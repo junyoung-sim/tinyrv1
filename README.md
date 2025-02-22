@@ -24,7 +24,7 @@ Use the following steps to build and run tests:
 
 # Run tests in $TINYRV1/test
 % cd $TINYRV1/test
-% ./Proc_*_test
+% ./Proc_*_test                      # Run all test cases for a specific TinyRV1 instruction (*)
 % ./Proc_*_test +test-case=?         # Run test case number (?) for a specific TinyRV1 instruction (*)
 % ./Proc_*_test +dump-vcd=waves.vcd  # Waveforms saved in waves.vcd (use vscode extension surfer)
 
