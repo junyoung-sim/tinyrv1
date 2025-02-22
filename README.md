@@ -1,3 +1,9 @@
+# Five-Stage Pipelined TinyRV1 Processor
+
+This repository demonstrates an example implementation of a five-stage pipelined microarchitecture for TinyRV1 (a limited subset of the RISC-V ISA used in ENGRD/ECE 2300 @ Cornell University) shown below:
+
+![Five-Stage Pipelined TinyRV1 Data Path Diagram](https://github.com/junyoung-sim/tinyrv1/blob/main/docs/Five-Stage%20Pipelined%20TinyRV1%20Datapath%20Diagram.png)
+
 ## RTL
 
 This five-stage pipelined TinyRV1 processor was implemented and tested incrementally by stage and instruction as reflected in the RTL for `ProcDpath` (Data Path) and `ProcCtrl` (Controller) where data path components and control signal tables are laid out by pipeline stage. Additionally, `ProcCtrl` includes a "Hazard Management" section where all RAW and control flow hazard signals are generated.
