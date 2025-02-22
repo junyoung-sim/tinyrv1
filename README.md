@@ -1,4 +1,4 @@
-# Five-Stage Pipeliend Tiny RISC-V Processor 1
+# Five-Stage Pipelined Tiny RISC-V Processor 1
 
 ## RTL
 
