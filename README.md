@@ -35,3 +35,7 @@ Use the following steps to build and run tests:
 ```
 
 Note that test cases are written in `$TINYRV1/test/Proc_*_test_cases.v` and included in `$TINYRV1/test/Proc_*_test.v`. The former includes pipeline diagrams with labeled bypass paths and dynamic assembly sequences, if applicable and appropriate, through comments to indicate the dependencies and control flows being tested.
+
+### Cocotb
+
+This five-stage pipelined TinyRV1 processor was originally tested with Cocotb, an open-source verification tool in Python. However, test scripts in `$TINYRV1/test/cocotb` are no longer in use as the additional logic needed for handling instruction and data memory requests to accomodate Cocotb were removed from the top-level module `Proc` once all test cases were re-written in SystemVerilog.
