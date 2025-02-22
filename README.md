@@ -14,7 +14,7 @@ Below is a high-level RTL view of the top-level module `Proc` that contains `Pro
 
 ## Verification
 
-For the five-stage pipelined TinyRV1 processor, it is critical to test proper bypassing between all stages, memory load latency stalling, and squashing to prevent RAW and control flow hazards. Thus, test cases for each TinyRV1 instruction focus on all bypass paths between all possible pair of instructions; LW stalling for all possible instructions; and critical cases of jumping and branching.
+For the five-stage pipelined TinyRV1 processor, it is critical to test proper bypassing between all stages, memory load latency stalling, and squashing to prevent RAW and control flow hazards. Thus, test cases for each TinyRV1 instruction focus on all bypass paths between all possible pair of instructions; LW stalling for all possible instructions; and critical cases of jumping and branching (not-taken speculation).
 
 Use the following steps to build and run tests:
 
