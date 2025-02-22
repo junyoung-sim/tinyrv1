@@ -8,7 +8,7 @@ This repository demonstrates an example implementation of the five-stage pipelin
 
 This five-stage pipelined TinyRV1 processor was implemented and tested incrementally as reflected in the RTL for `ProcDpath` (Data Path) and `ProcCtrl` (Controller) where data path components and control signal tables are laid out by pipeline stage and instruction. Additionally, `ProcCtrl` includes a "Hazard Management" section where all RAW and control flow hazard signals are generated.
 
-Below is a high-level RTL view of the top-level module `Proc` that contains `ProcDpath` and `ProcCtrl`. Further details can be explored in the `$TINYRV1/hw` directory.
+Below is a high-level RTL view of the top-level module `Proc` that contains `ProcDpath` and `ProcCtrl`. Further details can be explored in the `$TINYRV1/hw` and `$TINYRV1/docs` directories.
 
 ![RTL Viewer (Proc)](https://github.com/junyoung-sim/tinyrv1/blob/main/docs/RTL%20Viewer%20(Proc).png)
 
