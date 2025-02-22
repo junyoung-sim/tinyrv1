@@ -9,7 +9,7 @@ For the five-stage pipelined TinyRV1 processor, it is critical to test proper by
 Use the following steps to build and run tests:
 
 ```
-# Setup TINYRV1 path variable and test script
+# Setup TINYRV1 path variable and test script (one-time)
 % vim ~/.bashrc
     export TINYRV1=/path/to/tinyrv1
 % source ~/.bashrc
