@@ -46,7 +46,7 @@ Note that test cases are written in `$TINYRV1/test/Proc_*_test_cases.v` and incl
 
 ## FPGA Synthesis
 
-The following FPGA synthesis results (timing and resources) of the five-stage pipelined TinyRV1 processor. Refer to the `$TINYRV1/docs` directory for more.
+The following are FPGA synthesis results for the five-stage pipelined TinyRV1 processor. Refer to the `$TINYRV1/docs` directory for more.
 
 **Timing Analysis (Setup)**
 ```
