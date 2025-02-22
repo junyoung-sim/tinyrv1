@@ -1,6 +1,6 @@
 # Five-Stage Pipelined TinyRV1 Processor
 
-This repository demonstrates an example implementation of a five-stage pipelined microarchitecture for TinyRV1 (a limited subset of RISC-V used in ENGRD/ECE 2300 @ Cornell University) shown below:
+This repository demonstrates an example implementation of the five-stage pipelined microarchitecture for TinyRV1 (a limited subset of RISC-V used in ENGRD/ECE 2300 @ Cornell University) shown below:
 
 ![Five-Stage Pipelined TinyRV1 Data Path Diagram](https://github.com/junyoung-sim/tinyrv1/blob/main/docs/Five-Stage%20Pipelined%20TinyRV1%20Datapath%20Diagram.png)
 
