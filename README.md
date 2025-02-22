@@ -1,11 +1,3 @@
-## RTL
-
-
-
-## Verification
-
-### SystemVerilog
-
 For the five-stage pipelined TinyRV1 processor, it is critical to test proper bypassing between all stages, memory load latency stalling, and squashing to prevent RAW (read-after-write) and control flow hazards. Thus, test cases for each TinyRV1 instruction focus on all bypass paths between all possible pair of instructions; LW stalling for all possible instructions; and critical cases of jumping and branching.
 
 Use the following steps to build and run tests:
