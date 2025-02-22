@@ -9,10 +9,12 @@ For the five-stage pipelined TinyRV1 processor, it is critical to test proper by
 Use the following steps to build and run tests:
 
 ```
-# Add TINYRV1 path variable to ~/.bashrc (first step; one-time)
+# Initial setup
 % vim ~/.bashrc
     export TINYRV1=/path/to/tinyrv1
 % source ~/.bashrc
+% cd $TINYRV1/test
+% chmod +x test.sh
 
 # Build tests in $TINYRV1/test
 % cd $TINYRV1/test
@@ -27,8 +29,6 @@ Use the following steps to build and run tests:
 % ./Proc_*_test +dump-vcd=waves.vcd  # Waveforms saved in waves.vcd (use vscode extension surfer)
 
 # Build and run all tests
-% cd $TINYRV1/test
-% chmod +x test.sh                   # one-time
 % ./test.sh
 ```
 
