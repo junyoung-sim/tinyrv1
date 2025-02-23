@@ -85,8 +85,9 @@ module ProcCtrl
   logic squash_D;
   logic squash_F;
 
-  logic [11:0] csr_num;
+  logic [11:0] csrr_num;
   logic [1:0]  csrr_sel;
+  logic [11:0] csrw_num;
 
   //==========================================================
   // Instruction Registers
@@ -312,8 +313,8 @@ module ProcCtrl
 
   always_comb begin
     if(val_D & (inst_D ==? `CSRR)) begin
-      csr_num = inst_D[`CSR];
-      case(csr_num)
+      csrr_num = inst_D[`CSR];
+      case(csrr_num)
         `CSR_IN0 : csrr_sel = 0;
         `CSR_IN1 : csrr_sel = 1;
         `CSR_IN2 : csrr_sel = 2;
@@ -321,7 +322,7 @@ module ProcCtrl
       endcase
     end
     else begin
-      csr_num  = 'x;
+      csrr_num = 'x;
       csrr_sel = 'x;
     end
   end
@@ -477,8 +478,8 @@ module ProcCtrl
 
   always_comb begin
     if(val_W & (inst_W ==? `CSRW)) begin
-      csr_num = inst_W[`CSR];
-      case(csr_num)
+      csrw_num = inst_W[`CSR];
+      case(csrw_num)
         `CSR_OUT0: begin
           c2d_csrw_out0_en_W = 1;
           c2d_csrw_out1_en_W = 0;
@@ -502,7 +503,7 @@ module ProcCtrl
       endcase
     end
     else begin
-      csr_num = 'x;
+      csrw_num = 'x;
       c2d_csrw_out0_en_W = 0;
       c2d_csrw_out1_en_W = 0;
       c2d_csrw_out2_en_W = 0;
