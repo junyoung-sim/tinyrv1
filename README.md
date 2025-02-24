@@ -44,7 +44,7 @@ Use the following steps to build and run tests:
 
 Note that test cases are written in `$TINYRV1/test/Proc_*_test_cases.v` and included in `$TINYRV1/test/Proc_*_test.v`. The former includes pipeline diagrams with labeled bypass paths and dynamic assembly sequences, if applicable and appropriate, through comments to indicate the data dependencies and control flows being tested.
 
-## FPGA
+## FPGA Synthesis
 
 The following are FPGA synthesis results for the five-stage pipelined TinyRV1 processor. Refer to the `$TINYRV1/docs` directory for more.
 
@@ -106,7 +106,7 @@ Dedicated logic registers	3,728
 -- Routing optimization registers	214	
 ```
 
-## Physical Design
+## Physical Design Flow
 
 ***Adapted from Cornell Custom Silicon Systems (C2S2)***
 
