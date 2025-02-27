@@ -113,3 +113,9 @@ Dedicated logic registers	3,728
 OpenLane Caravel is an open-source digital ASIC tool that hardens RTL into physical designs for manufacturing custom chips with 10 mm^2 of user space along with a pad ring for all I/Os, a tiny RISC-V processor, and some memory. The following image shows the physical layout (600 um x 600 um; PL Density = 0.55) of this five-stage pipelined TinyRV1 processor after pushing it through the physical design flow:
 
 ![Proc Physical Design](https://github.com/junyoung-sim/tinyrv1/blob/main/docs/Proc.png)
+
+The following is the critical path report for the physical layout:
+
+```
+
+```
