@@ -274,3 +274,5 @@ Fanout     Cap    Slew   Delay    Time   Description
 -----------------------------------------------------------------------------
                                  13.90   slack (MET)
 ```
+
+Comparing this critical path report to wires in the synthesized top-level module (`$TINYRV1/caravel/openlane/Proc/Proc.v`), the beginning and end of the path is identified as the ALU adder output port and the PC input port, respectively. Assuming that the path does not enter the control logic, this path most likely involves the X-D bypass path between some instruction that requires addition (`ADD`, `ADDI`, `LW`, `SW`, `JAL`) and a `JR` instruction that follows.
