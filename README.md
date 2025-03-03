@@ -165,8 +165,6 @@ Dedicated logic registers	3,728
 
 ## Physical Design Flow
 
-***Adapted from Cornell Custom Silicon Systems (C2S2)***
-
 OpenLane Caravel is an open-source digital ASIC tool that hardens RTL into physical designs for manufacturing custom chips using Skywater 130 nm (SKY130 PDK). The following image shows the GDS of this five-stage pipelined TinyRV1 processor after pushing its top-level module `Proc` through the OpenLane flow (600 um x 600 um).
 
 ![Proc Physical Design](https://github.com/junyoung-sim/tinyrv1/blob/main/docs/Proc.png)
