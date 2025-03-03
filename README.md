@@ -6,7 +6,7 @@ This repository demonstrates an example implementation of the five-stage pipelin
 
 ## RTL
 
-This five-stage pipelined TinyRV1 processor was implemented and tested incrementally as reflected in the RTL for `ProcDpath` (Data Path) and `ProcCtrl` (Controller) where data path components and control signal tables are laid out by pipeline stage and instruction. Additionally, `ProcCtrl` includes a "Hazard Management" section where all RAW and control flow hazard signals are generated.
+This five-stage pipelined TinyRV1 processor microarchitecture was implemented incrementally as reflected in the RTL for ProcDpath (Data Path) and ProcCtrl (Control Logic) where data path components and control signal tables are laid out by pipeline stage and instruction. Additionally, ProcCtrl includes a "Hazard Management" section where all RAW (read-after-write) and control flow hazard signals are generated.
 
 Below is a high-level RTL view of the top-level module `Proc` that contains `ProcDpath` and `ProcCtrl`. Further details can be explored in the `$TINYRV1/hw` and `$TINYRV1/docs` directories.
 
@@ -14,7 +14,7 @@ Below is a high-level RTL view of the top-level module `Proc` that contains `Pro
 
 ## Verification
 
-For the five-stage pipelined TinyRV1 processor, it is critical to test proper bypassing between all stages, memory load latency stalling, and squashing to prevent RAW and control flow hazards. Thus, test cases for each TinyRV1 instruction focus on all bypass paths between all possible pair of instructions; LW stalling for all possible instructions; and critical cases of jumping and branching (not-taken speculation).
+For the five-stage pipelined TinyRV1 processor, it is critical to test proper bypassing between all stages, memory load latency stalling, and squashing to prevent RAW (read-after-write) and control flow hazards. Thus, test cases for each TinyRV1 instruction focus on verifying all bypass paths between all possible pairs of instructions; LW stalling for all possible instructions; and critical cases of jumping and branching (not-taken speculation).
 
 Use the following steps to build and run tests:
 
@@ -46,7 +46,62 @@ Note that test cases are written in `$TINYRV1/test/Proc_*_test_cases.v` and incl
 
 ## FPGA Emulation
 
-This five-stage pipelined TinyRV1 processor was synthesized on Altera DE0 FPGA (Intel Cyclone III) and Quartus Prime for physical emulation. The following are synthesis results concerning the microarchitecture’s performance and area usage. Refer to the `$TINYRV1/docs` directory for more.
+This five-stage pipelined TinyRV1 processor was synthesized on Altera DE0 FPGA (Intel Cyclone III) and Quartus Prime for physical emulation of an accumulator program in TinyRV1 assembly as shown below.
+
+```
+asm( 'h000, "csrw out1, x0"      ); // zero the output
+asm( 'h004, "csrr x1, in0"       ); // R[x1] <- size
+asm( 'h008, "csrr x2, in2"       ); // R[x2] <- go
+asm( 'h00c, "addi x3, x0, 1"     ); // R[x3] <- 1
+asm( 'h010, "bne  x2, x3, 0x004" ); // stop wait if go=1
+asm( 'h014, "csrw out0, x1"      ); // display size
+asm( 'h018, "addi x4, x0, 0"     ); // initialize sum
+asm( 'h01c, "addi x5, x0, 0x080" ); // initialize array address
+asm( 'h020, "lw x6, 0(x5)"       ); // accumulate loop
+asm( 'h024, "add x4, x4, x6"     ); // 
+asm( 'h028, "addi x5, x5, 4"     ); //
+asm( 'h02c, "addi x1, x1, -1"    ); //
+asm( 'h030, "bne x0, x1, 0x020"  ); //
+asm( 'h034, "csrw out1, x4"      ); // done (assumes result is in x4)
+asm( 'h038, "jal  x0, 0x004"     ); // jump to beginning
+
+// Input array
+                   //  size result seven_seg
+data( 'h080, 36 ); //     1     36  4
+data( 'h084, 26 ); //     2     62 30
+data( 'h088, 69 ); //     3    131  3
+data( 'h08c, 57 ); //     4    188 28
+data( 'h090, 11 ); //     5    199  7
+data( 'h094, 68 ); //     6    267 11
+data( 'h098, 41 ); //     7    308 20
+data( 'h09c, 90 ); //     8    398 14
+data( 'h0a0, 32 ); //     9    430 14
+data( 'h0a4, 76 ); //    10    506 26
+data( 'h0a8, 44 ); //    11    550  6
+data( 'h0ac, 19 ); //    12    569 25
+data( 'h0b0, 17 ); //    13    586 10
+data( 'h0b4, 59 ); //    14    645  5
+data( 'h0b8, 99 ); //    15    744  8
+data( 'h0bc, 49 ); //    16    793 25
+data( 'h0c0, 65 ); //    17    858 26
+data( 'h0c4, 12 ); //    18    870  6
+data( 'h0c8, 55 ); //    19    925 29
+data( 'h0cc,  0 ); //    20    925 29
+data( 'h0d0, 51 ); //    21    976 16
+data( 'h0d4, 42 ); //    22   1018 26
+data( 'h0d8, 82 ); //    23   1100 12
+data( 'h0dc, 23 ); //    24   1123  3
+data( 'h0e0, 21 ); //    25   1144 24
+data( 'h0e4, 54 ); //    26   1198 14
+data( 'h0e8, 83 ); //    27   1281  1
+data( 'h0ec, 31 ); //    28   1312  0
+data( 'h0f0, 16 ); //    29   1328 16
+data( 'h0f4, 76 ); //    30   1404 28
+data( 'h0f8, 21 ); //    31   1425 17
+data( 'h0fc,  4 ); //    32   1429 21
+```
+
+The following are synthesis results concerning the microarchitecture’s performance and area usage. Refer to the `$TINYRV1/docs` directory for more.
 
 **Timing Analysis (Setup)**
 ```
@@ -87,6 +142,8 @@ This five-stage pipelined TinyRV1 processor was synthesized on Altera DE0 FPGA (
 +----------+---------+----+------+--------+----------------------+-------------------------------------------------+
 ```
 
+This critical path (14.499 ns) begins at the multiplier’s output port, takes the X-D bypass path, and ends at the input port of the second operand register in stage D. This path is taken when there is an instruction that depends on the result of a preceding `MUL` instruction.
+
 **Resources**
 ```
 Combinational ALUT usage for logic	3,347	
@@ -110,11 +167,11 @@ Dedicated logic registers	3,728
 
 ***Adapted from Cornell Custom Silicon Systems (C2S2)***
 
-OpenLane Caravel is an open-source digital ASIC tool that hardens RTL into physical designs for manufacturing custom chips with 10 mm^2 of user space along with a pad ring for all I/Os, a tiny RISC-V processor, and some memory. The following image shows the physical layout (600 um x 600 um; PL Density = 0.55) of this five-stage pipelined TinyRV1 processor after pushing it through the physical design flow:
+OpenLane Caravel is an open-source digital ASIC tool that hardens RTL into physical designs for manufacturing custom chips using Skywater 130 nm (SKY130 PDK). The following image shows the GDS of this five-stage pipelined TinyRV1 processor after pushing its top-level module `Proc` through the OpenLane flow (600 um x 600 um).
 
 ![Proc Physical Design](https://github.com/junyoung-sim/tinyrv1/blob/main/docs/Proc.png)
 
-The following is the critical path report for the physical layout:
+Below is the critical path report for the physical layout of the five-stage pipelined TinyRV1 processor (17.72 ns). Comparing this report to wires in the synthesized top-level module indicates that the beginning and end of the path is the ALU’s adder output port and the PC input port, respectively. Assuming that the path does not enter the control logic, this path is most likely taken when the X-D bypass path is used between X and JR where X is an instruction that requires addition (`ADD`, `ADDI`, `LW`, `SW`, `JAL`).
 
 ```
 ===========================================================================
@@ -275,4 +332,6 @@ Fanout     Cap    Slew   Delay    Time   Description
                                  13.90   slack (MET)
 ```
 
-Comparing this critical path report to wires in the synthesized top-level module (`$TINYRV1/caravel/openlane/Proc/Proc.v`), the beginning and end of the path is identified as the ALU adder output port and the PC input port, respectively. Assuming that the path does not enter the control logic, this path most likely involves the X-D bypass path between some instruction that requires addition (`ADD`, `ADDI`, `LW`, `SW`, `JAL`) and a `JR` instruction that follows.
+## Acknowledgements
+
+I appreciate Professor Christoper Batten and student members of Cornell Custom Silicon Systems for their instruction and feedback that made this project possible.
