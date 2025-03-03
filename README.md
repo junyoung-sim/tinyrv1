@@ -332,4 +332,4 @@ Fanout     Cap    Slew   Delay    Time   Description
 
 ## Acknowledgements
 
-I appreciate Professor Christoper Batten and student members of Cornell Custom Silicon Systems for their instruction and feedback that made this project possible.
+I appreciate Professor Christoper Batten and student members of Cornell Custom Silicon Systems for providing the instruction and feedback that made this project possible.
