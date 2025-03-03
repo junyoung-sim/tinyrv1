@@ -44,9 +44,9 @@ Use the following steps to build and run tests:
 
 Note that test cases are written in `$TINYRV1/test/Proc_*_test_cases.v` and included in `$TINYRV1/test/Proc_*_test.v`. The former includes pipeline diagrams with labeled bypass paths and dynamic assembly sequences, if applicable and appropriate, through comments to indicate the data dependencies and control flows being tested.
 
-## FPGA Synthesis
+## FPGA Emulation
 
-The following are FPGA synthesis results for the five-stage pipelined TinyRV1 processor. Refer to the `$TINYRV1/docs` directory for more.
+This five-stage pipelined TinyRV1 processor was synthesized on Altera DE0 FPGA (Intel Cyclone III) and Quartus Prime for physical emulation. The following are synthesis results concerning the microarchitecture’s performance and area usage. Refer to the `$TINYRV1/docs` directory for more.
 
 **Timing Analysis (Setup)**
 ```
