@@ -169,7 +169,7 @@ OpenLane Caravel is an open-source digital ASIC tool that hardens RTL into physi
 
 ![Proc Physical Design](https://github.com/junyoung-sim/tinyrv1/blob/main/docs/Proc.png)
 
-Below is the critical path report for the physical layout of the five-stage pipelined TinyRV1 processor (17.72 ns). Comparing this report to wires in the synthesized top-level module indicates that the beginning and end of the path is the ALU’s adder output port and the PC input port, respectively. Assuming that the path does not enter the control logic, this path is most likely taken when the X-D bypass path is used between X and JR where X is an instruction that requires addition (`ADD`, `ADDI`, `LW`, `SW`, `JAL`).
+Below is the critical path report for the physical layout of the five-stage pipelined TinyRV1 processor (17.72 ns). Comparing this report to wires in the synthesized top-level module indicates that the beginning and end of the path is the ALU’s adder output port and the PC input port, respectively. Assuming that the path does not enter the control logic, this path is most likely taken when the X-D bypass path is used between `?` and `JR` where `?` is an instruction that requires addition (`ADD`, `ADDI`, `LW`, `SW`, `JAL`).
 
 ```
 ===========================================================================
