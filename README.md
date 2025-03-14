@@ -2,7 +2,7 @@
 
 This repository demonstrates an example implementation of the five-stage pipelined microarchitecture for TinyRV1 (a limited subset of RISC-V used in ENGRD/ECE 2300 @ Cornell University) shown below:
 
-![Five-Stage Pipelined TinyRV1 Data Path Diagram](https://github.com/junyoung-sim/tinyrv1/blob/main/docs/Five-Stage%20Pipelined%20TinyRV1%20Datapath%20Diagram.png)
+![Five-Stage Pipelined TinyRV1 Data Path Diagram](https://github.com/junyoung-sim/tinyrv1/blob/main/docs/Five-Stage_Pipelined_Tinyrv1_Datapath_Diagram.png)
 
 ## RTL
 
@@ -10,7 +10,7 @@ This five-stage pipelined TinyRV1 processor microarchitecture was implemented in
 
 Below is a high-level RTL view of the top-level module `Proc` that contains `ProcDpath` and `ProcCtrl`. Further details can be explored in the `$TINYRV1/hw` and `$TINYRV1/docs` directories.
 
-![RTL Viewer (Proc)](https://github.com/junyoung-sim/tinyrv1/blob/main/docs/RTL%20Viewer%20(Proc).png)
+![RTL Viewer (Proc)](https://github.com/junyoung-sim/tinyrv1/blob/main/docs/RTL_Viewer_(Proc).png)
 
 ## Verification
 
