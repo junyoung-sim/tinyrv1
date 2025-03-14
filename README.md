@@ -6,7 +6,7 @@ This repository demonstrates an example implementation of the five-stage pipelin
 
 ## RTL
 
-This five-stage pipelined TinyRV1 processor microarchitecture was implemented incrementally as reflected in the RTL for ProcDpath (Data Path) and ProcCtrl (Control Logic) where data path components and control signal tables are laid out by pipeline stage and instruction. Additionally, ProcCtrl includes a "Hazard Management" section where all RAW (read-after-write) and control flow hazard signals are generated.
+This five-stage pipelined TinyRV1 processor microarchitecture was implemented incrementally as reflected in the RTL for `ProcDpath` (Data Path) and `ProcCtrl` (Control Logic) where data path components and control signal tables are laid out by pipeline stage and instruction. Additionally, `ProcCtrl` includes a "Hazard Management" section where all RAW (read-after-write) and control flow hazard signals are generated.
 
 Below is a high-level RTL view of the top-level module `Proc` that contains `ProcDpath` and `ProcCtrl`. Further details can be explored in the `$TINYRV1/hw` and `$TINYRV1/docs` directories.
 
