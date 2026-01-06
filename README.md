@@ -6,23 +6,17 @@ This repository demonstrates an example implementation of the five-stage pipelin
 
 The five pipeline stages in the microarchitecture are Fetch (F), Decode (D), Compute (X), Memory (M), and Writeback (W). The following is a brief description of each pipeline stage.
 
-**Fetch (F)**: This stage fetches a TinyRV1 assembly instruction (ADDI, ADD, MUL, LW, SW, JR, JAL, BNE) from an ideal combinational memory at the PC address selected by the control logic.
-
-**Decode (D)**: This stage decodes the fetched instruction as directed by the control logic. For instance, this stage determines which register must be read from the register file (RF), which control-status register (CSR) input must be read, what type of immediate value must be generated, what PC address corresponds to the jump (JR, JAL) or branch (BNE) target, etc.
-
-**Compute (X)**: This stage performs combinational arithmetic operations, such as multiplication and addition for ADD, ADDI, MUL, LW, SW, and JAL. This stage also performs combinational equality comparison for the branch-not-equal (BNE) instruction.
-
-**Memory (M)**: This stage either stores data to or reads data from an ideal combinational memory.
-
-**Writeback (W)**: This stage, writes the RF with either an arithmetic result computed in stage X or data memory fetched in stage M.
+* **Fetch (F)**: This stage fetches a TinyRV1 assembly instruction (ADDI, ADD, MUL, LW, SW, JR, JAL, BNE) from an ideal combinational memory at the PC address selected by the control logic.
+* **Decode (D)**: This stage decodes the fetched instruction as directed by the control logic. For instance, this stage determines which register must be read from the register file (RF), which control-status register (CSR) input must be read, what type of immediate value must be generated, what PC address corresponds to the jump (JR, JAL) or branch (BNE) target, etc.
+* **Compute (X)**: This stage performs combinational arithmetic operations, such as multiplication and addition for ADD, ADDI, MUL, LW, SW, and JAL. This stage also performs combinational equality comparison for the branch-not-equal (BNE) instruction.
+* **Memory (M)**: This stage either stores data to or reads data from an ideal combinational memory.
+* **Writeback (W)**: This stage, writes the RF with either an arithmetic result computed in stage X or data memory fetched in stage M.
 
 The following are three hazards that occur in this pipelined microarchitecture.
 
-**Read-After-Write (RAW)**: Hazard RAW hazards occur when a register in the RF that is being written by a preceding instruction in the pipeline is also being read by a succeeding instruction in the pipeline. This conflict is resolved by introducing full bypass logic between stages X-D, M-D, and W-D.
-
-**Memory Load Hazard**: The LW instruction reads data memory by computing the memory address at stage X and fetching the data at stage M. This means that an instruction that immediately follows LW must only use the M-D bypass path after stalling for one cycle.
-
-**Control Flow Hazards**: When jump instructions (JR, JAL) are decoded in stage D, the instruction fetched in stage F is squashed to correctly set the PC address. When the branch-not-equal (BNE) instruction is decoded in stage D, a branch-not-taken speculation is assumed unless it is determined at stage X that the branch must be taken (which squashes instructions at stage F and D).
+* **Read-After-Write (RAW)**: Hazard RAW hazards occur when a register in the RF that is being written by a preceding instruction in the pipeline is also being read by a succeeding instruction in the pipeline. This conflict is resolved by introducing full bypass logic between stages X-D, M-D, and W-D.
+* **Memory Load Hazard**: The LW instruction reads data memory by computing the memory address at stage X and fetching the data at stage M. This means that an instruction that immediately follows LW must only use the M-D bypass path after stalling for one cycle.
+* **Control Flow Hazards**: When jump instructions (JR, JAL) are decoded in stage D, the instruction fetched in stage F is squashed to correctly set the PC address. When the branch-not-equal (BNE) instruction is decoded in stage D, a branch-not-taken speculation is assumed unless it is determined at stage X that the branch must be taken (which squashes instructions at stage F and D).
 
 
 ## RTL
